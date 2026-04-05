@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
+// @ts-expect-error - maath does not have types for this specific export path
 import * as random from 'maath/random/dist/maath-random.esm';
 import gsap from 'gsap';
 import Link from 'next/link';
