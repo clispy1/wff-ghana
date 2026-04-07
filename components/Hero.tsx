@@ -1,32 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Points, PointMaterial } from '@react-three/drei';
-// @ts-expect-error - maath does not have types for this specific export path
-import * as random from 'maath/random/dist/maath-random.esm';
 import gsap from 'gsap';
+import MeshGradient from '@/components/MeshGradient';
 import Link from 'next/link';
-
-function ParticleField() {
-  const ref = useRef<any>(null);
-  const [sphere] = useState(() => random.inSphere(new Float32Array(5000), { radius: 1.5 }));
-
-  useFrame((state, delta) => {
-    if (ref.current) {
-      ref.current.rotation.x -= delta / 10;
-      ref.current.rotation.y -= delta / 15;
-    }
-  });
-
-  return (
-    <group rotation={[0, 0, Math.PI / 4]}>
-      <Points ref={ref} positions={sphere as Float32Array} stride={3} frustumCulled={false}>
-        <PointMaterial transparent color="#CC0000" size={0.005} sizeAttenuation={true} depthWrite={false} />
-      </Points>
-    </group>
-  );
-}
 
 export default function Hero() {
   const headlineRef = useRef<HTMLHeadingElement>(null);
@@ -70,8 +47,8 @@ export default function Hero() {
       '-=0.4'
     );
 
-    // Countdown Logic
-    const targetDate = new Date('2026-09-01T00:00:00').getTime();
+    // Countdown Logic - Sept 26, 2026
+    const targetDate = new Date('2026-09-26T00:00:00').getTime();
 
     const updateTimer = () => {
       const now = new Date().getTime();
@@ -95,31 +72,28 @@ export default function Hero() {
 
   return (
     <section className="relative h-screen w-full overflow-hidden bg-wff-dark flex items-center justify-center">
-      {/* Three.js Background */}
-      <div className="absolute inset-0 z-0 opacity-60">
-        <Canvas camera={{ position: [0, 0, 1] }}>
-          <ParticleField />
-        </Canvas>
-      </div>
+      <MeshGradient />
 
-      {/* Overlay Gradient */}
-      <div className="absolute inset-0 z-1 bg-gradient-to-b from-wff-dark/30 via-wff-dark/50 to-wff-dark"></div>
+      {/* Overlay Gradient for contrast */}
+      <div className="absolute inset-0 z-1 bg-gradient-to-b from-wff-dark/50 via-wff-dark/20 to-wff-dark"></div>
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 flex flex-col items-center text-center mt-16">
-        <h1 ref={headlineRef} className="font-bebas text-6xl md:text-8xl lg:text-[10rem] leading-none tracking-tight mb-6 overflow-hidden flex flex-wrap justify-center gap-x-4 md:gap-x-8">
-          <span className="block">GHANA.</span>
-          <span className="block text-transparent text-stroke">STRONGER.</span>
-          <span className="block text-wff-red">BOLDER.</span>
-          <span className="block">READY.</span>
+        <p ref={subRef} className="font-sans text-wff-gold font-bold text-sm md:text-lg mb-4 uppercase tracking-[0.3em] opacity-0">
+          WFF Ghana Presents
+        </p>
+        
+        <h1 ref={headlineRef} className="font-bebas text-6xl md:text-8xl lg:text-[9rem] leading-[0.85] tracking-tight mb-8 overflow-hidden flex flex-col items-center">
+          <span className="block text-transparent text-stroke-gold">2026 ALL AFRICA</span>
+          <span className="block text-white">CHAMPIONSHIP</span>
         </h1>
 
-        <p ref={subRef} className="font-sans text-lg md:text-2xl text-white/80 max-w-3xl mb-12 uppercase tracking-widest opacity-0">
-          WFF Ghana • Official Host of the 2026 World Championships
-        </p>
+        <div className="bg-wff-gold text-wff-black font-bebas text-2xl md:text-4xl px-8 py-2 mb-12 transform -skew-x-12">
+          <span className="block transform skew-x-12">GHANA MEETS AFRICA</span>
+        </div>
 
         {/* Countdown */}
-        <div ref={timerRef} className="flex space-x-4 md:space-x-8 mb-12 opacity-0">
+        <div ref={timerRef} className="flex space-x-6 md:space-x-12 mb-12 opacity-0">
           {[
             { label: 'Days', value: timeLeft.days },
             { label: 'Hours', value: timeLeft.hours },
@@ -127,8 +101,8 @@ export default function Hero() {
             { label: 'Seconds', value: timeLeft.seconds },
           ].map((item) => (
             <div key={item.label} className="flex flex-col items-center">
-              <span className="font-bebas text-4xl md:text-6xl text-wff-gold">{item.value.toString().padStart(2, '0')}</span>
-              <span className="font-sans text-xs md:text-sm uppercase tracking-widest text-white/60">{item.label}</span>
+              <span className="font-bebas text-5xl md:text-7xl text-white drop-shadow-lg">{item.value.toString().padStart(2, '0')}</span>
+              <span className="font-sans text-xs md:text-sm uppercase tracking-widest text-wff-gold font-bold">{item.label}</span>
             </div>
           ))}
         </div>
@@ -136,17 +110,23 @@ export default function Hero() {
         {/* CTAs */}
         <div ref={ctaRef} className="flex flex-col sm:flex-row gap-6 opacity-0">
           <Link 
-            href="#register"
+            href="/championship"
             className="bg-wff-red text-white font-bebas text-2xl px-10 py-4 tracking-wider hover:bg-white hover:text-wff-red transition-colors duration-300"
           >
-            COMPETE FOR GHANA
+            EVENT DETAILS
           </Link>
           <Link 
-            href="#ghana-2026"
-            className="border border-white/30 text-white font-bebas text-2xl px-10 py-4 tracking-wider hover:border-wff-red hover:bg-wff-red transition-all duration-300"
+            href="/athletes"
+            className="border border-wff-gold text-wff-gold font-bebas text-2xl px-10 py-4 tracking-wider hover:bg-wff-gold hover:text-wff-black transition-all duration-300"
           >
-            2026 WORLD CHAMPIONSHIPS
+            REGISTER TO COMPETE
           </Link>
+          <button 
+            className="border border-white/20 text-white/80 font-bebas text-2xl px-10 py-4 tracking-wider hover:border-white hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
+          >
+            <span className="w-2 h-2 rounded-full bg-wff-red animate-pulse"></span>
+            WATCH LIVE PPV
+          </button>
         </div>
       </div>
     </section>

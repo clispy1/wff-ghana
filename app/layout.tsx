@@ -1,6 +1,10 @@
 import type {Metadata} from 'next';
 import { Bebas_Neue, DM_Sans } from 'next/font/google';
 import './globals.css'; // Global styles
+import CustomCursor from '@/components/CustomCursor';
+import PageLoader from '@/components/PageLoader';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 const bebasNeue = Bebas_Neue({
   weight: '400',
@@ -14,15 +18,19 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'WFF Ghana | World Fitness Federation',
-  description: 'Official digital home for the World Fitness Federation (WFF) Ghana chapter.',
+  title: 'WFF Ghana | 2026 All Africa Championship',
+  description: 'Official digital home for the World Fitness Federation (WFF) Ghana. Host of the 2026 All Africa Championship.',
 };
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={`${bebasNeue.variable} ${dmSans.variable} scroll-smooth`}>
-      <body className="bg-[#0A0A0A] text-white font-sans antialiased overflow-x-hidden selection:bg-[#CC0000] selection:text-white" suppressHydrationWarning>
+      <body className="bg-wff-dark text-white font-sans antialiased overflow-x-hidden selection:bg-wff-red selection:text-white" suppressHydrationWarning>
+        <CustomCursor />
+        <PageLoader />
+        <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );

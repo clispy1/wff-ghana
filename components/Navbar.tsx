@@ -6,14 +6,14 @@ import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 
 const navLinks = [
-  { name: 'About', href: '#about' },
-  { name: 'Ghana 2026', href: '#ghana-2026' },
-  { name: 'Events', href: '#events' },
-  { name: 'Athletes', href: '#athletes' },
-  { name: 'Wellness', href: '#wellness' },
-  { name: 'Shop', href: '#shop' },
-  { name: 'News', href: '#news' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'Federation', href: '/federation' },
+  { name: 'Championship', href: '/championship' },
+  { name: 'Athletes', href: '/athletes' },
+  { name: 'Wellness', href: '/wellness' },
+  { name: 'Shop', href: '/shop' },
+  { name: 'Media', href: '/media' },
+  { name: 'Partnerships', href: '/partnerships' },
+  { name: 'Contact', href: '/contact' },
 ];
 
 export default function Navbar() {
@@ -81,19 +81,27 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center space-x-8">
+        <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
           {navLinks.map((link) => (
             <Link 
               key={link.name} 
               href={link.href}
-              className="font-sans text-sm uppercase tracking-widest text-white/80 hover:text-wff-red transition-colors relative group"
+              className="font-sans text-xs lg:text-sm uppercase tracking-widest text-white/80 hover:text-wff-red transition-colors relative group"
             >
               {link.name}
               <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-wff-red transition-all duration-300 group-hover:w-full"></span>
             </Link>
           ))}
+          
+          {/* Language Toggle */}
+          <div className="flex items-center space-x-2 font-sans text-xs font-bold tracking-widest text-white/50 border-l border-white/20 pl-6">
+            <button className="text-white hover:text-wff-gold transition-colors">EN</button>
+            <span>/</span>
+            <button className="hover:text-wff-gold transition-colors">FR</button>
+          </div>
+
           <Link 
-            href="#register"
+            href="/athletes"
             className="bg-wff-red text-white font-bebas text-xl px-6 py-2 tracking-wider hover:bg-white hover:text-wff-red transition-colors duration-300"
           >
             JOIN TEAM GHANA
