@@ -25,8 +25,8 @@ const steps = [
   },
   {
     num: '04',
-    title: 'Cameroon 2026',
-    desc: 'Travel with Team Ghana to compete against 70+ nations on the world stage.'
+    title: 'Defend Home Turf',
+    desc: 'Represent Team Ghana and compete against 70+ nations right here on home soil.'
   }
 ];
 
@@ -75,12 +75,12 @@ export default function WorldChampionships() {
   }, []);
 
   return (
-    <section id="cameroon-2026" ref={sectionRef} className="bg-wff-dark relative">
+    <section id="ghana-2026" ref={sectionRef} className="bg-wff-dark relative">
       {/* Dramatic Banner */}
       <div ref={bannerRef} className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden">
         <Image 
-          src="https://picsum.photos/seed/cameroon/1920/1080" 
-          alt="WFF World Championships Cameroon"
+          src="https://picsum.photos/seed/accra/1920/1080" 
+          alt="WFF World Championships Ghana"
           fill
           className="object-cover scale-110"
           referrerPolicy="no-referrer"
@@ -93,16 +93,16 @@ export default function WorldChampionships() {
           <h2 className="font-bebas text-6xl md:text-8xl lg:text-9xl tracking-tight mb-4 text-stroke">
             WORLD CHAMPIONSHIPS
           </h2>
-          <h3 className="font-bebas text-4xl md:text-6xl text-white">CAMEROON • SEP 2026</h3>
+          <h3 className="font-bebas text-4xl md:text-6xl text-white">ACCRA, GHANA • SEP 2026</h3>
         </div>
       </div>
 
       {/* Content */}
       <div className="container mx-auto px-6 py-24">
         <div className="max-w-4xl mx-auto text-center mb-20">
-          <h3 className="font-bebas text-4xl md:text-5xl mb-6">ROAD TO CAMEROON</h3>
+          <h3 className="font-bebas text-4xl md:text-5xl mb-6">BRINGING THE WORLD HOME</h3>
           <p className="font-sans text-lg text-white/70">
-            This is the moment. WFF Ghana is assembling an elite squad of bodybuilders, fitness models, and physique athletes to represent the nation. Earning your spot on Team Ghana means competing for professional status and global recognition.
+            This is the moment. WFF Ghana is assembling an elite squad of bodybuilders, fitness models, and physique athletes to defend our home turf. Earning your spot on Team Ghana means competing for professional status and global recognition in front of a home crowd.
           </p>
         </div>
 

@@ -5,6 +5,8 @@ import Hero from '@/components/Hero';
 import About from '@/components/About';
 import WorldChampionships from '@/components/WorldChampionships';
 import Events from '@/components/Events';
+import Wellness from '@/components/Wellness';
+import Shop from '@/components/Shop';
 import Registration from '@/components/Registration';
 import Athletes from '@/components/Athletes';
 import Gallery from '@/components/Gallery';
@@ -22,6 +24,8 @@ export default function Home() {
       <About />
       <WorldChampionships />
       <Events />
+      <Wellness />
+      <Shop />
       <Registration />
       <Athletes />
       <Gallery />

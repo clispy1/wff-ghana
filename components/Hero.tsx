@@ -115,7 +115,7 @@ export default function Hero() {
         </h1>
 
         <p ref={subRef} className="font-sans text-lg md:text-2xl text-white/80 max-w-3xl mb-12 uppercase tracking-widest opacity-0">
-          WFF Ghana National Team • Road to Cameroon 2026 World Championships
+          WFF Ghana • Official Host of the 2026 World Championships
         </p>
 
         {/* Countdown */}
@@ -142,7 +142,7 @@ export default function Hero() {
             COMPETE FOR GHANA
           </Link>
           <Link 
-            href="#cameroon-2026"
+            href="#ghana-2026"
             className="border border-white/30 text-white font-bebas text-2xl px-10 py-4 tracking-wider hover:border-wff-red hover:bg-wff-red transition-all duration-300"
           >
             2026 WORLD CHAMPIONSHIPS

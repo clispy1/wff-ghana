@@ -7,9 +7,11 @@ import Link from 'next/link';
 
 const navLinks = [
   { name: 'About', href: '#about' },
-  { name: 'Cameroon 2026', href: '#cameroon-2026' },
+  { name: 'Ghana 2026', href: '#ghana-2026' },
   { name: 'Events', href: '#events' },
   { name: 'Athletes', href: '#athletes' },
+  { name: 'Wellness', href: '#wellness' },
+  { name: 'Shop', href: '#shop' },
   { name: 'News', href: '#news' },
   { name: 'Contact', href: '#contact' },
 ];

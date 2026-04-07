@@ -94,7 +94,7 @@ export default function About() {
                 The World Fitness Federation (WFF) is an international bodybuilding and fitness organisation founded in 1968 in Germany. We promote classic, aesthetic bodybuilding — not just size, but symmetry, conditioning, and stage presence.
               </p>
               <p className="reveal-text">
-                WFF Ghana is the official national chapter. Our mission is to elevate Ghanaian athletes to the world stage. In September 2026, we will send our elite national team to compete in the WFF World Championships in Cameroon.
+                WFF Ghana is the official national chapter. Our mission is to elevate Ghanaian athletes to the world stage. In September 2026, we are proud to host the WFF World Championships right here in Accra, welcoming over 70 nations to our home soil.
               </p>
             </div>
 
