@@ -12,6 +12,39 @@ import ParticleSilhouette from '@/components/ParticleSilhouette';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const journeyPanels = [
+  {
+    title: 'GHANA',
+    subtitle: 'BORN IN THE IRON.',
+    type: 'image',
+    src: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=2070&auto=format&fit=crop'
+  },
+  {
+    title: 'TRAINING',
+    subtitle: 'NO EXCUSES. JUST WORK.',
+    type: 'video',
+    src: 'https://assets.mixkit.co/videos/preview/mixkit-man-training-with-heavy-ropes-in-the-gym-23450-large.mp4'
+  },
+  {
+    title: 'QUALIFIER',
+    subtitle: 'EARN YOUR SPOT.',
+    type: 'image',
+    src: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop'
+  },
+  {
+    title: 'CHAMPIONSHIP',
+    subtitle: 'THE ALL AFRICA STAGE.',
+    type: 'video',
+    src: 'https://assets.mixkit.co/videos/preview/mixkit-silhouette-of-a-bodybuilder-flexing-his-muscles-41717-large.mp4'
+  },
+  {
+    title: 'GLORY',
+    subtitle: 'BECOME IMMORTAL.',
+    type: 'image',
+    src: 'https://images.unsplash.com/photo-1552674605-171ff3ea36f6?q=80&w=2070&auto=format&fit=crop'
+  }
+];
+
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -89,34 +122,89 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. Federation / About */}
-      <section className="py-32 relative">
+      {/* 3. Federation / About & President */}
+      <section className="py-32 relative bg-[#0A0A0A]">
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
         <div className="container mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <div className="reveal-target">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+            
+            {/* President Image */}
+            <div className="lg:col-span-5 reveal-target relative">
+              <div className="relative aspect-[4/5] bg-[#111] border border-white/10 overflow-hidden group">
+                <Image 
+                  src="/president.png" 
+                  alt="WFF Ghana President"
+                  fill
+                  className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://picsum.photos/seed/boardroom/800/1000";
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+                <div className="absolute bottom-8 left-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                  <h3 className="font-bebas text-4xl mb-1 text-white">VICTOR BAIDEN</h3>
+                  <p className="font-sans text-wff-gold font-bold uppercase tracking-widest text-sm">President, WFF Ghana</p>
+                </div>
+              </div>
+              {/* Decorative element */}
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 border-b-2 border-r-2 border-wff-gold z-[-1]"></div>
+            </div>
+
+            {/* Federation Text */}
+            <div className="lg:col-span-7 reveal-target lg:pl-12">
               <h2 className="font-bebas text-6xl md:text-8xl text-wff-gold mb-6">THE FEDERATION</h2>
-              <p className="font-sans text-lg text-white/70 leading-relaxed mb-8">
-                World Fitness Federation (WFF) Ghana is the premier destination for aesthetic and athletic excellence. We are bringing the global standard of bodybuilding and fitness modeling to the heart of West Africa.
-              </p>
+              <div className="space-y-6 font-sans text-lg text-white/70 leading-relaxed mb-10">
+                <p className="text-xl text-white italic border-l-4 border-wff-red pl-6 py-2">
+                  "Our vision is to provide a world-class platform for Ghanaian athletes to showcase their hard work, dedication, and aesthetic excellence on the global stage."
+                </p>
+                <p>
+                  World Fitness Federation (WFF) Ghana is the premier destination for aesthetic and athletic excellence. We are bringing the global standard of bodybuilding and fitness modeling to the heart of West Africa, ensuring fair judging, athlete welfare, and community building.
+                </p>
+              </div>
               <Link href="/federation" className="inline-block border border-wff-gold text-wff-gold font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 hover:bg-wff-gold hover:text-black transition-colors">
                 Discover Our Legacy
               </Link>
             </div>
-            <div className="reveal-target relative aspect-square border border-white/10 flex items-center justify-center bg-[#0A0A0A]">
-              <span className="font-bebas text-4xl text-white/20">[Ghana Map Draw Animation Here]</span>
-            </div>
+
           </div>
         </div>
       </section>
 
       {/* 4. Horizontal Scroll Strip */}
       <section className="horizontal-scroll-container h-screen bg-[#050505] flex items-center overflow-hidden border-y border-white/10">
-        <div className="horizontal-scroll-content flex space-x-32 px-[10vw] items-center h-full w-max">
-          {['GHANA', 'TRAINING', 'QUALIFIER', 'CHAMPIONSHIP', 'GLORY'].map((word, idx) => (
-            <div key={idx} className="flex-shrink-0 flex items-center justify-center w-[80vw] h-[60vh] border border-white/5 bg-[#0A0A0A] relative overflow-hidden group">
-              <div className="absolute inset-0 bg-wff-red/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-              <h2 className="font-bebas text-[15vw] leading-none text-white/10 group-hover:text-white transition-colors duration-700">{word}</h2>
+        <div className="horizontal-scroll-content flex space-x-8 px-[10vw] items-center h-full w-max">
+          {journeyPanels.map((panel, idx) => (
+            <div key={idx} className="flex-shrink-0 flex flex-col justify-end w-[85vw] md:w-[60vw] h-[70vh] border border-white/10 bg-[#0A0A0A] relative overflow-hidden group cursor-pointer">
+              
+              {/* Media Background */}
+              {panel.type === 'video' ? (
+                <video 
+                  src={panel.src} 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline 
+                  className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-60 transition-opacity duration-700 grayscale group-hover:grayscale-0"
+                />
+              ) : (
+                <div 
+                  className="absolute inset-0 w-full h-full bg-cover bg-center opacity-30 group-hover:opacity-60 transition-opacity duration-700 grayscale group-hover:grayscale-0"
+                  style={{ backgroundImage: `url(${panel.src})` }}
+                />
+              )}
+              
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+              
+              {/* Content */}
+              <div className="relative z-10 p-8 md:p-12 translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
+                <p className="font-sans text-wff-red font-bold uppercase tracking-[0.3em] text-sm mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                  {panel.subtitle}
+                </p>
+                <h2 className="font-bebas text-6xl md:text-[8vw] leading-none text-white/80 group-hover:text-white transition-colors duration-700">
+                  {panel.title}
+                </h2>
+              </div>
             </div>
           ))}
         </div>
