@@ -3,10 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Canvas } from '@react-three/fiber';
-import Globe from '@/components/Globe';
 import Link from 'next/link';
-import { Volume2, VolumeX } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,56 +11,54 @@ export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const timerRef = useRef<HTMLDivElement>(null);
-  const globeContainerRef = useRef<HTMLDivElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [isMuted, setIsMuted] = useState(true);
+  const bgRef = useRef<HTMLDivElement>(null);
 
   const [timeLeft, setTimeLeft] = useState({
     days: 0, hours: 0, minutes: 0, seconds: 0
   });
 
   useEffect(() => {
-    // Audio Setup
-    if (audioRef.current) {
-      audioRef.current.volume = 0.3;
-      // Attempt autoplay muted
-      audioRef.current.play().catch(() => console.log("Autoplay blocked"));
-    }
-
     // GSAP Animations
     const tl = gsap.timeline({ delay: 2.5 }); // Wait for loader
+
+    // Slow zoom on background
+    if (bgRef.current) {
+      gsap.to(bgRef.current, {
+        scale: 1.1,
+        duration: 20,
+        ease: 'none',
+        repeat: -1,
+        yoyo: true
+      });
+    }
 
     // Cinematic Headline Reveal
     if (headlineRef.current?.children) {
       const words = Array.from(headlineRef.current.children);
       tl.fromTo(words, 
-        { y: 150, opacity: 0, scale: 1.5, rotationX: -90 },
+        { y: 50, opacity: 0 },
         { 
           y: 0, 
           opacity: 1, 
-          scale: 1, 
-          rotationX: 0,
-          duration: 1, 
-          stagger: 0.2, 
-          ease: 'power4.out',
-          transformOrigin: 'bottom center'
+          duration: 1.2, 
+          stagger: 0.15, 
+          ease: 'power3.out',
         }
       );
     }
 
     // Timer Reveal
     tl.fromTo(timerRef.current,
-      { y: 30, opacity: 0 },
+      { y: 20, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' },
-      '-=0.5'
+      '-=0.8'
     );
 
-    // ScrollTrigger for Globe and Background Reset
-    if (globeContainerRef.current && containerRef.current) {
-      gsap.to(globeContainerRef.current, {
-        scale: 0.5,
-        y: '50vh',
-        opacity: 0.2,
+    // Parallax effect on scroll
+    if (containerRef.current && headlineRef.current) {
+      gsap.to(headlineRef.current, {
+        y: '30vh',
+        opacity: 0,
         ease: 'none',
         scrollTrigger: {
           trigger: containerRef.current,
@@ -71,15 +66,6 @@ export default function Hero() {
           end: 'bottom top',
           scrub: true,
         }
-      });
-
-      // Reset background color when returning to Hero
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: 'top center',
-        end: 'bottom center',
-        onEnter: () => gsap.to('body', { '--bg-color': '#0A0A0A', duration: 1 }),
-        onEnterBack: () => gsap.to('body', { '--bg-color': '#0A0A0A', duration: 1 }),
       });
     }
 
@@ -106,64 +92,57 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, []);
 
-  const toggleAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !audioRef.current.muted;
-      setIsMuted(audioRef.current.muted);
-    }
-  };
-
   return (
-    <section ref={containerRef} className="relative h-screen w-full overflow-hidden flex items-center justify-center">
-      {/* Audio Element (Using a placeholder drumbeat URL) */}
-      <audio ref={audioRef} loop muted src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" />
+    <section ref={containerRef} className="relative h-screen w-full overflow-hidden flex items-center justify-center bg-black">
+      
+      {/* Dramatic Background Image (Placeholder until real assets arrive) */}
+      <div 
+        ref={bgRef}
+        className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat opacity-40"
+      ></div>
 
-      {/* Audio Toggle */}
-      <button 
-        onClick={toggleAudio}
-        className="absolute bottom-8 right-8 z-50 w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white transition-colors"
-      >
-        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-      </button>
-
-      {/* 3D Globe Background */}
-      <div ref={globeContainerRef} className="absolute inset-0 z-0 flex items-center justify-center">
-        <div className="w-[150vw] h-[150vw] md:w-[80vw] md:h-[80vw]">
-          <Canvas camera={{ position: [0, 0, 5] }}>
-            <ambientLight intensity={0.5} />
-            <directionalLight position={[10, 10, 5]} intensity={1} />
-            <Globe />
-          </Canvas>
-        </div>
-      </div>
-
-      {/* Overlay Gradient for contrast */}
-      <div className="absolute inset-0 z-1 bg-gradient-to-b from-transparent via-wff-dark/50 to-wff-dark"></div>
+      {/* Heavy Vignette/Gradient Overlay for text legibility */}
+      <div className="absolute inset-0 z-1 bg-gradient-to-b from-black/80 via-black/40 to-[#050505]"></div>
+      <div className="absolute inset-0 z-1 bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)] opacity-80"></div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 flex flex-col items-center text-center mt-16 pointer-events-none">
+      <div className="relative z-10 container mx-auto px-6 flex flex-col items-center text-center mt-12">
         
-        <h1 ref={headlineRef} className="font-bebas flex flex-col items-center justify-center leading-[0.8] mb-12" style={{ perspective: '1000px' }}>
-          <span className="block text-[4rem] md:text-[6rem] lg:text-[8rem] text-wff-gold tracking-widest">2026</span>
-          <span className="block text-[6rem] md:text-[10rem] lg:text-[14rem] text-white">ALL AFRICA</span>
-          <span className="block text-[3rem] md:text-[5rem] lg:text-[7rem] text-transparent text-stroke-hover tracking-[0.2em]">CHAMPIONSHIP</span>
+        <h1 ref={headlineRef} className="font-bebas flex flex-col items-center justify-center leading-[0.85] mb-12 w-full">
+          <span className="block text-wff-gold font-sans font-bold uppercase tracking-[0.5em] text-sm md:text-base mb-6">WFF Ghana Presents</span>
+          
+          {/* Massive Outline Text */}
+          <span 
+            className="block text-[15vw] md:text-[12vw] text-transparent tracking-tighter w-full"
+            style={{ WebkitTextStroke: '2px rgba(255,255,255,0.8)' }}
+          >
+            ALL AFRICA
+          </span>
+          
+          {/* Massive Solid Text */}
+          <span className="block text-[15vw] md:text-[12vw] text-white tracking-tighter drop-shadow-2xl w-full">
+            CHAMPIONSHIP
+          </span>
         </h1>
 
-        {/* Dramatic Countdown */}
-        <div ref={timerRef} className="flex space-x-4 md:space-x-8 opacity-0 bg-black/40 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-sm pointer-events-auto">
-          {[
-            { label: 'DAYS', value: timeLeft.days },
-            { label: 'HRS', value: timeLeft.hours },
-            { label: 'MIN', value: timeLeft.minutes },
-            { label: 'SEC', value: timeLeft.seconds },
-          ].map((item, idx) => (
-            <div key={item.label} className="flex flex-col items-center">
-              <span className="font-mono text-4xl md:text-7xl text-wff-red font-bold tracking-tighter drop-shadow-[0_0_15px_rgba(206,17,38,0.5)]">
-                {item.value.toString().padStart(2, '0')}
-              </span>
-              <span className="font-sans text-[10px] md:text-xs uppercase tracking-[0.3em] text-white/40 mt-2">{item.label}</span>
-            </div>
-          ))}
+        {/* Sleek Countdown */}
+        <div ref={timerRef} className="flex flex-col items-center">
+          <p className="font-sans text-white/50 uppercase tracking-[0.3em] text-xs mb-4">Countdown to Glory</p>
+          <div className="flex space-x-6 md:space-x-12 border-t border-b border-white/10 py-6 px-8 backdrop-blur-sm">
+            {[
+              { label: 'DAYS', value: timeLeft.days },
+              { label: 'HRS', value: timeLeft.hours },
+              { label: 'MIN', value: timeLeft.minutes },
+              { label: 'SEC', value: timeLeft.seconds },
+            ].map((item, idx) => (
+              <div key={item.label} className="flex flex-col items-center">
+                <span className="font-bebas text-5xl md:text-7xl text-wff-red">
+                  {item.value.toString().padStart(2, '0')}
+                </span>
+                <span className="font-sans text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/40 mt-1">{item.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
       </div>

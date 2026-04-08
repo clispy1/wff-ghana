@@ -17,21 +17,20 @@ export default function Home() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Universal Reveal Animation (play reverse play reverse)
+      // Universal Reveal Animation - Simplified and standardized for consistency
       gsap.utils.toArray('.reveal-target').forEach((el: any) => {
         gsap.fromTo(el,
-          { opacity: 0, y: 50, scale: 0.98 },
+          { opacity: 0, y: 40 },
           {
             opacity: 1,
             y: 0,
-            scale: 1,
-            duration: 1,
-            ease: 'power3.out',
+            duration: 0.8,
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: el,
               start: 'top 85%',
-              end: 'bottom 15%',
-              toggleActions: 'play reverse play reverse',
+              // Play once when scrolling down, reverse when scrolling all the way back up
+              toggleActions: 'play none none reverse',
             }
           }
         );
@@ -62,6 +61,12 @@ export default function Home() {
           invalidateOnRefresh: true
         });
       }
+      
+      // Refresh ScrollTrigger after a short delay to account for any layout shifts
+      setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 500);
+
     }, containerRef);
 
     return () => ctx.revert();
