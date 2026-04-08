@@ -237,9 +237,9 @@ export default function AthletesClient() {
                 <div>
                   <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Category</label>
                   <select className="w-full bg-[#0A0A0A] border border-white/10 p-3 text-white focus:border-wff-red outline-none transition-colors appearance-none">
-                    <option>Men's Bodybuilding</option>
+                    <option>Men&apos;s Bodybuilding</option>
                     <option>Classic Physique</option>
-                    <option>Men's Physique</option>
+                    <option>Men&apos;s Physique</option>
                     <option>Bikini</option>
                     <option>Sports Model</option>
                   </select>

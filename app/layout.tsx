@@ -2,8 +2,8 @@ import type {Metadata} from 'next';
 import { Bebas_Neue, DM_Sans } from 'next/font/google';
 import './globals.css'; // Global styles
 import CustomCursor from '@/components/CustomCursor';
-import PageLoader from '@/components/PageLoader';
-import Navbar from '@/components/Navbar';
+import Loader from '@/components/Loader';
+import ScrubberNavbar from '@/components/ScrubberNavbar';
 import Footer from '@/components/Footer';
 
 const bebasNeue = Bebas_Neue({
@@ -28,8 +28,8 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       <body className="text-white font-sans antialiased overflow-x-hidden selection:bg-wff-red selection:text-white" suppressHydrationWarning>
         <div className="noise-overlay"></div>
         <CustomCursor />
-        <PageLoader />
-        <Navbar />
+        <Loader />
+        <ScrubberNavbar />
         {children}
         <Footer />
       </body>

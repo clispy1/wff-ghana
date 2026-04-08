@@ -1,13 +1,13 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 export default function FireTunnel() {
   const groupRef = useRef<THREE.Group>(null);
 
-  const particles = useMemo(() => {
+  const [particles] = useState(() => {
     const temp = [];
     for (let i = 0; i < 1000; i++) {
       const theta = Math.random() * Math.PI * 2;
@@ -20,7 +20,7 @@ export default function FireTunnel() {
       });
     }
     return temp;
-  }, []);
+  });
 
   useFrame((state, delta) => {
     if (groupRef.current) {

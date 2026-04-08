@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -8,7 +8,7 @@ export default function ParticleSilhouette() {
   const groupRef = useRef<THREE.Group>(null);
 
   // Generate points roughly in the shape of a V-taper torso
-  const particles = useMemo(() => {
+  const [particles] = useState(() => {
     const temp = [];
     for (let i = 0; i < 2000; i++) {
       // Very rough approximation of a torso
@@ -31,7 +31,7 @@ export default function ParticleSilhouette() {
       }
     }
     return temp;
-  }, []);
+  });
 
   useFrame((state) => {
     if (groupRef.current) {

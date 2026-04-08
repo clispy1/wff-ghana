@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Sphere, MeshDistortMaterial } from '@react-three/drei';
 import * as THREE from 'three';
@@ -53,6 +53,23 @@ export default function Globe() {
 function OrbitingParticles() {
   const groupRef = useRef<THREE.Group>(null);
 
+  const [particles] = useState(() => {
+    return Array.from({ length: 50 }).map(() => {
+      const radius = 2.5 + Math.random() * 1;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(Math.random() * 2 - 1);
+      
+      const x = radius * Math.sin(phi) * Math.cos(theta);
+      const y = radius * Math.sin(phi) * Math.sin(theta);
+      const z = radius * Math.cos(phi);
+      
+      return {
+        position: [x, y, z] as [number, number, number],
+        color: Math.random() > 0.5 ? "#CE1126" : "#FCD116"
+      };
+    });
+  });
+
   useFrame((state, delta) => {
     if (groupRef.current) {
       groupRef.current.rotation.y -= delta * 0.2;
@@ -62,22 +79,12 @@ function OrbitingParticles() {
 
   return (
     <group ref={groupRef}>
-      {Array.from({ length: 50 }).map((_, i) => {
-        const radius = 2.5 + Math.random() * 1;
-        const theta = Math.random() * Math.PI * 2;
-        const phi = Math.acos(Math.random() * 2 - 1);
-        
-        const x = radius * Math.sin(phi) * Math.cos(theta);
-        const y = radius * Math.sin(phi) * Math.sin(theta);
-        const z = radius * Math.cos(phi);
-
-        return (
-          <mesh key={i} position={[x, y, z]}>
-            <sphereGeometry args={[0.02, 8, 8]} />
-            <meshBasicMaterial color={Math.random() > 0.5 ? "#CE1126" : "#FCD116"} />
-          </mesh>
-        );
-      })}
+      {particles.map((p, i) => (
+        <mesh key={i} position={p.position}>
+          <sphereGeometry args={[0.02, 8, 8]} />
+          <meshBasicMaterial color={p.color} />
+        </mesh>
+      ))}
     </group>
   );
 }
