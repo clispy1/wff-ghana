@@ -271,7 +271,55 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 8. Gallery / Media */}
+      {/* 8. Shop / Merch */}
+      <section className="py-32 bg-wff-dark relative overflow-hidden">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 reveal-target">
+            <div>
+              <p className="font-sans text-wff-red font-bold uppercase tracking-[0.5em] text-sm mb-4">Official Gear</p>
+              <h2 className="font-bebas text-6xl md:text-8xl text-white">THE <span className="text-wff-gold">ARMORY</span></h2>
+            </div>
+            <Link href="/shop" className="hidden md:inline-block border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 hover:bg-white hover:text-black transition-colors mb-2">
+              View All Gear
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { name: 'WFF Pro Stringer', price: '₵ 150.00', img: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=800&auto=format&fit=crop' },
+              { name: 'Championship Hoodie', price: '₵ 350.00', img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop' },
+              { name: 'Elite Lifting Belt', price: '₵ 450.00', img: 'https://images.unsplash.com/photo-1584865288642-42078afe6942?q=80&w=800&auto=format&fit=crop' },
+              { name: 'WFF Ghana Cap', price: '₵ 120.00', img: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop' }
+            ].map((product, i) => (
+              <div key={i} className="reveal-target group cursor-pointer">
+                <div className="relative aspect-[4/5] bg-[#111] border border-white/10 overflow-hidden mb-6">
+                  <div className="absolute inset-0 bg-wff-red/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
+                  <Image 
+                    src={product.img} 
+                    alt={product.name}
+                    fill
+                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute bottom-0 left-0 w-full p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-20 bg-black/80 backdrop-blur-sm">
+                    <span className="font-bebas text-xl text-wff-gold">QUICK VIEW</span>
+                  </div>
+                </div>
+                <h3 className="font-bebas text-2xl text-white mb-1 group-hover:text-wff-red transition-colors">{product.name}</h3>
+                <p className="font-sans text-white/60">{product.price}</p>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-12 text-center md:hidden reveal-target">
+            <Link href="/shop" className="inline-block border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 hover:bg-white hover:text-black transition-colors w-full">
+              View All Gear
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 9. Gallery / Media */}
       <section className="py-32 bg-[#050505]">
         <div className="container mx-auto px-6">
           <div className="flex justify-between items-end mb-16 reveal-target">
@@ -288,7 +336,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 9. News & Updates */}
+      {/* 10. News & Updates */}
       <section className="py-32 bg-wff-dark">
         <div className="container mx-auto px-6">
           <h2 className="font-bebas text-6xl md:text-8xl text-white mb-16 text-center reveal-target">LATEST <span className="text-wff-gold">NEWS</span></h2>
@@ -307,7 +355,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 10. Partnerships */}
+      {/* 11. Partnerships */}
       <section className="py-32 bg-[#050505] border-t border-white/10">
         <div className="container mx-auto px-6 text-center reveal-target">
           <h2 className="font-bebas text-6xl md:text-8xl text-white mb-8">PARTNERSHIPS</h2>
@@ -320,7 +368,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 11. Contact / Register CTA */}
+      {/* 12. Contact / Register CTA */}
       <section className="py-40 bg-wff-dark relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-wff-red/10"></div>
         <div className="container mx-auto px-6 text-center relative z-10 reveal-target">
