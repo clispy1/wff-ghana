@@ -25,7 +25,8 @@ export const metadata: Metadata = {
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={`${bebasNeue.variable} ${dmSans.variable} scroll-smooth`}>
-      <body className="bg-wff-dark text-white font-sans antialiased overflow-x-hidden selection:bg-wff-red selection:text-white" suppressHydrationWarning>
+      <body className="text-white font-sans antialiased overflow-x-hidden selection:bg-wff-red selection:text-white" suppressHydrationWarning>
+        <div className="noise-overlay"></div>
         <CustomCursor />
         <PageLoader />
         <Navbar />

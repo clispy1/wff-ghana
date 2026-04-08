@@ -2,50 +2,86 @@
 
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import MeshGradient from '@/components/MeshGradient';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Canvas } from '@react-three/fiber';
+import Globe from '@/components/Globe';
 import Link from 'next/link';
+import { Volume2, VolumeX } from 'lucide-react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
-  const subRef = useRef<HTMLParagraphElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<HTMLDivElement>(null);
+  const globeContainerRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
 
   const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
+    days: 0, hours: 0, minutes: 0, seconds: 0
   });
 
   useEffect(() => {
+    // Audio Setup
+    if (audioRef.current) {
+      audioRef.current.volume = 0.3;
+      // Attempt autoplay muted
+      audioRef.current.play().catch(() => console.log("Autoplay blocked"));
+    }
+
     // GSAP Animations
     const tl = gsap.timeline({ delay: 2.5 }); // Wait for loader
 
+    // Cinematic Headline Reveal
     if (headlineRef.current?.children) {
-      tl.fromTo(headlineRef.current.children, 
-        { y: 100, opacity: 0, scale: 1.2 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.8, stagger: 0.1, ease: 'back.out(1.7)' }
+      const words = Array.from(headlineRef.current.children);
+      tl.fromTo(words, 
+        { y: 150, opacity: 0, scale: 1.5, rotationX: -90 },
+        { 
+          y: 0, 
+          opacity: 1, 
+          scale: 1, 
+          rotationX: 0,
+          duration: 1, 
+          stagger: 0.2, 
+          ease: 'power4.out',
+          transformOrigin: 'bottom center'
+        }
       );
     }
 
-    tl.fromTo(subRef.current,
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' },
-      '-=0.4'
-    );
-
+    // Timer Reveal
     tl.fromTo(timerRef.current,
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' },
-      '-=0.4'
+      { y: 30, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' },
+      '-=0.5'
     );
 
-    tl.fromTo(ctaRef.current?.children || [],
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power2.out' },
-      '-=0.4'
-    );
+    // ScrollTrigger for Globe and Background Reset
+    if (globeContainerRef.current && containerRef.current) {
+      gsap.to(globeContainerRef.current, {
+        scale: 0.5,
+        y: '50vh',
+        opacity: 0.2,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+        }
+      });
+
+      // Reset background color when returning to Hero
+      ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: 'top center',
+        end: 'bottom center',
+        onEnter: () => gsap.to('body', { '--bg-color': '#0A0A0A', duration: 1 }),
+        onEnterBack: () => gsap.to('body', { '--bg-color': '#0A0A0A', duration: 1 }),
+      });
+    }
 
     // Countdown Logic - Sept 26, 2026
     const targetDate = new Date('2026-09-26T00:00:00').getTime();
@@ -70,64 +106,66 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, []);
 
+  const toggleAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.muted = !audioRef.current.muted;
+      setIsMuted(audioRef.current.muted);
+    }
+  };
+
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-wff-dark flex items-center justify-center">
-      <MeshGradient />
+    <section ref={containerRef} className="relative h-screen w-full overflow-hidden flex items-center justify-center">
+      {/* Audio Element (Using a placeholder drumbeat URL) */}
+      <audio ref={audioRef} loop muted src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" />
+
+      {/* Audio Toggle */}
+      <button 
+        onClick={toggleAudio}
+        className="absolute bottom-8 right-8 z-50 w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white transition-colors"
+      >
+        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+      </button>
+
+      {/* 3D Globe Background */}
+      <div ref={globeContainerRef} className="absolute inset-0 z-0 flex items-center justify-center">
+        <div className="w-[150vw] h-[150vw] md:w-[80vw] md:h-[80vw]">
+          <Canvas camera={{ position: [0, 0, 5] }}>
+            <ambientLight intensity={0.5} />
+            <directionalLight position={[10, 10, 5]} intensity={1} />
+            <Globe />
+          </Canvas>
+        </div>
+      </div>
 
       {/* Overlay Gradient for contrast */}
-      <div className="absolute inset-0 z-1 bg-gradient-to-b from-wff-dark/50 via-wff-dark/20 to-wff-dark"></div>
+      <div className="absolute inset-0 z-1 bg-gradient-to-b from-transparent via-wff-dark/50 to-wff-dark"></div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 flex flex-col items-center text-center mt-16">
-        <p ref={subRef} className="font-sans text-wff-gold font-bold text-sm md:text-lg mb-4 uppercase tracking-[0.3em] opacity-0">
-          WFF Ghana Presents
-        </p>
+      <div className="relative z-10 container mx-auto px-6 flex flex-col items-center text-center mt-16 pointer-events-none">
         
-        <h1 ref={headlineRef} className="font-bebas text-6xl md:text-8xl lg:text-[9rem] leading-[0.85] tracking-tight mb-8 overflow-hidden flex flex-col items-center">
-          <span className="block text-transparent text-stroke-gold">2026 ALL AFRICA</span>
-          <span className="block text-white">CHAMPIONSHIP</span>
+        <h1 ref={headlineRef} className="font-bebas flex flex-col items-center justify-center leading-[0.8] mb-12" style={{ perspective: '1000px' }}>
+          <span className="block text-[4rem] md:text-[6rem] lg:text-[8rem] text-wff-gold tracking-widest">2026</span>
+          <span className="block text-[6rem] md:text-[10rem] lg:text-[14rem] text-white">ALL AFRICA</span>
+          <span className="block text-[3rem] md:text-[5rem] lg:text-[7rem] text-transparent text-stroke-hover tracking-[0.2em]">CHAMPIONSHIP</span>
         </h1>
 
-        <div className="bg-wff-gold text-wff-black font-bebas text-2xl md:text-4xl px-8 py-2 mb-12 transform -skew-x-12">
-          <span className="block transform skew-x-12">GHANA MEETS AFRICA</span>
-        </div>
-
-        {/* Countdown */}
-        <div ref={timerRef} className="flex space-x-6 md:space-x-12 mb-12 opacity-0">
+        {/* Dramatic Countdown */}
+        <div ref={timerRef} className="flex space-x-4 md:space-x-8 opacity-0 bg-black/40 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-sm pointer-events-auto">
           {[
-            { label: 'Days', value: timeLeft.days },
-            { label: 'Hours', value: timeLeft.hours },
-            { label: 'Minutes', value: timeLeft.minutes },
-            { label: 'Seconds', value: timeLeft.seconds },
-          ].map((item) => (
+            { label: 'DAYS', value: timeLeft.days },
+            { label: 'HRS', value: timeLeft.hours },
+            { label: 'MIN', value: timeLeft.minutes },
+            { label: 'SEC', value: timeLeft.seconds },
+          ].map((item, idx) => (
             <div key={item.label} className="flex flex-col items-center">
-              <span className="font-bebas text-5xl md:text-7xl text-white drop-shadow-lg">{item.value.toString().padStart(2, '0')}</span>
-              <span className="font-sans text-xs md:text-sm uppercase tracking-widest text-wff-gold font-bold">{item.label}</span>
+              <span className="font-mono text-4xl md:text-7xl text-wff-red font-bold tracking-tighter drop-shadow-[0_0_15px_rgba(206,17,38,0.5)]">
+                {item.value.toString().padStart(2, '0')}
+              </span>
+              <span className="font-sans text-[10px] md:text-xs uppercase tracking-[0.3em] text-white/40 mt-2">{item.label}</span>
             </div>
           ))}
         </div>
 
-        {/* CTAs */}
-        <div ref={ctaRef} className="flex flex-col sm:flex-row gap-6 opacity-0">
-          <Link 
-            href="/championship"
-            className="bg-wff-red text-white font-bebas text-2xl px-10 py-4 tracking-wider hover:bg-white hover:text-wff-red transition-colors duration-300"
-          >
-            EVENT DETAILS
-          </Link>
-          <Link 
-            href="/athletes"
-            className="border border-wff-gold text-wff-gold font-bebas text-2xl px-10 py-4 tracking-wider hover:bg-wff-gold hover:text-wff-black transition-all duration-300"
-          >
-            REGISTER TO COMPETE
-          </Link>
-          <button 
-            className="border border-white/20 text-white/80 font-bebas text-2xl px-10 py-4 tracking-wider hover:border-white hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
-          >
-            <span className="w-2 h-2 rounded-full bg-wff-red animate-pulse"></span>
-            WATCH LIVE PPV
-          </button>
-        </div>
       </div>
     </section>
   );

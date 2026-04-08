@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
+import DistortedImage from '@/components/DistortedImage';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -37,14 +38,40 @@ const news = [
 export default function MediaClient() {
   const headerRef = useRef<HTMLDivElement>(null);
   const newsRef = useRef<HTMLDivElement>(null);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
+  const [hoveredArticle, setHoveredArticle] = useState<number | null>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // Header Animation
       gsap.fromTo(headerRef.current,
         { opacity: 0, y: 50 },
         { opacity: 1, y: 0, duration: 1, ease: 'power3.out', delay: 0.5 }
       );
 
+      // Video Scrubbing
+      if (videoContainerRef.current && videoRef.current) {
+        // Ensure video is loaded before getting duration
+        videoRef.current.addEventListener('loadedmetadata', () => {
+          ScrollTrigger.create({
+            trigger: videoContainerRef.current,
+            start: 'top top',
+            end: '+=200%', // Pin for 2 viewport heights
+            pin: true,
+            scrub: 0.5, // Smooth scrubbing
+            onUpdate: (self) => {
+              if (videoRef.current && videoRef.current.duration) {
+                // Scrub video based on scroll progress
+                videoRef.current.currentTime = videoRef.current.duration * self.progress;
+              }
+            }
+          });
+        });
+      }
+
+      // News Grid Animation
       if (newsRef.current) {
         const articles = newsRef.current.querySelectorAll('.news-article');
         gsap.fromTo(articles,
@@ -69,6 +96,24 @@ export default function MediaClient() {
 
   return (
     <main className="pt-32 pb-24 min-h-screen bg-wff-dark">
+      
+      {/* Scroll-Scrub Video Section */}
+      <div ref={videoContainerRef} className="w-full h-screen relative overflow-hidden bg-black mb-24">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none bg-black/40">
+          <h2 className="font-bebas text-6xl md:text-9xl text-white tracking-widest mix-blend-overlay">THE JOURNEY</h2>
+          <p className="font-sans text-wff-gold tracking-[0.5em] uppercase text-sm md:text-lg mt-4">Scroll to explore</p>
+        </div>
+        {/* Using a placeholder video that allows seeking */}
+        <video 
+          ref={videoRef}
+          className="w-full h-full object-cover opacity-80"
+          src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+          muted
+          playsInline
+          preload="auto"
+        />
+      </div>
+
       <div className="container mx-auto px-6">
         
         {/* Header */}
@@ -82,21 +127,22 @@ export default function MediaClient() {
         {/* News Grid */}
         <div ref={newsRef} className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {news.map((item) => (
-            <article key={item.id} className="news-article group cursor-pointer bg-[#111] border border-white/10 overflow-hidden hover:border-wff-red transition-colors duration-300">
-              <div className="relative aspect-video overflow-hidden">
-                <Image 
-                  src={item.image} 
-                  alt={item.title}
-                  fill
-                  className="object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute top-4 left-4 bg-wff-red text-white font-sans text-xs font-bold uppercase tracking-widest px-3 py-1">
+            <article 
+              key={item.id} 
+              className="news-article group cursor-pointer bg-[#111] border border-white/10 overflow-hidden hover:border-wff-red transition-colors duration-300"
+              onMouseEnter={() => setHoveredArticle(item.id)}
+              onMouseLeave={() => setHoveredArticle(null)}
+            >
+              <div className="relative aspect-video overflow-hidden bg-black">
+                <div className="absolute inset-0 z-0">
+                  <DistortedImage src={item.image} isHovered={hoveredArticle === item.id} />
+                </div>
+                <div className="absolute top-4 left-4 z-10 bg-wff-red text-white font-sans text-xs font-bold uppercase tracking-widest px-3 py-1">
                   {item.category}
                 </div>
               </div>
               
-              <div className="p-8">
+              <div className="p-8 relative z-10 bg-[#111]">
                 <div className="font-sans text-sm text-wff-gold mb-3">{item.date}</div>
                 <h3 className="font-bebas text-3xl text-white mb-4 group-hover:text-wff-red transition-colors">{item.title}</h3>
                 <p className="font-sans text-white/60 text-sm leading-relaxed mb-6">

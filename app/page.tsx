@@ -1,10 +1,14 @@
 import Hero from '@/components/Hero';
+import Manifesto from '@/components/Manifesto';
+import FeaturedAthletes from '@/components/FeaturedAthletes';
 import Link from 'next/link';
 
 export default function Home() {
   return (
     <main className="relative bg-wff-dark min-h-screen">
       <Hero />
+      
+      <Manifesto />
       
       {/* Quick Access Teasers */}
       <section className="py-24 border-t border-white/10 relative overflow-hidden">
@@ -41,6 +45,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <FeaturedAthletes />
 
       {/* Sponsors Marquee Teaser */}
       <section className="py-12 border-t border-b border-white/10 bg-[#050505] overflow-hidden">

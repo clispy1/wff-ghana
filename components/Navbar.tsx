@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const navLinks = [
   { name: 'Federation', href: '/federation' },
@@ -20,6 +21,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,7 +29,7 @@ export default function Navbar() {
       
       if (window.scrollY > 50) {
         gsap.to(navRef.current, {
-          backgroundColor: 'rgba(10, 10, 10, 0.9)',
+          backgroundColor: 'rgba(10, 10, 10, 0.95)',
           backdropFilter: 'blur(10px)',
           paddingTop: '1rem',
           paddingBottom: '1rem',
@@ -53,15 +55,15 @@ export default function Navbar() {
   useEffect(() => {
     if (isOpen) {
       gsap.to(menuRef.current, {
-        x: '0%',
-        duration: 0.5,
+        clipPath: 'circle(150% at 100% 0%)',
+        duration: 0.8,
         ease: 'power3.inOut',
       });
       document.body.style.overflow = 'hidden';
     } else {
       gsap.to(menuRef.current, {
-        x: '100%',
-        duration: 0.5,
+        clipPath: 'circle(0% at 100% 0%)',
+        duration: 0.8,
         ease: 'power3.inOut',
       });
       document.body.style.overflow = '';
@@ -82,16 +84,21 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-          {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              href={link.href}
-              className="font-sans text-xs lg:text-sm uppercase tracking-widest text-white/80 hover:text-wff-red transition-colors relative group"
-            >
-              {link.name}
-              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-wff-red transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link 
+                key={link.name} 
+                href={link.href}
+                className={`font-sans text-xs lg:text-sm uppercase tracking-widest transition-all duration-300 relative group ${
+                  isActive ? 'text-wff-red drop-shadow-[0_0_8px_rgba(206,17,38,0.8)]' : 'text-white/80 hover:text-wff-red'
+                }`}
+              >
+                {link.name}
+                <span className={`absolute -bottom-1 left-0 h-[1px] bg-wff-red transition-all duration-300 ${isActive ? 'w-full shadow-[0_0_8px_rgba(206,17,38,1)]' : 'w-0 group-hover:w-full'}`}></span>
+              </Link>
+            );
+          })}
           
           {/* Language Toggle */}
           <div className="flex items-center space-x-2 font-sans text-xs font-bold tracking-widest text-white/50 border-l border-white/20 pl-6">
@@ -120,22 +127,31 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <div 
         ref={menuRef}
-        className="fixed inset-0 bg-wff-dark z-40 translate-x-full flex flex-col justify-center items-center space-y-8 px-6"
+        className="fixed inset-0 bg-wff-dark z-40 flex flex-col justify-center items-center space-y-8 px-6"
+        style={{ clipPath: 'circle(0% at 100% 0%)' }}
       >
-        {navLinks.map((link, i) => (
-          <Link 
-            key={link.name} 
-            href={link.href}
-            onClick={() => setIsOpen(false)}
-            className="font-bebas text-4xl tracking-wider text-white hover:text-wff-red transition-colors"
-          >
-            {link.name}
-          </Link>
-        ))}
+        {/* Background Texture for Mobile Menu */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cubes.png")' }}></div>
+        
+        {navLinks.map((link, i) => {
+          const isActive = pathname === link.href;
+          return (
+            <Link 
+              key={link.name} 
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+              className={`font-bebas text-4xl tracking-wider transition-colors relative z-10 ${
+                isActive ? 'text-wff-red drop-shadow-[0_0_10px_rgba(206,17,38,0.8)]' : 'text-white hover:text-wff-red'
+              }`}
+            >
+              {link.name}
+            </Link>
+          );
+        })}
         <Link 
-          href="#register"
+          href="/athletes"
           onClick={() => setIsOpen(false)}
-          className="bg-wff-red text-white font-bebas text-3xl px-8 py-4 tracking-wider hover:bg-white hover:text-wff-red transition-colors duration-300 mt-8"
+          className="bg-wff-red text-white font-bebas text-3xl px-8 py-4 tracking-wider hover:bg-white hover:text-wff-red transition-colors duration-300 mt-8 relative z-10"
         >
           JOIN TEAM GHANA
         </Link>

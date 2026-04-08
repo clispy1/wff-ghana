@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { X, Upload, Music, FileText } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Canvas } from '@react-three/fiber';
+import ParticleSilhouette from '@/components/ParticleSilhouette';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -105,17 +107,19 @@ export default function AthletesClient() {
       );
 
       if (rosterRef.current) {
-        gsap.fromTo(rosterRef.current.children,
-          { opacity: 0, y: 50 },
+        const cards = rosterRef.current.querySelectorAll('.athlete-card');
+        gsap.fromTo(cards,
+          { opacity: 0, rotationY: 90, z: -200 },
           {
             opacity: 1,
-            y: 0,
-            duration: 0.8,
-            stagger: 0.15,
-            ease: 'power3.out',
+            rotationY: 0,
+            z: 0,
+            duration: 1,
+            stagger: 0.2,
+            ease: 'back.out(1.5)',
             scrollTrigger: {
               trigger: rosterRef.current,
-              start: 'top 80%',
+              start: 'top 70%',
             }
           }
         );
@@ -142,8 +146,18 @@ export default function AthletesClient() {
   }, []);
 
   return (
-    <main className="pt-32 pb-24 min-h-screen bg-wff-dark">
-      <div className="container mx-auto px-6">
+    <main className="pt-32 pb-24 min-h-screen bg-wff-dark relative overflow-hidden">
+      
+      {/* 3D Particle Silhouette Background */}
+      <div className="absolute inset-0 z-0 opacity-30 pointer-events-none flex items-center justify-center">
+        <div className="w-[100vw] h-[100vh] md:w-[50vw]">
+          <Canvas camera={{ position: [0, 0, 8] }}>
+            <ParticleSilhouette />
+          </Canvas>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-6 relative z-10">
         
         {/* Header */}
         <div ref={headerRef} className="max-w-4xl mx-auto text-center mb-24 opacity-0">
@@ -154,11 +168,11 @@ export default function AthletesClient() {
         </div>
 
         {/* Roster Grid */}
-        <div ref={rosterRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-32">
+        <div ref={rosterRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-32" style={{ perspective: '2000px' }}>
           {athletes.map((athlete) => (
             <div 
               key={athlete.id}
-              className="relative aspect-[3/4] cursor-pointer group"
+              className="athlete-card relative aspect-[3/4] cursor-pointer group rounded-sm overflow-hidden border border-white/10 bg-[#111]"
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
               onClick={() => setSelectedAthlete(athlete)}
@@ -180,6 +194,10 @@ export default function AthletesClient() {
                 <h3 className="font-bebas text-3xl text-white mb-1">{athlete.name}</h3>
                 <p className="font-sans text-sm text-white/60">{athlete.weightClass}</p>
               </div>
+              
+              {/* Decorative corner accents */}
+              <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-wff-red opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-wff-red opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             </div>
           ))}
         </div>
