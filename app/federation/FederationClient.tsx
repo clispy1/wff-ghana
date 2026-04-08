@@ -24,6 +24,8 @@ export default function FederationClient() {
     athletes: 0
   });
 
+  const statsObj = useRef({ founded: 0, countries: 0, athletes: 0 });
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Background Color Shift (Act 1 - Earthy)
@@ -90,17 +92,17 @@ export default function FederationClient() {
           trigger: statsRef.current,
           start: 'top 80%',
           onEnter: () => {
-            gsap.to(stats, {
+            gsap.to(statsObj.current, {
               founded: 1968,
               countries: 42,
               athletes: 5000,
               duration: 2,
               ease: 'power2.out',
-              onUpdate: function() {
+              onUpdate: () => {
                 setStats({
-                  founded: Math.round(this.targets()[0].founded),
-                  countries: Math.round(this.targets()[0].countries),
-                  athletes: Math.round(this.targets()[0].athletes)
+                  founded: Math.round(statsObj.current.founded),
+                  countries: Math.round(statsObj.current.countries),
+                  athletes: Math.round(statsObj.current.athletes)
                 });
               }
             });
@@ -112,7 +114,7 @@ export default function FederationClient() {
       // Content Animation
       if (contentRef.current) {
         gsap.fromTo(contentRef.current.children,
-          { opacity: 0, y: 30 },
+          { opacity: 0, y: 40 },
           {
             opacity: 1,
             y: 0,
@@ -126,13 +128,13 @@ export default function FederationClient() {
           }
         );
       }
-    });
+    }, containerRef);
 
     return () => ctx.revert();
-  }, [stats]);
+  }, []);
 
   return (
-    <main ref={containerRef} className="pt-32 pb-24 min-h-screen relative overflow-hidden">
+    <main ref={containerRef} className="pt-32 pb-24 min-h-screen relative overflow-hidden bg-wff-dark">
       
       {/* Ghosted Background Text */}
       <div className="absolute inset-0 pointer-events-none z-0 flex flex-col justify-between overflow-hidden opacity-[0.03]">
@@ -162,7 +164,7 @@ export default function FederationClient() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-32">
           
           {/* Animated SVG Map */}
-          <div className="map-container relative aspect-square flex items-center justify-center bg-[#111]/50 border border-white/5 p-8 rounded-full">
+          <div className="map-container relative aspect-square flex items-center justify-center bg-[#111]/50 border border-white/5 p-8 rounded-full backdrop-blur-sm shadow-2xl">
             <svg width="100%" height="100%" viewBox="0 0 200 250" className="overflow-visible">
               {/* Simplified Ghana Map Path */}
               <path 
@@ -183,15 +185,15 @@ export default function FederationClient() {
 
           {/* Stats */}
           <div ref={statsRef} className="space-y-12">
-            <div>
+            <div className="border-l-2 border-wff-gold pl-6">
               <h3 className="font-bebas text-6xl text-wff-gold mb-2">{stats.founded}</h3>
               <p className="font-sans text-sm uppercase tracking-widest text-white/50">Year Founded (Global)</p>
             </div>
-            <div>
+            <div className="border-l-2 border-wff-red pl-6">
               <h3 className="font-bebas text-6xl text-wff-red mb-2">{stats.countries}+</h3>
               <p className="font-sans text-sm uppercase tracking-widest text-white/50">Participating African Nations</p>
             </div>
-            <div>
+            <div className="border-l-2 border-white pl-6">
               <h3 className="font-bebas text-6xl text-white mb-2">{stats.athletes.toLocaleString()}+</h3>
               <p className="font-sans text-sm uppercase tracking-widest text-white/50">Registered Athletes</p>
             </div>
@@ -201,22 +203,22 @@ export default function FederationClient() {
 
         {/* Content */}
         <div ref={contentRef} className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
-          <div className="relative aspect-[3/4] bg-[#111] border border-white/10 overflow-hidden">
+          <div className="relative aspect-[3/4] bg-[#111] border border-white/10 overflow-hidden group">
             <Image 
               src="https://picsum.photos/seed/boardroom/800/1200" 
               alt="WFF Ghana Executive"
               fill
-              className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
+              className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
               referrerPolicy="no-referrer"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-            <div className="absolute bottom-8 left-8">
-              <h3 className="font-bebas text-3xl mb-1">KWAME MENSAH</h3>
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+            <div className="absolute bottom-8 left-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+              <h3 className="font-bebas text-4xl mb-1 text-white">KWAME MENSAH</h3>
               <p className="font-sans text-wff-gold font-bold uppercase tracking-widest text-sm">President, WFF Ghana</p>
             </div>
           </div>
 
-          <div className="space-y-12">
+          <div className="space-y-12 bg-[#0A0A0A]/80 backdrop-blur-md p-8 md:p-12 border border-white/5">
             <div>
               <h2 className="font-bebas text-4xl mb-4 text-wff-red">OUR MISSION</h2>
               <p className="font-sans text-white/70 leading-relaxed text-lg">
@@ -230,7 +232,7 @@ export default function FederationClient() {
               </p>
             </div>
             <div className="pt-8 border-t border-white/10">
-              <button className="border border-wff-gold text-wff-gold font-bebas text-xl px-8 py-4 hover:bg-wff-gold hover:text-black transition-colors">
+              <button className="border border-wff-gold text-wff-gold font-bebas text-xl px-8 py-4 hover:bg-wff-gold hover:text-black transition-colors w-full md:w-auto">
                 DOWNLOAD RULEBOOK
               </button>
             </div>
