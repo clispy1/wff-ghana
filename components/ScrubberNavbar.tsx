@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ShoppingBag } from 'lucide-react';
+import { useCart } from '@/lib/CartContext';
 
 const navLinks = [
   { name: 'Federation', href: '/federation' },
@@ -22,6 +24,7 @@ export default function ScrubberNavbar() {
   const lastScrollY = useRef(0);
   const pathname = usePathname();
   const menuLinksRef = useRef<HTMLDivElement>(null);
+  const { cartCount, setIsCartOpen } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -110,6 +113,18 @@ export default function ScrubberNavbar() {
               >
                 REGISTER
               </Link>
+              
+              <button 
+                onClick={() => setIsCartOpen(true)}
+                className="relative ml-2 p-2 text-white/80 hover:text-white transition-colors"
+              >
+                <ShoppingBag size={20} />
+                {cartCount > 0 && (
+                  <span className="absolute top-0 right-0 bg-wff-red text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
             </div>
 
             {/* Mobile Hamburger */}
@@ -132,6 +147,20 @@ export default function ScrubberNavbar() {
                   </>
                 )}
               </svg>
+            </button>
+            
+            {/* Mobile Cart Button */}
+            <button 
+              className="md:hidden relative text-white p-2 focus:outline-none ml-2"
+              onClick={() => setIsCartOpen(true)}
+              aria-label="Open Cart"
+            >
+              <ShoppingBag size={24} />
+              {cartCount > 0 && (
+                <span className="absolute top-0 right-0 bg-wff-red text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
             </button>
           </div>
 

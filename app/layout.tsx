@@ -6,6 +6,8 @@ import Loader from '@/components/Loader';
 import ScrubberNavbar from '@/components/ScrubberNavbar';
 import Footer from '@/components/Footer';
 import SmoothScrolling from '@/components/SmoothScrolling';
+import { CartProvider } from '@/lib/CartContext';
+import CartDrawer from '@/components/CartDrawer';
 
 const bebasNeue = Bebas_Neue({
   weight: '400',
@@ -27,14 +29,17 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={`${bebasNeue.variable} ${dmSans.variable}`}>
       <body className="text-white font-sans antialiased overflow-x-hidden selection:bg-wff-red selection:text-white" suppressHydrationWarning>
-        <SmoothScrolling>
-          <div className="noise-overlay"></div>
-          <CustomCursor />
-          <Loader />
-          <ScrubberNavbar />
-          {children}
-          <Footer />
-        </SmoothScrolling>
+        <CartProvider>
+          <SmoothScrolling>
+            <div className="noise-overlay"></div>
+            <CustomCursor />
+            <Loader />
+            <ScrubberNavbar />
+            <CartDrawer />
+            {children}
+            <Footer />
+          </SmoothScrolling>
+        </CartProvider>
       </body>
     </html>
   );

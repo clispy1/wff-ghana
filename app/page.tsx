@@ -286,12 +286,12 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { name: 'WFF Pro Stringer', price: '₵ 150.00', img: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=800&auto=format&fit=crop' },
-              { name: 'Championship Hoodie', price: '₵ 350.00', img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop' },
-              { name: 'Elite Lifting Belt', price: '₵ 450.00', img: 'https://images.unsplash.com/photo-1584865288642-42078afe6942?q=80&w=800&auto=format&fit=crop' },
-              { name: 'WFF Ghana Cap', price: '₵ 120.00', img: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop' }
+              { id: '1', name: 'WFF Pro Stringer', price: 150.00, img: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=800&auto=format&fit=crop', category: 'Tanks', description: 'Classic stringer tank top.' },
+              { id: '6', name: 'Championship Hoodie', price: 350.00, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop', category: 'Outerwear', description: 'Heavyweight hoodie.' },
+              { id: '4', name: 'Elite Lifting Belt', price: 450.00, img: 'https://images.unsplash.com/photo-1584865288642-42078afe6942?q=80&w=800&auto=format&fit=crop', category: 'Gear', description: 'Genuine leather lifting belt.' },
+              { id: '3', name: 'WFF Ghana Cap', price: 120.00, img: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop', category: 'Accessories', description: 'Adjustable snapback cap.' }
             ].map((product, i) => (
-              <div key={i} className="reveal-target group cursor-pointer">
+              <Link href={`/shop/${product.id}`} key={i} className="reveal-target group cursor-pointer block">
                 <div className="relative aspect-[4/5] bg-[#111] border border-white/10 overflow-hidden mb-6">
                   <div className="absolute inset-0 bg-wff-red/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
                   <Image 
@@ -302,12 +302,14 @@ export default function Home() {
                     referrerPolicy="no-referrer"
                   />
                   <div className="absolute bottom-0 left-0 w-full p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-20 bg-black/80 backdrop-blur-sm">
-                    <span className="font-bebas text-xl text-wff-gold">QUICK VIEW</span>
+                    <span className="block w-full text-center font-bebas text-xl text-wff-gold hover:text-white transition-colors">
+                      VIEW IN SHOP
+                    </span>
                   </div>
                 </div>
                 <h3 className="font-bebas text-2xl text-white mb-1 group-hover:text-wff-red transition-colors">{product.name}</h3>
-                <p className="font-sans text-white/60">{product.price}</p>
-              </div>
+                <p className="font-sans text-white/60">₵ {product.price.toFixed(2)}</p>
+              </Link>
             ))}
           </div>
           
