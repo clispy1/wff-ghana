@@ -1,14 +1,34 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
-import { MapPin, Calendar, Clock, Ticket } from 'lucide-react';
+import { MapPin, Calendar, Clock, Ticket, Check } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import FireTunnel from '@/components/FireTunnel';
+import { useCart } from '@/lib/CartContext';
 
 gsap.registerPlugin(ScrollTrigger);
+
+const TICKETS = [
+  {
+    id: 'ticket-ga',
+    name: 'General Admission Ticket',
+    price: 150.00,
+    image: 'https://images.unsplash.com/photo-1540039155732-6761b54f228a?q=80&w=800&auto=format&fit=crop',
+    category: 'Tickets',
+    description: 'General admission to the 2026 All Africa Championship.'
+  },
+  {
+    id: 'ticket-vip',
+    name: 'VIP Backstage Pass',
+    price: 800.00,
+    image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop',
+    category: 'Tickets',
+    description: 'VIP access including backstage pass, premium seating, and meet & greet.'
+  }
+];
 
 export default function ChampionshipClient() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -16,6 +36,18 @@ export default function ChampionshipClient() {
   const detailsRef = useRef<HTMLDivElement>(null);
   const scheduleItemsRef = useRef<HTMLUListElement>(null);
   const ticketItemsRef = useRef<HTMLDivElement>(null);
+  
+  const { addToCart } = useCart();
+  const [addedTicketId, setAddedTicketId] = useState<string | null>(null);
+
+  const handleAddTicket = (ticketId: string) => {
+    const ticket = TICKETS.find(t => t.id === ticketId);
+    if (ticket) {
+      addToCart(ticket, 1);
+      setAddedTicketId(ticketId);
+      setTimeout(() => setAddedTicketId(null), 2000);
+    }
+  };
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -142,15 +174,29 @@ export default function ChampionshipClient() {
             <div>
               <h4 className="font-bebas text-3xl text-wff-gold mb-4 flex items-center"><Ticket className="mr-3" /> TICKETING</h4>
               <div ref={ticketItemsRef} className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-hidden">
-                <div className="bg-[#111] border border-white/10 p-6 hover:border-wff-red transition-colors cursor-pointer group opacity-0 rounded-sm">
-                  <h5 className="font-bebas text-2xl mb-1 text-white">GENERAL ADMISSION</h5>
-                  <p className="font-sans text-wff-gold font-bold mb-4">₵ 150.00</p>
-                  <button className="font-sans text-sm uppercase tracking-widest text-white/50 group-hover:text-wff-red transition-colors">Buy Now →</button>
+                <div 
+                  onClick={() => handleAddTicket('ticket-ga')}
+                  className="bg-[#111] border border-white/10 p-6 hover:border-wff-red transition-colors cursor-pointer group opacity-0 rounded-sm flex flex-col justify-between"
+                >
+                  <div>
+                    <h5 className="font-bebas text-2xl mb-1 text-white">GENERAL ADMISSION</h5>
+                    <p className="font-sans text-wff-gold font-bold mb-4">₵ 150.00</p>
+                  </div>
+                  <button className="font-sans text-sm uppercase tracking-widest text-white/50 group-hover:text-wff-red transition-colors flex items-center">
+                    {addedTicketId === 'ticket-ga' ? <><Check size={16} className="mr-2" /> Added</> : 'Buy Now →'}
+                  </button>
                 </div>
-                <div className="bg-wff-red text-white p-6 hover:bg-white hover:text-wff-dark transition-colors cursor-pointer group opacity-0 rounded-sm">
-                  <h5 className="font-bebas text-2xl mb-1">VIP BACKSTAGE PASS</h5>
-                  <p className="font-sans font-bold mb-4">₵ 800.00</p>
-                  <button className="font-sans text-sm uppercase tracking-widest opacity-80 group-hover:opacity-100 transition-opacity">Buy Now →</button>
+                <div 
+                  onClick={() => handleAddTicket('ticket-vip')}
+                  className="bg-wff-red text-white p-6 hover:bg-white hover:text-wff-dark transition-colors cursor-pointer group opacity-0 rounded-sm flex flex-col justify-between"
+                >
+                  <div>
+                    <h5 className="font-bebas text-2xl mb-1">VIP BACKSTAGE PASS</h5>
+                    <p className="font-sans font-bold mb-4">₵ 800.00</p>
+                  </div>
+                  <button className="font-sans text-sm uppercase tracking-widest opacity-80 group-hover:opacity-100 transition-opacity flex items-center">
+                    {addedTicketId === 'ticket-vip' ? <><Check size={16} className="mr-2" /> Added</> : 'Buy Now →'}
+                  </button>
                 </div>
               </div>
             </div>
