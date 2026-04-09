@@ -16,7 +16,7 @@ const athletes = [
     name: 'Kofi Mensah',
     category: 'Men\'s Bodybuilding',
     weightClass: 'Over 90kg',
-    image: 'https://picsum.photos/seed/kofi/600/800',
+    image: '/award-1.jpg',
     bio: 'A veteran of the Ghanaian bodybuilding scene, Kofi brings unmatched mass and conditioning. He is a 3-time national champion aiming for his pro card.',
     achievements: ['2025 WFF Ghana Overall Champion', '2024 West African Classic Winner']
   },
@@ -25,7 +25,7 @@ const athletes = [
     name: 'Ama Osei',
     category: 'Bikini',
     weightClass: 'Open',
-    image: 'https://picsum.photos/seed/ama/600/800',
+    image: '/culture-1.jpg',
     bio: 'Ama\'s perfect symmetry and stage presence make her a standout in the Bikini division. She has been training for 4 years and is ready for the world stage.',
     achievements: ['2025 WFF Ghana Bikini Champion', '2025 Arnold Classic Africa Top 5']
   },
@@ -34,7 +34,7 @@ const athletes = [
     name: 'Kwesi Appiah',
     category: 'Classic Physique',
     weightClass: 'Under 85kg',
-    image: 'https://picsum.photos/seed/kwesi/600/800',
+    image: '/award-4.jpg',
     bio: 'Embodying the golden era of bodybuilding, Kwesi focuses on aesthetics, tiny waist, and wide shoulders. His posing routines are legendary.',
     achievements: ['2025 WFF Ghana Classic Physique Winner']
   },
@@ -43,7 +43,7 @@ const athletes = [
     name: 'Abena Yeboah',
     category: 'Sports Modelling',
     weightClass: 'Open',
-    image: 'https://picsum.photos/seed/abena/600/800',
+    image: '/culture-2.jpg',
     bio: 'Abena combines athletic performance with fitness modeling. Her dynamic routines and athletic build make her a top contender.',
     achievements: ['2024 WFF Universe Top 10', '2025 WFF Ghana Sports Model Winner']
   }
@@ -183,6 +183,9 @@ export default function AthletesClient() {
                 fill
                 className="object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500"
                 referrerPolicy="no-referrer"
+                onError={(e) => {
+                  e.currentTarget.src = `https://picsum.photos/seed/${athlete.name.replace(/\s+/g, '')}/600/800`;
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/40 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500"></div>
               
@@ -297,6 +300,9 @@ export default function AthletesClient() {
                 fill
                 className="object-cover"
                 referrerPolicy="no-referrer"
+                onError={(e) => {
+                  e.currentTarget.src = `https://picsum.photos/seed/${selectedAthlete.name.replace(/\s+/g, '')}/600/800`;
+                }}
               />
             </div>
 

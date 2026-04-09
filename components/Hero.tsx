@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
+import Image from 'next/image';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,6 +13,8 @@ export default function Hero() {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const timerRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLImageElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
 
   const [timeLeft, setTimeLeft] = useState({
     days: 0, hours: 0, minutes: 0, seconds: 0
@@ -32,6 +35,14 @@ export default function Hero() {
       });
     }
 
+    // Logo Reveal
+    if (logoRef.current) {
+      tl.fromTo(logoRef.current,
+        { y: -30, opacity: 0, scale: 0.8 },
+        { y: 0, opacity: 1, scale: 1, duration: 1, ease: 'back.out(1.7)' }
+      );
+    }
+
     // Cinematic Headline Reveal
     if (headlineRef.current?.children) {
       const words = Array.from(headlineRef.current.children);
@@ -43,7 +54,8 @@ export default function Hero() {
           duration: 1.2, 
           stagger: 0.15, 
           ease: 'power3.out',
-        }
+        },
+        '-=0.5'
       );
     }
 
@@ -54,9 +66,19 @@ export default function Hero() {
       '-=0.8'
     );
 
+    // CTAs Reveal
+    if (ctaRef.current?.children) {
+      const ctas = Array.from(ctaRef.current.children);
+      tl.fromTo(ctas,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power2.out' },
+        '-=0.4'
+      );
+    }
+
     // Parallax effect on scroll
-    if (containerRef.current && headlineRef.current) {
-      gsap.to(headlineRef.current, {
+    if (containerRef.current && headlineRef.current && logoRef.current) {
+      gsap.to([headlineRef.current, logoRef.current], {
         y: '30vh',
         opacity: 0,
         ease: 'none',
@@ -108,6 +130,14 @@ export default function Hero() {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 flex flex-col items-center text-center mt-12">
         
+        {/* Logo */}
+        <img 
+          ref={logoRef}
+          src="/logo.svg" 
+          alt="WFF Ghana Logo" 
+          className="w-24 md:w-32 h-auto mb-6 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+        />
+
         <h1 ref={headlineRef} className="font-bebas flex flex-col items-center justify-center leading-[0.85] mb-12 w-full">
           <span className="block text-wff-gold font-sans font-bold uppercase tracking-[0.5em] text-sm md:text-base mb-6">WFF Ghana Presents</span>
           
@@ -126,7 +156,7 @@ export default function Hero() {
         </h1>
 
         {/* Sleek Countdown */}
-        <div ref={timerRef} className="flex flex-col items-center">
+        <div ref={timerRef} className="flex flex-col items-center mb-10">
           <p className="font-sans text-white/50 uppercase tracking-[0.3em] text-xs mb-4">Countdown to Glory</p>
           <div className="flex space-x-6 md:space-x-12 border-t border-b border-white/10 py-6 px-8 backdrop-blur-sm">
             {[
@@ -143,6 +173,16 @@ export default function Hero() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* CTAs */}
+        <div ref={ctaRef} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md">
+          <Link href="/tickets" className="w-full sm:w-auto bg-wff-red text-white font-bebas text-2xl px-10 py-4 hover:bg-white hover:text-wff-red transition-colors text-center">
+            BUY TICKETS
+          </Link>
+          <Link href="/register" className="w-full sm:w-auto border border-white/20 bg-black/40 backdrop-blur-sm text-white font-bebas text-2xl px-10 py-4 hover:bg-white hover:text-black transition-colors text-center">
+            REGISTER TO COMPETE
+          </Link>
         </div>
 
       </div>

@@ -118,41 +118,42 @@ export default function MediaClient() {
         
         {/* Header */}
         <div ref={headerRef} className="max-w-4xl mx-auto text-center mb-20 opacity-0">
-          <h1 className="font-bebas text-6xl md:text-8xl mb-6">THE <span className="text-wff-red">HYPE</span> MACHINE</h1>
+          <h1 className="font-bebas text-6xl md:text-8xl mb-6">THE <span className="text-wff-red">GALLERY</span></h1>
           <p className="font-sans text-xl text-white/70">
-            Latest news, press releases, and media from WFF Ghana and the Road to 2026.
+            Relive the glory. Exclusive moments from the WFF Ghana Championships, Fitness Ghana Awards, and behind-the-scenes action.
           </p>
         </div>
 
-        {/* News Grid */}
-        <div ref={newsRef} className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {news.map((item) => (
-            <article 
+        {/* Gallery Grid */}
+        <div ref={newsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-32">
+          {[
+            { id: 1, src: '/award-1.jpg', alt: 'WFF Ghana Awards 2025', aspect: 'aspect-square' },
+            { id: 2, src: '/award-2.jpg', alt: 'President Victor Baiden Citation', aspect: 'aspect-[3/4]' },
+            { id: 3, src: '/award-3.jpg', alt: 'Fitness Ghana Awards', aspect: 'aspect-[4/3]' },
+            { id: 4, src: '/award-4.jpg', alt: 'Athlete Medal Presentation', aspect: 'aspect-square' },
+            { id: 5, src: '/award-5.jpg', alt: 'President Victor Baiden Award', aspect: 'aspect-[3/4]' },
+            { id: 6, src: '/award-6.jpg', alt: 'WFF Ghana Leadership', aspect: 'aspect-[4/3]' },
+            { id: 7, src: '/culture-1.jpg', alt: 'Ghanaian Culture & Heritage', aspect: 'aspect-square' },
+            { id: 8, src: '/culture-2.jpg', alt: 'Traditional Attire', aspect: 'aspect-[3/4]' },
+          ].map((item) => (
+            <div 
               key={item.id} 
-              className="news-article group cursor-pointer bg-[#111] border border-white/10 overflow-hidden hover:border-wff-red transition-colors duration-300"
-              onMouseEnter={() => setHoveredArticle(item.id)}
-              onMouseLeave={() => setHoveredArticle(null)}
+              className={`news-article relative w-full ${item.aspect} bg-[#111] border border-white/10 group overflow-hidden cursor-pointer`}
             >
-              <div className="relative aspect-video overflow-hidden bg-black">
-                <div className="absolute inset-0 z-0">
-                  <DistortedImage src={item.image} isHovered={hoveredArticle === item.id} />
-                </div>
-                <div className="absolute top-4 left-4 z-10 bg-wff-red text-white font-sans text-xs font-bold uppercase tracking-widest px-3 py-1">
-                  {item.category}
-                </div>
+              <div className="absolute inset-0 bg-wff-red/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 mix-blend-overlay"></div>
+              <Image 
+                src={item.src}
+                alt={item.alt}
+                fill
+                className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                onError={(e) => {
+                  e.currentTarget.src = `https://picsum.photos/seed/wff${item.id}/800/800`;
+                }}
+              />
+              <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/90 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-20">
+                <p className="font-bebas text-2xl text-white">{item.alt}</p>
               </div>
-              
-              <div className="p-8 relative z-10 bg-[#111]">
-                <div className="font-sans text-sm text-wff-gold mb-3">{item.date}</div>
-                <h3 className="font-bebas text-3xl text-white mb-4 group-hover:text-wff-red transition-colors">{item.title}</h3>
-                <p className="font-sans text-white/60 text-sm leading-relaxed mb-6">
-                  {item.excerpt}
-                </p>
-                <span className="font-sans text-sm uppercase tracking-widest text-white/40 group-hover:text-white transition-colors flex items-center">
-                  Read Full Article <span className="ml-2 group-hover:translate-x-2 transition-transform">→</span>
-                </span>
-              </div>
-            </article>
+            </div>
           ))}
         </div>
 
