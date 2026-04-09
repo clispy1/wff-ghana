@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { ShoppingBag } from 'lucide-react';
 import { useCart } from '@/lib/CartContext';
@@ -86,8 +87,13 @@ export default function ScrubberNavbar() {
               isExpanded ? 'opacity-100 w-auto visible' : 'opacity-0 w-0 invisible absolute'
             }`}
           >
-            <Link href="/" className="font-bebas text-2xl md:text-3xl text-white md:mr-4 tracking-wider hover:text-wff-red transition-colors">
-              WFF
+            <Link href="/" className="relative w-10 h-10 md:w-12 md:h-12 md:mr-4 hover:scale-105 transition-transform">
+              <Image 
+                src="/wff-ghana-logo.svg" 
+                alt="WFF Ghana" 
+                fill 
+                className="object-contain"
+              />
             </Link>
             
             {/* Desktop Links */}

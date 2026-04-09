@@ -131,12 +131,15 @@ export default function Hero() {
       <div className="relative z-10 container mx-auto px-6 flex flex-col items-center text-center mt-12">
         
         {/* Logo */}
-        <img 
-          ref={logoRef}
-          src="/logo.svg" 
-          alt="WFF Ghana Logo" 
-          className="w-24 md:w-32 h-auto mb-6 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
-        />
+        <div ref={logoRef} className="relative w-32 h-32 md:w-48 md:h-48 mb-6 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+          <Image 
+            src="/wff-ghana-logo.svg" 
+            alt="WFF Ghana Logo" 
+            fill
+            className="object-contain"
+            priority
+          />
+        </div>
 
         <h1 ref={headlineRef} className="font-bebas flex flex-col items-center justify-center leading-[0.85] mb-12 w-full">
           <span className="block text-wff-gold font-sans font-bold uppercase tracking-[0.5em] text-sm md:text-base mb-6">WFF Ghana Presents</span>
@@ -177,10 +180,10 @@ export default function Hero() {
 
         {/* CTAs */}
         <div ref={ctaRef} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md">
-          <Link href="/tickets" className="w-full sm:w-auto bg-wff-red text-white font-bebas text-2xl px-10 py-4 hover:bg-white hover:text-wff-red transition-colors text-center">
+          <Link href="/championship" className="w-full sm:w-auto bg-wff-red text-white font-bebas text-2xl px-10 py-4 hover:bg-white hover:text-wff-red transition-colors text-center">
             BUY TICKETS
           </Link>
-          <Link href="/register" className="w-full sm:w-auto border border-white/20 bg-black/40 backdrop-blur-sm text-white font-bebas text-2xl px-10 py-4 hover:bg-white hover:text-black transition-colors text-center">
+          <Link href="/athletes" className="w-full sm:w-auto border border-white/20 bg-black/40 backdrop-blur-sm text-white font-bebas text-2xl px-10 py-4 hover:bg-white hover:text-black transition-colors text-center">
             REGISTER TO COMPETE
           </Link>
         </div>

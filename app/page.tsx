@@ -132,7 +132,7 @@ export default function Home() {
             <div className="lg:col-span-5 reveal-target relative">
               <div className="relative aspect-[4/5] bg-[#111] border border-white/10 overflow-hidden group">
                 <Image 
-                  src="/president.png" 
+                  src="/wff-president.jpg" 
                   alt="WFF Ghana President"
                   fill
                   className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
@@ -211,18 +211,66 @@ export default function Home() {
       </section>
 
       {/* 5. Championship Feature */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden bg-black">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black py-32">
         <div className="absolute inset-0 z-0">
           <Canvas camera={{ position: [0, 0, 5] }}>
             <FireTunnel />
           </Canvas>
         </div>
-        <div className="relative z-10 text-center reveal-target bg-black/40 p-12 backdrop-blur-sm border border-white/10">
-          <p className="font-sans text-wff-gold font-bold uppercase tracking-[0.5em] text-sm mb-4">Sept 26, 2026 • Accra</p>
-          <h2 className="font-bebas text-7xl md:text-9xl text-white mb-8">THE CHAMPIONSHIP</h2>
-          <Link href="/championship" className="inline-block bg-wff-red text-white font-bebas text-2xl px-12 py-4 hover:bg-white hover:text-wff-red transition-colors">
-            GET TICKETS
-          </Link>
+        <div className="absolute inset-0 bg-gradient-to-t from-wff-dark via-transparent to-wff-dark z-0"></div>
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="max-w-4xl mx-auto text-center mb-16 reveal-target">
+            <p className="font-sans text-wff-gold font-bold uppercase tracking-[0.5em] text-sm mb-4">Sept 26, 2026 • Accra, Ghana</p>
+            <h2 className="font-bebas text-7xl md:text-9xl text-white mb-6">THE <span className="text-wff-red">CHAMPIONSHIP</span></h2>
+            <p className="font-sans text-xl text-white/80">
+              The ultimate battleground for African aesthetics. 
+              Compete for the prestigious WFF Pro Card and cement your legacy on the continental stage.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div className="bg-black/60 backdrop-blur-md border border-white/10 p-8 reveal-target">
+              <h3 className="font-bebas text-3xl text-wff-gold mb-4">CATEGORIES</h3>
+              <ul className="space-y-2 font-sans text-white/70">
+                <li>• Men's Bodybuilding</li>
+                <li>• Men's Physique</li>
+                <li>• Classic Physique</li>
+                <li>• Women's Bikini</li>
+                <li>• Women's Wellness</li>
+              </ul>
+            </div>
+            
+            <div className="bg-black/60 backdrop-blur-md border border-white/10 p-8 reveal-target">
+              <h3 className="font-bebas text-3xl text-wff-gold mb-4">THE STAKES</h3>
+              <p className="font-sans text-white/70 mb-4">
+                Overall winners in each division will be awarded the highly coveted <strong className="text-white">WFF Pro Card</strong>, granting them elite professional status globally.
+              </p>
+              <p className="font-sans text-wff-red font-bold uppercase tracking-widest text-sm">Pro Status • Cash Prizes • Sponsorships</p>
+            </div>
+
+            <div className="bg-black/60 backdrop-blur-md border border-white/10 p-8 reveal-target">
+              <h3 className="font-bebas text-3xl text-wff-gold mb-4">VENUE</h3>
+              <p className="font-sans text-white/70 mb-2">
+                <strong className="text-white">Accra International Conference Centre</strong>
+              </p>
+              <p className="font-sans text-white/50 text-sm mb-6">
+                Castle Rd, Accra, Ghana
+              </p>
+              <p className="font-sans text-white/70 text-sm">
+                Experience the electrifying atmosphere in Ghana's premier event space, featuring state-of-the-art lighting and stage design.
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center reveal-target flex flex-col sm:flex-row items-center justify-center gap-6">
+            <Link href="/championship" className="inline-block bg-wff-red text-white font-bebas text-2xl px-12 py-4 hover:bg-white hover:text-wff-red transition-colors w-full sm:w-auto">
+              GET TICKETS
+            </Link>
+            <Link href="/athletes" className="inline-block border border-wff-gold text-wff-gold font-bebas text-2xl px-12 py-4 hover:bg-wff-gold hover:text-black transition-colors w-full sm:w-auto">
+              REGISTER TO COMPETE
+            </Link>
+          </div>
         </div>
       </section>
 

@@ -2,11 +2,12 @@
 
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import Image from 'next/image';
 
 export default function Loader() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const pathRef = useRef<SVGPathElement>(null);
-  const fillRef = useRef<SVGPathElement>(null);
+  const logoRef = useRef<HTMLImageElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Lock scroll while loading
@@ -19,60 +20,58 @@ export default function Loader() {
       }
     });
 
-    if (pathRef.current && fillRef.current && containerRef.current) {
-      const length = pathRef.current.getTotalLength();
-      
+    if (logoRef.current && containerRef.current && progressRef.current) {
       // Initial state
-      gsap.set(pathRef.current, { strokeDasharray: length, strokeDashoffset: length });
-      gsap.set(fillRef.current, { opacity: 0 });
+      gsap.set(logoRef.current, { scale: 0.8, opacity: 0, filter: 'blur(10px)' });
+      gsap.set(progressRef.current, { scaleX: 0, transformOrigin: 'left center' });
 
       // Animation sequence
-      tl.to(pathRef.current, { 
-          strokeDashoffset: 0, 
-          duration: 2, 
-          ease: 'power2.inOut' 
+      tl.to(logoRef.current, {
+          scale: 1,
+          opacity: 1,
+          filter: 'blur(0px)',
+          duration: 1.5,
+          ease: 'power3.out'
         })
-        .to(fillRef.current, { 
-          opacity: 1, 
-          duration: 0.5,
-          ease: 'power2.out'
-        }, '-=0.5')
+        .to(progressRef.current, {
+          scaleX: 1,
+          duration: 1.5,
+          ease: 'power2.inOut'
+        }, '<') // Run at the same time
+        .to(logoRef.current, {
+          scale: 1.1,
+          duration: 0.2,
+          yoyo: true,
+          repeat: 1,
+          ease: 'power1.inOut'
+        }, '+=0.2') // Heartbeat pulse
         .to(containerRef.current, { 
-          scale: 15, 
           opacity: 0, 
-          duration: 1.2, 
-          ease: 'power4.inOut' 
-        }, '+=0.3');
+          duration: 0.8, 
+          ease: 'power2.inOut' 
+        }, '+=0.2');
     }
 
     return () => { document.body.style.overflow = ''; };
   }, []);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-[100] bg-[#050505] flex items-center justify-center pointer-events-none origin-center">
-      <svg 
-        width="120" 
-        height="150" 
-        viewBox="0 0 100 120" 
-        fill="none" 
-        xmlns="http://www.w3.org/2000/svg"
-        className="transform scale-150"
-      >
-        {/* Simplified outline of Ghana */}
-        <path 
-          ref={fillRef}
-          d="M20,60 L30,30 L60,20 L80,40 L90,70 L70,100 L40,110 L10,80 Z" 
-          fill="#D4AF37" 
+    <div ref={containerRef} className="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center pointer-events-none">
+      <div className="relative w-48 h-48 md:w-64 md:h-64 mb-8">
+        <Image 
+          ref={logoRef}
+          src="/wff-ghana-logo.svg" 
+          alt="WFF Ghana Logo"
+          fill
+          className="object-contain"
+          priority
         />
-        <path 
-          ref={pathRef}
-          d="M20,60 L30,30 L60,20 L80,40 L90,70 L70,100 L40,110 L10,80 Z" 
-          stroke="#D4AF37" 
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      </div>
+      
+      {/* Loading Progress Bar */}
+      <div className="w-48 md:w-64 h-[2px] bg-white/10 rounded-full overflow-hidden">
+        <div ref={progressRef} className="h-full bg-wff-gold w-full"></div>
+      </div>
     </div>
   );
 }
