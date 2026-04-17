@@ -115,7 +115,7 @@ export default function ScrubberNavbar() {
               
               <Link 
                 href="/contact"
-                className="ml-4 bg-wff-red text-white font-bebas text-xl px-6 py-2 tracking-wider hover:bg-white hover:text-wff-red transition-colors"
+                className="ml-4 bg-wff-red text-white font-bebas text-xl px-6 py-2 tracking-wider rounded-md hover:bg-white hover:text-wff-red transition-colors"
               >
                 REGISTER
               </Link>
@@ -227,7 +227,7 @@ export default function ScrubberNavbar() {
           <Link 
             href="/contact"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="bg-wff-red text-white font-bebas text-3xl px-12 py-4 tracking-wider hover:bg-white hover:text-wff-red transition-colors"
+            className="bg-wff-red text-white font-bebas text-3xl px-12 py-4 tracking-wider rounded-md hover:bg-white hover:text-wff-red transition-colors"
           >
             REGISTER NOW
           </Link>

@@ -203,7 +203,7 @@ export default function FederationClient() {
 
         {/* Content */}
         <div ref={contentRef} className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
-          <div className="relative aspect-[3/4] bg-[#111] border border-white/10 overflow-hidden group">
+          <div className="relative aspect-[3/4] bg-[#111] border border-white/10 overflow-hidden group rounded-xl">
             <Image 
               src="https://picsum.photos/seed/boardroom/800/1200" 
               alt="WFF Ghana Executive"
@@ -218,7 +218,7 @@ export default function FederationClient() {
             </div>
           </div>
 
-          <div className="space-y-12 bg-[#0A0A0A]/80 backdrop-blur-md p-8 md:p-12 border border-white/5">
+          <div className="space-y-12 bg-[#0A0A0A]/80 backdrop-blur-md p-8 md:p-12 border border-white/5 rounded-xl">
             <div>
               <h2 className="font-bebas text-4xl mb-4 text-wff-red">OUR MISSION</h2>
               <p className="font-sans text-white/70 leading-relaxed text-lg">

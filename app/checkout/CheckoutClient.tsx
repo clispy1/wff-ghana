@@ -80,11 +80,11 @@ export default function CheckoutClient() {
                 <div className="space-y-4">
                   <div>
                     <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Email Address</label>
-                    <input required type="email" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors" />
+                    <input required type="email" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
                   </div>
                   <div>
                     <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Phone Number</label>
-                    <input required type="tel" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors" />
+                    <input required type="tel" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
                   </div>
                 </div>
               </section>
@@ -95,11 +95,11 @@ export default function CheckoutClient() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">First Name</label>
-                    <input required type="text" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors" />
+                    <input required type="text" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
                   </div>
                   <div>
                     <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Last Name</label>
-                    <input required type="text" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors" />
+                    <input required type="text" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
                   </div>
                   <div className="md:col-span-2">
                     <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Street Address</label>
@@ -119,23 +119,23 @@ export default function CheckoutClient() {
               {/* Payment Info */}
               <section>
                 <h2 className="font-bebas text-3xl mb-6 text-wff-gold">3. PAYMENT DETAILS</h2>
-                <div className="bg-[#111] border border-white/10 p-6 space-y-4">
+                <div className="bg-[#111] border border-white/10 p-6 space-y-4 rounded-xl">
                   <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-full h-12 bg-white/5 border border-white/10 flex items-center justify-center text-white/50 font-sans text-sm">Credit Card</div>
-                    <div className="w-full h-12 bg-white/5 border border-white/10 flex items-center justify-center text-white/50 font-sans text-sm">Mobile Money</div>
+                    <div className="w-full h-12 bg-white/5 border border-white/10 flex items-center justify-center text-white/50 font-sans text-sm rounded-md">Credit Card</div>
+                    <div className="w-full h-12 bg-white/5 border border-white/10 flex items-center justify-center text-white/50 font-sans text-sm rounded-md">Mobile Money</div>
                   </div>
                   <div>
                     <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Card Number</label>
-                    <input required type="text" placeholder="0000 0000 0000 0000" className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors" />
+                    <input required type="text" placeholder="0000 0000 0000 0000" className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Expiry Date</label>
-                      <input required type="text" placeholder="MM/YY" className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors" />
+                      <input required type="text" placeholder="MM/YY" className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
                     </div>
                     <div>
                       <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">CVC</label>
-                      <input required type="text" placeholder="123" className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors" />
+                      <input required type="text" placeholder="123" className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
                     </div>
                   </div>
                 </div>
@@ -144,7 +144,7 @@ export default function CheckoutClient() {
               <button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="w-full bg-wff-red text-white font-bebas text-3xl py-6 hover:bg-white hover:text-wff-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-wff-red text-white font-bebas text-3xl py-6 rounded-md hover:bg-white hover:text-wff-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'PROCESSING...' : `PAY ₵ ${finalTotal.toFixed(2)}`}
               </button>
@@ -153,13 +153,13 @@ export default function CheckoutClient() {
 
           {/* Order Summary */}
           <div className="lg:w-1/3">
-            <div className="bg-[#111] border border-white/10 p-8 sticky top-32">
+            <div className="bg-[#111] border border-white/10 p-8 sticky top-32 rounded-xl">
               <h2 className="font-bebas text-3xl mb-8 border-b border-white/10 pb-4">ORDER SUMMARY</h2>
               
               <div className="space-y-6 mb-8 max-h-[40vh] overflow-y-auto no-scrollbar">
                 {cart.map((item) => (
                   <div key={`${item.id}-${item.size}`} className="flex gap-4">
-                    <div className="relative w-20 h-20 bg-black border border-white/10 flex-shrink-0">
+                    <div className="relative w-20 h-20 bg-black border border-white/10 flex-shrink-0 rounded-md overflow-hidden">
                       <Image 
                         src={item.image} 
                         alt={item.name} 

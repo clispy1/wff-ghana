@@ -66,22 +66,22 @@ export default function ContactClient() {
           </div>
 
           {/* Contact Form */}
-          <div ref={formRef} className="bg-[#111] border border-white/10 p-8 md:p-12 opacity-0">
+          <div ref={formRef} className="bg-[#111] border border-white/10 p-8 md:p-12 opacity-0 rounded-xl">
             <h3 className="font-bebas text-4xl mb-8">SEND A MESSAGE</h3>
             <form className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Name</label>
-                  <input type="text" className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors" />
+                  <input type="text" className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
                 </div>
                 <div>
                   <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Email</label>
-                  <input type="email" className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors" />
+                  <input type="email" className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
                 </div>
               </div>
               <div>
                 <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Subject</label>
-                <select className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors appearance-none">
+                <select className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors appearance-none rounded-md">
                   <option>General Inquiry</option>
                   <option>Athlete Registration</option>
                   <option>Sponsorships</option>
@@ -90,9 +90,9 @@ export default function ContactClient() {
               </div>
               <div>
                 <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Message</label>
-                <textarea rows={5} className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors resize-none"></textarea>
+                <textarea rows={5} className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors resize-none rounded-md"></textarea>
               </div>
-              <button type="button" className="w-full bg-wff-red text-white font-bebas text-2xl py-4 hover:bg-white hover:text-wff-dark transition-colors">
+              <button type="button" className="w-full bg-wff-red text-white font-bebas text-2xl py-4 rounded-md hover:bg-white hover:text-wff-dark transition-colors">
                 SEND MESSAGE
               </button>
             </form>

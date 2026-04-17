@@ -130,7 +130,7 @@ export default function WellnessClient() {
         </div>
 
         {/* Video Vault Teaser */}
-        <div ref={videoRef} className="relative aspect-video max-w-5xl mx-auto bg-[#001A1A] border border-[#00A86B]/20 mb-24 group cursor-pointer overflow-hidden opacity-0 rounded-sm">
+        <div ref={videoRef} className="relative aspect-video max-w-5xl mx-auto bg-[#001A1A] border border-[#00A86B]/20 mb-24 group cursor-pointer overflow-hidden opacity-0 rounded-xl">
           <Image 
             src="https://picsum.photos/seed/training-video/1200/600" 
             alt="Training Video"
@@ -155,7 +155,7 @@ export default function WellnessClient() {
           {pillars.map((pillar, index) => (
             <div 
               key={index} 
-              className="wellness-card bg-[#001A1A]/50 backdrop-blur-sm border border-[#00A86B]/10 p-8 hover:border-[#00A86B]/40 transition-colors duration-700 group text-center flex flex-col items-center rounded-sm"
+              className="wellness-card bg-[#001A1A]/50 backdrop-blur-sm border border-[#00A86B]/10 p-8 hover:border-[#00A86B]/40 transition-colors duration-700 group text-center flex flex-col items-center rounded-xl"
             >
               <div className="w-16 h-16 rounded-full bg-[#00A86B]/10 flex items-center justify-center text-[#00A86B] mb-6 group-hover:scale-105 transition-transform duration-700">
                 {pillar.icon}

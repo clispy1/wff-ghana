@@ -180,10 +180,10 @@ export default function Hero() {
 
         {/* CTAs */}
         <div ref={ctaRef} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md">
-          <Link href="/championship" className="w-full sm:w-auto bg-wff-red text-white font-bebas text-2xl px-10 py-4 hover:bg-white hover:text-wff-red transition-colors text-center">
+          <Link href="/championship" className="w-full sm:w-auto bg-wff-red text-white font-bebas text-2xl px-10 py-4 rounded-md hover:bg-white hover:text-wff-red transition-colors text-center">
             BUY TICKETS
           </Link>
-          <Link href="/athletes" className="w-full sm:w-auto border border-white/20 bg-black/40 backdrop-blur-sm text-white font-bebas text-2xl px-10 py-4 hover:bg-white hover:text-black transition-colors text-center">
+          <Link href="/athletes" className="w-full sm:w-auto border border-white/20 bg-black/40 backdrop-blur-sm text-white font-bebas text-2xl px-10 py-4 rounded-md hover:bg-white hover:text-black transition-colors text-center">
             REGISTER TO COMPETE
           </Link>
         </div>

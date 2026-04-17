@@ -120,7 +120,7 @@ export default function PartnershipsClient() {
         {/* Stats */}
         <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-32">
           {stats.map((stat, idx) => (
-            <div key={idx} className="bg-[#111] border border-white/10 p-8 text-center flex flex-col items-center justify-center">
+            <div key={idx} className="bg-[#111] border border-white/10 p-8 text-center flex flex-col items-center justify-center rounded-xl">
               <div className="text-wff-red mb-4">{stat.icon}</div>
               <div className="font-bebas text-5xl text-white mb-2">{stat.value}</div>
               <div className="font-sans text-sm uppercase tracking-widest text-white/50">{stat.label}</div>

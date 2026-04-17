@@ -1,5 +1,5 @@
 import type {Metadata} from 'next';
-import { Bebas_Neue, DM_Sans } from 'next/font/google';
+import { Oswald, DM_Sans } from 'next/font/google';
 import './globals.css'; // Global styles
 import CustomCursor from '@/components/CustomCursor';
 import Loader from '@/components/Loader';
@@ -9,10 +9,9 @@ import SmoothScrolling from '@/components/SmoothScrolling';
 import { CartProvider } from '@/lib/CartContext';
 import CartDrawer from '@/components/CartDrawer';
 
-const bebasNeue = Bebas_Neue({
-  weight: '400',
+const oswald = Oswald({
   subsets: ['latin'],
-  variable: '--font-bebas',
+  variable: '--font-bebas', // Keeping the variable name the same so we don't have to change all the font-bebas classes
 });
 
 const dmSans = DM_Sans({
@@ -27,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="en" className={`${bebasNeue.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${oswald.variable} ${dmSans.variable}`}>
       <body className="text-white font-sans antialiased overflow-x-hidden selection:bg-wff-red selection:text-white" suppressHydrationWarning>
         <CartProvider>
           <SmoothScrolling>

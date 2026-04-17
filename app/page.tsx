@@ -130,7 +130,7 @@ export default function Home() {
             
             {/* President Image */}
             <div className="lg:col-span-5 reveal-target relative">
-              <div className="relative aspect-[4/5] bg-[#111] border border-white/10 overflow-hidden group">
+              <div className="relative aspect-[4/5] bg-[#111] border border-white/10 overflow-hidden group rounded-xl">
                 <Image 
                   src="/wff-president.jpg" 
                   alt="WFF Ghana President"
@@ -161,7 +161,7 @@ export default function Home() {
                   World Fitness Federation (WFF) Ghana is the premier destination for aesthetic and athletic excellence. We are bringing the global standard of bodybuilding and fitness modeling to the heart of West Africa, ensuring fair judging, athlete welfare, and community building.
                 </p>
               </div>
-              <Link href="/federation" className="inline-block border border-wff-gold text-wff-gold font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 hover:bg-wff-gold hover:text-black transition-colors">
+              <Link href="/federation" className="inline-block border border-wff-gold text-wff-gold font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 rounded-md hover:bg-wff-gold hover:text-black transition-colors">
                 Discover Our Legacy
               </Link>
             </div>
@@ -174,7 +174,7 @@ export default function Home() {
       <section className="horizontal-scroll-container h-screen bg-[#050505] flex items-center overflow-hidden border-y border-white/10">
         <div className="horizontal-scroll-content flex space-x-8 px-[10vw] items-center h-full w-max">
           {journeyPanels.map((panel, idx) => (
-            <div key={idx} className="flex-shrink-0 flex flex-col justify-end w-[85vw] md:w-[60vw] h-[70vh] border border-white/10 bg-[#0A0A0A] relative overflow-hidden group cursor-pointer">
+            <div key={idx} className="flex-shrink-0 flex flex-col justify-end w-[85vw] md:w-[60vw] h-[70vh] border border-white/10 bg-[#0A0A0A] relative overflow-hidden group cursor-pointer rounded-xl">
               
               {/* Media Background */}
               {panel.type === 'video' ? (
@@ -230,7 +230,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            <div className="bg-black/60 backdrop-blur-md border border-white/10 p-8 reveal-target">
+            <div className="bg-black/60 backdrop-blur-md border border-white/10 p-8 reveal-target rounded-xl">
               <h3 className="font-bebas text-3xl text-wff-gold mb-4">CATEGORIES</h3>
               <ul className="space-y-2 font-sans text-white/70">
                 <li>• Men's Bodybuilding</li>
@@ -241,7 +241,7 @@ export default function Home() {
               </ul>
             </div>
             
-            <div className="bg-black/60 backdrop-blur-md border border-white/10 p-8 reveal-target">
+            <div className="bg-black/60 backdrop-blur-md border border-white/10 p-8 reveal-target rounded-xl">
               <h3 className="font-bebas text-3xl text-wff-gold mb-4">THE STAKES</h3>
               <p className="font-sans text-white/70 mb-4">
                 Overall winners in each division will be awarded the highly coveted <strong className="text-white">WFF Pro Card</strong>, granting them elite professional status globally.
@@ -249,7 +249,7 @@ export default function Home() {
               <p className="font-sans text-wff-red font-bold uppercase tracking-widest text-sm">Pro Status • Cash Prizes • Sponsorships</p>
             </div>
 
-            <div className="bg-black/60 backdrop-blur-md border border-white/10 p-8 reveal-target">
+            <div className="bg-black/60 backdrop-blur-md border border-white/10 p-8 reveal-target rounded-xl">
               <h3 className="font-bebas text-3xl text-wff-gold mb-4">VENUE</h3>
               <p className="font-sans text-white/70 mb-2">
                 <strong className="text-white">Accra International Conference Centre</strong>
@@ -264,10 +264,10 @@ export default function Home() {
           </div>
 
           <div className="text-center reveal-target flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Link href="/championship" className="inline-block bg-wff-red text-white font-bebas text-2xl px-12 py-4 hover:bg-white hover:text-wff-red transition-colors w-full sm:w-auto">
+            <Link href="/championship" className="inline-block bg-wff-red text-white font-bebas text-2xl px-12 py-4 rounded-md hover:bg-white hover:text-wff-red transition-colors w-full sm:w-auto">
               GET TICKETS
             </Link>
-            <Link href="/athletes" className="inline-block border border-wff-gold text-wff-gold font-bebas text-2xl px-12 py-4 hover:bg-wff-gold hover:text-black transition-colors w-full sm:w-auto">
+            <Link href="/athletes" className="inline-block border border-wff-gold text-wff-gold font-bebas text-2xl px-12 py-4 rounded-md hover:bg-wff-gold hover:text-black transition-colors w-full sm:w-auto">
               REGISTER TO COMPETE
             </Link>
           </div>
@@ -288,7 +288,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="reveal-target aspect-[3/4] bg-[#111] border border-white/10 relative group cursor-pointer overflow-hidden">
+              <div key={i} className="reveal-target aspect-[3/4] bg-[#111] border border-white/10 relative group cursor-pointer overflow-hidden rounded-xl">
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 z-10"></div>
                 <div className="absolute bottom-0 left-0 w-full p-8 z-20 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                   <p className="font-sans text-wff-gold font-bold uppercase tracking-widest text-xs mb-2">Pro Division</p>
@@ -298,7 +298,7 @@ export default function Home() {
             ))}
           </div>
           <div className="text-center mt-16 reveal-target">
-            <Link href="/athletes" className="inline-block border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 hover:bg-white hover:text-black transition-colors">
+            <Link href="/athletes" className="inline-block border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 rounded-md hover:bg-white hover:text-black transition-colors">
               View Full Roster
             </Link>
           </div>
@@ -313,7 +313,7 @@ export default function Home() {
           <p className="font-sans text-lg text-white/60 max-w-2xl mx-auto mb-12">
             True strength is built in the moments of rest. Explore our wellness programs, recovery techniques, and mindfulness practices designed for elite competitors.
           </p>
-          <Link href="/wellness" className="inline-block border border-teal-500 text-teal-500 font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 hover:bg-teal-500 hover:text-black transition-colors">
+          <Link href="/wellness" className="inline-block border border-teal-500 text-teal-500 font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 rounded-md hover:bg-teal-500 hover:text-black transition-colors">
             Explore Wellness
           </Link>
         </div>
@@ -327,7 +327,7 @@ export default function Home() {
               <p className="font-sans text-wff-red font-bold uppercase tracking-[0.5em] text-sm mb-4">Official Gear</p>
               <h2 className="font-bebas text-6xl md:text-8xl text-white">THE <span className="text-wff-gold">ARMORY</span></h2>
             </div>
-            <Link href="/shop" className="hidden md:inline-block border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 hover:bg-white hover:text-black transition-colors mb-2">
+            <Link href="/shop" className="hidden md:inline-block border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 rounded-md hover:bg-white hover:text-black transition-colors mb-2">
               View All Gear
             </Link>
           </div>
@@ -340,7 +340,7 @@ export default function Home() {
               { id: '3', name: 'WFF Ghana Cap', price: 120.00, img: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop', category: 'Accessories', description: 'Adjustable snapback cap.' }
             ].map((product, i) => (
               <Link href={`/shop/${product.id}`} key={i} className="reveal-target group cursor-pointer block">
-                <div className="relative aspect-[4/5] bg-[#111] border border-white/10 overflow-hidden mb-6">
+                <div className="relative aspect-[4/5] bg-[#111] border border-white/10 overflow-hidden mb-6 rounded-xl">
                   <div className="absolute inset-0 bg-wff-red/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
                   <Image 
                     src={product.img} 
@@ -362,7 +362,7 @@ export default function Home() {
           </div>
           
           <div className="mt-12 text-center md:hidden reveal-target">
-            <Link href="/shop" className="inline-block border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 hover:bg-white hover:text-black transition-colors w-full">
+            <Link href="/shop" className="inline-block border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 rounded-md hover:bg-white hover:text-black transition-colors w-full">
               View All Gear
             </Link>
           </div>
@@ -380,7 +380,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className={`reveal-target bg-[#111] border border-white/10 ${i === 1 || i === 4 ? 'aspect-square' : 'aspect-[3/4]'} hover:border-wff-red transition-colors cursor-pointer`}></div>
+              <div key={i} className={`reveal-target bg-[#111] border border-white/10 ${i === 1 || i === 4 ? 'aspect-square' : 'aspect-[3/4]'} hover:border-wff-red transition-colors cursor-pointer rounded-xl`}></div>
             ))}
           </div>
         </div>
@@ -392,7 +392,7 @@ export default function Home() {
           <h2 className="font-bebas text-6xl md:text-8xl text-white mb-16 text-center reveal-target">LATEST <span className="text-wff-gold">NEWS</span></h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="reveal-target bg-[#0A0A0A] border border-white/10 p-8 hover:-translate-y-2 transition-transform duration-500">
+              <div key={i} className="reveal-target bg-[#0A0A0A] border border-white/10 p-8 hover:-translate-y-2 transition-transform duration-500 rounded-xl">
                 <p className="font-sans text-wff-red text-xs font-bold uppercase tracking-widest mb-4">Oct 12, 2025</p>
                 <h3 className="font-bebas text-3xl text-white mb-4">ROAD TO THE CHAMPIONSHIP: QUALIFIERS ANNOUNCED</h3>
                 <p className="font-sans text-sm text-white/60 mb-6 line-clamp-3">
@@ -412,7 +412,7 @@ export default function Home() {
           <p className="font-sans text-lg text-white/60 max-w-2xl mx-auto mb-12">
             Align your brand with the pinnacle of African fitness. Discover our sponsorship tiers and corporate partnership opportunities.
           </p>
-          <Link href="/partnerships" className="inline-block border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 hover:bg-white hover:text-black transition-colors">
+          <Link href="/partnerships" className="inline-block border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-8 py-4 rounded-md hover:bg-white hover:text-black transition-colors">
             Partner With Us
           </Link>
         </div>
@@ -424,10 +424,10 @@ export default function Home() {
         <div className="container mx-auto px-6 text-center relative z-10 reveal-target">
           <h2 className="font-bebas text-7xl md:text-[10rem] text-white leading-none mb-8">READY FOR <br/><span className="text-wff-red">GLORY?</span></h2>
           <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-            <Link href="/contact" className="bg-wff-red text-white font-bebas text-3xl px-16 py-6 hover:bg-white hover:text-wff-red transition-colors w-full md:w-auto">
+            <Link href="/contact" className="bg-wff-red text-white font-bebas text-3xl px-16 py-6 rounded-md hover:bg-white hover:text-wff-red transition-colors w-full md:w-auto">
               REGISTER NOW
             </Link>
-            <Link href="/contact" className="border border-white/20 text-white font-bebas text-3xl px-16 py-6 hover:bg-white hover:text-black transition-colors w-full md:w-auto">
+            <Link href="/contact" className="border border-white/20 text-white font-bebas text-3xl px-16 py-6 rounded-md hover:bg-white hover:text-black transition-colors w-full md:w-auto">
               CONTACT US
             </Link>
           </div>

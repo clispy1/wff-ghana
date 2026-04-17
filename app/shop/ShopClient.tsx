@@ -117,7 +117,7 @@ export default function ShopClient() {
         <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
           {products.map((product) => (
             <Link href={`/shop/${product.id}`} key={product.id} className="product-card group cursor-pointer block">
-              <div className="relative aspect-square bg-[#111] border border-white/10 mb-6 overflow-hidden">
+              <div className="relative aspect-square bg-[#111] border border-white/10 mb-6 overflow-hidden rounded-xl">
                 <Image 
                   src={product.image} 
                   alt={product.name}
@@ -128,7 +128,7 @@ export default function ShopClient() {
                 
                 {/* Tag */}
                 {product.tag && (
-                  <div className="absolute top-4 left-4 bg-wff-red text-white font-sans text-xs font-bold uppercase tracking-widest px-3 py-1 z-10">
+                  <div className="absolute top-4 left-4 bg-wff-red text-white font-sans text-xs font-bold uppercase tracking-widest px-3 py-1 z-10 rounded-md">
                     {product.tag}
                   </div>
                 )}

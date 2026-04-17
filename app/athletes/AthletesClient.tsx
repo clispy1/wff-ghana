@@ -172,7 +172,7 @@ export default function AthletesClient() {
           {athletes.map((athlete) => (
             <div 
               key={athlete.id}
-              className="athlete-card relative aspect-[3/4] cursor-pointer group rounded-sm overflow-hidden border border-white/10 bg-[#111]"
+              className="athlete-card relative aspect-[3/4] cursor-pointer group rounded-xl overflow-hidden border border-white/10 bg-[#111]"
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
               onClick={() => setSelectedAthlete(athlete)}
@@ -206,7 +206,7 @@ export default function AthletesClient() {
         </div>
 
         {/* Athlete Portal / Registration */}
-        <div ref={portalRef} className="max-w-5xl mx-auto bg-[#111] border border-white/10 p-8 md:p-12 opacity-0">
+        <div ref={portalRef} className="max-w-5xl mx-auto bg-[#111] border border-white/10 p-8 md:p-12 opacity-0 rounded-xl">
           <div className="text-center mb-12">
             <h2 className="font-bebas text-5xl mb-4">ATHLETE <span className="text-wff-gold">PORTAL</span></h2>
             <p className="font-sans text-white/60">Register for the 2026 All Africa Championship and manage your logistics.</p>
@@ -220,16 +220,16 @@ export default function AthletesClient() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">First Name</label>
-                    <input type="text" className="w-full bg-[#0A0A0A] border border-white/10 p-3 text-white focus:border-wff-red outline-none transition-colors" />
+                    <input type="text" className="w-full bg-[#0A0A0A] border border-white/10 p-3 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
                   </div>
                   <div>
                     <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Last Name</label>
-                    <input type="text" className="w-full bg-[#0A0A0A] border border-white/10 p-3 text-white focus:border-wff-red outline-none transition-colors" />
+                    <input type="text" className="w-full bg-[#0A0A0A] border border-white/10 p-3 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
                   </div>
                 </div>
                 <div>
                   <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Country</label>
-                  <select className="w-full bg-[#0A0A0A] border border-white/10 p-3 text-white focus:border-wff-red outline-none transition-colors appearance-none">
+                  <select className="w-full bg-[#0A0A0A] border border-white/10 p-3 text-white focus:border-wff-red outline-none transition-colors appearance-none rounded-md">
                     <option>Ghana</option>
                     <option>Nigeria</option>
                     <option>South Africa</option>
@@ -239,7 +239,7 @@ export default function AthletesClient() {
                 </div>
                 <div>
                   <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Category</label>
-                  <select className="w-full bg-[#0A0A0A] border border-white/10 p-3 text-white focus:border-wff-red outline-none transition-colors appearance-none">
+                  <select className="w-full bg-[#0A0A0A] border border-white/10 p-3 text-white focus:border-wff-red outline-none transition-colors appearance-none rounded-md">
                     <option>Men&apos;s Bodybuilding</option>
                     <option>Classic Physique</option>
                     <option>Men&apos;s Physique</option>
@@ -247,7 +247,7 @@ export default function AthletesClient() {
                     <option>Sports Model</option>
                   </select>
                 </div>
-                <button type="button" className="w-full bg-wff-red text-white font-bebas text-xl py-4 hover:bg-white hover:text-wff-dark transition-colors mt-4">
+                <button type="button" className="w-full bg-wff-red text-white font-bebas text-xl py-4 rounded-md hover:bg-white hover:text-wff-dark transition-colors mt-4">
                   PROCEED TO PAYMENT
                 </button>
               </form>
@@ -267,7 +267,7 @@ export default function AthletesClient() {
                   <h4 className="font-bebas text-xl mb-1">PASSPORT / ID</h4>
                   <p className="font-sans text-xs text-white/50">PDF or JPG format</p>
                 </div>
-                <div className="bg-[#0A0A0A] p-4 border border-white/5">
+                <div className="bg-[#0A0A0A] p-4 border border-white/5 rounded-lg">
                   <p className="font-sans text-xs text-white/60 leading-relaxed">
                     <span className="text-wff-red font-bold">NOTE:</span> All uploads must be completed by September 10th, 2026. Failure to upload posing music will result in default house music being played.
                   </p>
@@ -284,7 +284,7 @@ export default function AthletesClient() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-wff-dark/90 backdrop-blur-sm">
           <div 
             ref={modalRef}
-            className="bg-[#111] border border-white/10 w-full max-w-5xl max-h-[90vh] overflow-y-auto no-scrollbar relative flex flex-col md:flex-row"
+            className="bg-[#111] border border-white/10 w-full max-w-5xl max-h-[90vh] overflow-y-auto no-scrollbar relative flex flex-col md:flex-row rounded-xl"
           >
             <button 
               onClick={() => setSelectedAthlete(null)}

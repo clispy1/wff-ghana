@@ -137,7 +137,7 @@ export default function ChampionshipClient() {
 
         {/* Event Details Grid */}
         <div ref={detailsRef} className="grid grid-cols-1 lg:grid-cols-2 gap-12 opacity-0">
-          <div className="relative aspect-video lg:aspect-square bg-[#111] border border-white/10 overflow-hidden rounded-sm">
+          <div className="relative aspect-video lg:aspect-square bg-[#111] border border-white/10 overflow-hidden rounded-xl">
             <Image 
               src="https://picsum.photos/seed/accra-venue/1000/1000" 
               alt="Accra Venue"
@@ -176,7 +176,7 @@ export default function ChampionshipClient() {
               <div ref={ticketItemsRef} className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-hidden">
                 <div 
                   onClick={() => handleAddTicket('ticket-ga')}
-                  className="bg-[#111] border border-white/10 p-6 hover:border-wff-red transition-colors cursor-pointer group opacity-0 rounded-sm flex flex-col justify-between"
+                  className="bg-[#111] border border-white/10 p-6 hover:border-wff-red transition-colors cursor-pointer group opacity-0 rounded-xl flex flex-col justify-between"
                 >
                   <div>
                     <h5 className="font-bebas text-2xl mb-1 text-white">GENERAL ADMISSION</h5>
@@ -188,7 +188,7 @@ export default function ChampionshipClient() {
                 </div>
                 <div 
                   onClick={() => handleAddTicket('ticket-vip')}
-                  className="bg-wff-red text-white p-6 hover:bg-white hover:text-wff-dark transition-colors cursor-pointer group opacity-0 rounded-sm flex flex-col justify-between"
+                  className="bg-wff-red text-white p-6 hover:bg-white hover:text-wff-dark transition-colors cursor-pointer group opacity-0 rounded-xl flex flex-col justify-between"
                 >
                   <div>
                     <h5 className="font-bebas text-2xl mb-1">VIP BACKSTAGE PASS</h5>
