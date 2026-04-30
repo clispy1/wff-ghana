@@ -120,7 +120,7 @@ export default function Hero() {
       {/* Dramatic Background Image (Placeholder until real assets arrive) */}
       <div 
         ref={bgRef}
-        className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat opacity-40"
+        className="absolute inset-0 z-0 bg-[url('/hero-bg.jpeg')] bg-cover bg-center bg-no-repeat opacity-40"
       ></div>
 
       {/* Heavy Vignette/Gradient Overlay for text legibility */}
@@ -142,19 +142,19 @@ export default function Hero() {
         </div>
 
         <h1 ref={headlineRef} className="font-bebas flex flex-col items-center justify-center leading-[0.85] mb-12 w-full">
-          <span className="block text-wff-gold font-sans font-bold uppercase tracking-[0.5em] text-sm md:text-base mb-6">WFF Ghana Presents</span>
+          <span className="block text-wff-gold font-sans font-bold uppercase tracking-[0.5em] text-sm md:text-base mb-6">Ghana Meets Africa</span>
           
           {/* Massive Outline Text */}
           <span 
-            className="block text-[15vw] md:text-[12vw] text-transparent tracking-tighter w-full"
+            className="block text-[11vw] md:text-[8vw] text-transparent tracking-tighter w-full"
             style={{ WebkitTextStroke: '2px rgba(255,255,255,0.8)' }}
           >
-            ALL AFRICA
+            ALL AFRICA BODYBUILDING
           </span>
           
           {/* Massive Solid Text */}
-          <span className="block text-[15vw] md:text-[12vw] text-white tracking-tighter drop-shadow-2xl w-full">
-            CHAMPIONSHIP
+          <span className="block text-[11vw] md:text-[8vw] text-white tracking-tighter drop-shadow-2xl w-full">
+            CHAMPIONSHIP 2026
           </span>
         </h1>
 

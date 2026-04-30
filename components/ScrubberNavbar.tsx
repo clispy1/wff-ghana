@@ -69,7 +69,7 @@ export default function ScrubberNavbar() {
 
   return (
     <>
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center">
+      <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center">
         <div 
           className="bg-[#0A0A0A]/90 backdrop-blur-md border border-white/10 rounded-full overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] flex items-center shadow-2xl"
           style={{ 
