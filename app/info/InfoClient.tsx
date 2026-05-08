@@ -129,6 +129,36 @@ export default function InfoClient() {
                 <p className="text-wff-gold text-sm mb-4">Airport City (5 mins from ACC)</p>
                 <p className="text-white/60 text-sm">Colorful, convenient, and incredibly cost-effective for large national teams while remaining inside the security and comfort of Airport City.</p>
               </div>
+              <div className="bg-black/50 border border-white/5 p-6 rounded-lg">
+                <h3 className="text-xl font-bold mb-1 text-white">The African Regent Hotel</h3>
+                <p className="text-wff-gold text-sm mb-2">Airport West (6 mins from ACC)</p>
+                <p className="text-white/60 text-sm">A bold, contemporary hotel with deeply African character. Offers excellent amenities and a focused environment for resting athletes.</p>
+              </div>
+              <div className="bg-black/50 border border-white/5 p-6 rounded-lg">
+                <h3 className="text-xl font-bold mb-1 text-white">Airport View Hotel</h3>
+                <p className="text-wff-gold text-sm mb-2">Airport intersection (4 mins from ACC)</p>
+                <p className="text-white/60 text-sm">Ideal for athletes seeking short commutes and solid baseline comfort without the premium price tag. Features an indoor gym and a good pool.</p>
+              </div>
+              <div className="bg-black/50 border border-white/5 p-6 rounded-lg">
+                <h3 className="text-xl font-bold mb-1 text-white">Villa Monticello</h3>
+                <p className="text-wff-gold text-sm mb-2">Airport Residential Area (6 mins from ACC)</p>
+                <p className="text-white/60 text-sm">A luxury boutique property for those who desire total quiet and personalized service during their peak week.</p>
+              </div>
+              <div className="bg-black/50 border border-white/5 p-6 rounded-lg">
+                <h3 className="text-xl font-bold mb-1 text-white">Best Western Premier</h3>
+                <p className="text-wff-gold text-sm mb-2">Airport Residential (5 mins from ACC)</p>
+                <p className="text-white/60 text-sm">Well-appointed rooms and a reliable standard of service with excellent dietary support options from their kitchen.</p>
+              </div>
+              <div className="bg-black/50 border border-white/5 p-6 rounded-lg">
+                <h3 className="text-xl font-bold mb-1 text-white">Tang Palace Hotel</h3>
+                <p className="text-wff-gold text-sm mb-2">Roman Ridge (8 mins from ACC)</p>
+                <p className="text-white/60 text-sm">Upscale modern luxury boasting an extensive gym, large outdoor pool, and serene environment just minutes from the main routes.</p>
+              </div>
+              <div className="bg-black/50 border border-white/5 p-6 rounded-lg">
+                <h3 className="text-xl font-bold mb-1 text-white">Lancaster Accra</h3>
+                <p className="text-wff-gold text-sm mb-2">Liberation Road (7 mins from ACC)</p>
+                <p className="text-white/60 text-sm">A long-standing favorite with sprawling grounds and gym facilities. Great for larger delegations wanting a resort-like atmosphere in the city.</p>
+              </div>
               <div className="bg-black/50 border border-white/5 p-6 rounded-lg md:col-span-2 xl:col-span-3 hover:border-white/10 transition-colors">
                 <h3 className="text-xl font-bold mb-1 text-white">Polo Court Apartments</h3>
                 <p className="text-wff-gold text-sm mb-2">Airport Bypass Rd (7 mins from ACC)</p>
