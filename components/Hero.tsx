@@ -13,7 +13,7 @@ export default function Hero() {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const timerRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
-  const logoRef = useRef<HTMLImageElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
 
   const [timeLeft, setTimeLeft] = useState({
@@ -45,12 +45,13 @@ export default function Hero() {
 
     // Cinematic Headline Reveal
     if (headlineRef.current?.children) {
-      const words = Array.from(headlineRef.current.children);
-      tl.fromTo(words, 
-        { y: 50, opacity: 0 },
+      const parts = Array.from(headlineRef.current.querySelectorAll('.hero-text-part'));
+      tl.fromTo(parts, 
+        { y: 50, opacity: 0, rotateX: 20 },
         { 
           y: 0, 
           opacity: 1, 
+          rotateX: 0,
           duration: 1.2, 
           stagger: 0.15, 
           ease: 'power3.out',
@@ -115,76 +116,86 @@ export default function Hero() {
   }, []);
 
   return (
-    <section ref={containerRef} className="relative h-screen w-full overflow-hidden flex items-center justify-center bg-black">
+    <section ref={containerRef} className="relative min-h-[100svh] w-full overflow-hidden flex items-center justify-center bg-black pt-20">
       
-      {/* Dramatic Background Image (Placeholder until real assets arrive) */}
+      {/* Dramatic Background Image */}
       <div 
         ref={bgRef}
-        className="absolute inset-0 z-0 bg-[url('/hero-bg.jpeg')] bg-cover bg-center bg-no-repeat opacity-40"
+        className="absolute inset-0 z-0 bg-[url('/hero-bg.jpeg')] bg-cover bg-center bg-no-repeat opacity-50 mix-blend-luminosity"
       ></div>
 
       {/* Heavy Vignette/Gradient Overlay for text legibility */}
-      <div className="absolute inset-0 z-1 bg-gradient-to-b from-black/80 via-black/40 to-[#050505]"></div>
-      <div className="absolute inset-0 z-1 bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)] opacity-80"></div>
+      <div className="absolute inset-0 z-1 bg-gradient-to-b from-[#050505]/90 via-black/50 to-[#050505]"></div>
+      <div className="absolute inset-0 z-1 bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)] opacity-90"></div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 flex flex-col items-center text-center mt-12">
+      <div className="relative z-10 w-full px-6 flex flex-col items-center text-center pb-10">
         
-        {/* Logo */}
-        <div ref={logoRef} className="relative w-32 h-32 md:w-48 md:h-48 mb-6 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-          <Image 
-            src="/wff-ghana-logo.svg" 
-            alt="WFF Ghana Logo" 
-            fill
-            className="object-contain"
-            priority
-          />
+        {/* Header Area with Logo */}
+        <div ref={logoRef} className="flex flex-col items-center mb-8 perspective-1000">
+          <div className="relative w-24 h-24 md:w-32 md:h-32 mb-4 drop-shadow-[0_0_20px_rgba(206,17,38,0.4)]">
+            <Image 
+              src="/wff-ghana-logo.svg" 
+              alt="WFF Ghana Logo" 
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+          <span className="text-wff-gold font-sans font-bold uppercase tracking-[0.6em] text-[10px] md:text-sm">Ghana Meets Africa</span>
         </div>
 
-        <h1 ref={headlineRef} className="font-bebas flex flex-col items-center justify-center leading-[0.85] mb-12 w-full">
-          <span className="block text-wff-gold font-sans font-bold uppercase tracking-[0.5em] text-sm md:text-base mb-6">Ghana Meets Africa</span>
-          
-          {/* Massive Outline Text */}
-          <span 
-            className="block text-[11vw] md:text-[8vw] text-transparent tracking-tighter w-full"
-            style={{ WebkitTextStroke: '2px rgba(255,255,255,0.8)' }}
-          >
-            ALL AFRICA BODYBUILDING
-          </span>
-          
-          {/* Massive Solid Text */}
-          <span className="block text-[11vw] md:text-[8vw] text-white tracking-tighter drop-shadow-2xl w-full">
-            CHAMPIONSHIP 2026
-          </span>
+        <h1 ref={headlineRef} className="font-bebas flex flex-col items-center justify-center leading-[0.8] mb-12 w-full uppercase select-none">
+          {/* Main Title Lockup */}
+          <div className="flex flex-col items-center w-full max-w-[1400px] mx-auto perspective-1000">
+             <span className="hero-text-part block text-[15vw] md:text-[14vw] xl:text-[12rem] text-white tracking-normal drop-shadow-2xl">
+              ALL AFRICA
+             </span>
+             <span 
+               className="hero-text-part block text-[18vw] md:text-[16vw] xl:text-[14rem] text-transparent tracking-tight -mt-[2vw] md:-mt-[1.5rem]"
+               style={{ WebkitTextStroke: '2px rgba(255,255,255,0.7)' }}
+             >
+              BODYBUILDING
+             </span>
+             <div className="flex items-center justify-center gap-4 md:gap-8 w-full -mt-[2vw] md:-mt-[1.5rem]">
+                <span className="hero-text-part block text-[13vw] md:text-[12vw] xl:text-[10rem] text-wff-red tracking-wide drop-shadow-[0_0_30px_rgba(206,17,38,0.5)]">
+                 CHAMPIONSHIP
+                </span>
+                <span className="hero-text-part block text-[13vw] md:text-[12vw] xl:text-[10rem] text-white/90 tracking-wide">
+                 2026
+                </span>
+             </div>
+          </div>
         </h1>
 
         {/* Sleek Countdown */}
-        <div ref={timerRef} className="flex flex-col items-center mb-10">
-          <p className="font-sans text-white/50 uppercase tracking-[0.3em] text-xs mb-4">Countdown to Glory</p>
-          <div className="flex space-x-6 md:space-x-12 border-t border-b border-white/10 py-6 px-8 backdrop-blur-sm">
+        <div ref={timerRef} className="flex flex-col items-center mb-12">
+          <div className="flex space-x-6 md:space-x-12 border border-white/10 bg-black/30 py-4 px-8 backdrop-blur-md rounded-xl">
             {[
               { label: 'DAYS', value: timeLeft.days },
               { label: 'HRS', value: timeLeft.hours },
               { label: 'MIN', value: timeLeft.minutes },
               { label: 'SEC', value: timeLeft.seconds },
             ].map((item, idx) => (
-              <div key={item.label} className="flex flex-col items-center">
-                <span className="font-bebas text-5xl md:text-7xl text-wff-red">
+              <div key={item.label} className="flex flex-col items-center min-w-[3rem] md:min-w-[4rem]">
+                <span className="font-bebas text-4xl md:text-6xl text-white">
                   {item.value.toString().padStart(2, '0')}
                 </span>
-                <span className="font-sans text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/40 mt-1">{item.label}</span>
+                <span className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-wff-gold mt-1">{item.label}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* CTAs */}
-        <div ref={ctaRef} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md">
-          <Link href="/championship" className="w-full sm:w-auto bg-wff-red text-white font-bebas text-2xl px-10 py-4 rounded-md hover:bg-white hover:text-wff-red transition-colors text-center">
-            BUY TICKETS
+        <div ref={ctaRef} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-lg mx-auto">
+          <Link href="/championship" className="group relative w-full sm:w-auto bg-wff-red text-white font-bebas text-2xl px-12 py-3 rounded overflow-hidden">
+            <span className="relative z-10">BUY TICKETS</span>
+            <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out z-0"></div>
+            <span className="absolute inset-0 flex items-center justify-center text-wff-red font-bebas text-2xl z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">BUY TICKETS</span>
           </Link>
-          <Link href="/athletes" className="w-full sm:w-auto border border-white/20 bg-black/40 backdrop-blur-sm text-white font-bebas text-2xl px-10 py-4 rounded-md hover:bg-white hover:text-black transition-colors text-center">
-            REGISTER TO COMPETE
+          <Link href="/athletes" className="w-full sm:w-auto border border-white/20 bg-transparent text-white font-bebas text-2xl px-12 py-3 rounded hover:bg-white/10 transition-colors">
+            REGISTER
           </Link>
         </div>
 

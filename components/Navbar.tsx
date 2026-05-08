@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation';
 const navLinks = [
   { name: 'Federation', href: '/federation' },
   { name: 'Championship', href: '/championship' },
+  { name: 'Event Info', href: '/info' },
   { name: 'Athletes', href: '/athletes' },
   { name: 'Wellness', href: '/wellness' },
   { name: 'Shop', href: '/shop' },

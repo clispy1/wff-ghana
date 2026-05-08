@@ -1,5 +1,5 @@
 import type {Metadata} from 'next';
-import { Oswald, DM_Sans } from 'next/font/google';
+import { Teko, DM_Sans } from 'next/font/google';
 import './globals.css'; // Global styles
 import CustomCursor from '@/components/CustomCursor';
 import Loader from '@/components/Loader';
@@ -9,9 +9,10 @@ import SmoothScrolling from '@/components/SmoothScrolling';
 import { CartProvider } from '@/lib/CartContext';
 import CartDrawer from '@/components/CartDrawer';
 
-const oswald = Oswald({
+const teko = Teko({
   subsets: ['latin'],
   variable: '--font-bebas', // Keeping the variable name the same so we don't have to change all the font-bebas classes
+  weight: ['300', '400', '500', '600', '700'],
 });
 
 const dmSans = DM_Sans({
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="en" className={`${oswald.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${teko.variable} ${dmSans.variable}`}>
       <body className="text-white font-sans antialiased overflow-x-hidden selection:bg-wff-red selection:text-white" suppressHydrationWarning>
         <CartProvider>
           <SmoothScrolling>

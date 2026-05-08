@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { Canvas } from '@react-three/fiber';
 import FireTunnel from '@/components/FireTunnel';
 import ParticleSilhouette from '@/components/ParticleSilhouette';
+import WorldChampionships from '@/components/WorldChampionships';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -142,7 +143,7 @@ export default function Home() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
                 <div className="absolute bottom-8 left-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                  <h3 className="font-bebas text-4xl mb-1 text-white">VICTOR BAIDEN</h3>
+                  <h3 className="font-bebas text-4xl mb-1 text-white">VICTOR AHENKORAH BAIDEN</h3>
                   <p className="font-sans text-wff-gold font-bold uppercase tracking-widest text-sm">President, WFF Ghana</p>
                 </div>
               </div>
@@ -241,18 +242,23 @@ export default function Home() {
               </ul>
             </div>
             
-            <div className="bg-black/60 backdrop-blur-md border border-white/10 p-8 reveal-target rounded-xl">
+            <div className="bg-black/60 backdrop-blur-md border border-white/10 p-8 reveal-target rounded-xl flex flex-col items-center text-center">
               <h3 className="font-bebas text-3xl text-wff-gold mb-4">THE STAKES</h3>
+              
+              <div className="relative w-48 h-48 mb-4 hover:scale-105 transition-transform duration-500">
+                <Image src="/africa-medal.jpg" alt="Africa Championship Medal" fill className="object-contain drop-shadow-2xl" />
+              </div>
+
               <p className="font-sans text-white/70 mb-4">
-                Overall winners in each division will be awarded the highly coveted <strong className="text-white">WFF Pro Card</strong>, granting them elite professional status globally.
+                Overall winners in each division will be awarded the highly coveted <strong className="text-white">WFF Pro Card</strong> and this prestigious championship medal.
               </p>
-              <p className="font-sans text-wff-red font-bold uppercase tracking-widest text-sm">Pro Status • Cash Prizes • Sponsorships</p>
+              <p className="font-sans text-wff-red font-bold uppercase tracking-widest text-sm">Pro Status • Cash Prizes • Glory</p>
             </div>
 
             <div className="bg-black/60 backdrop-blur-md border border-white/10 p-8 reveal-target rounded-xl">
               <h3 className="font-bebas text-3xl text-wff-gold mb-4">VENUE</h3>
               <p className="font-sans text-white/70 mb-2">
-                <strong className="text-white">Accra International Conference Centre</strong>
+                <strong className="text-white">UPSA Auditorium</strong>
               </p>
               <p className="font-sans text-white/50 text-sm mb-6">
                 Castle Rd, Accra, Ghana
@@ -273,6 +279,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* 5.5 World Championships */}
+      <WorldChampionships />
 
       {/* 6. Athletes */}
       <section className="py-32 relative bg-[#0A0A0A] overflow-hidden">

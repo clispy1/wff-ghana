@@ -135,7 +135,7 @@ export default function About() {
               </div>
               
               <div className="relative z-10">
-                <h3 className="font-bebas text-3xl mb-1">Kwame Mensah</h3>
+                <h3 className="font-bebas text-3xl mb-1">Victor Ahenkorah Baiden</h3>
                 <p className="font-sans text-wff-red uppercase tracking-widest text-sm font-bold mb-4">President, WFF Ghana</p>
                 <p className="font-sans text-sm text-white/60 italic">
                   &quot;Our athletes have the genetics, the work ethic, and the heart. It&apos;s time the world sees what Ghana brings to the stage.&quot;

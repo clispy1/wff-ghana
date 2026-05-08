@@ -16,7 +16,7 @@ const articles = [
     title: 'Ghana 2026: Bringing the World Home',
     excerpt: 'WFF International has officially announced Accra, Ghana as the host city for the 2026 World Championships. Here is what it means for Team Ghana.',
     image: 'https://picsum.photos/seed/news1/800/600',
-    content: 'The World Fitness Federation (WFF) International executive committee has officially selected Accra, Ghana to host the 2026 World Championships this September. This marks a historic moment as the prestigious event comes to our home soil.\n\nFor WFF Ghana, this presents an unprecedented opportunity. "We are aiming to field our largest and most competitive team yet," stated WFF Ghana President Kwame Mensah. "Defending our home turf means our athletes will have the entire nation behind them."\n\nThe national qualifiers will be more competitive than ever, as athletes vie for a spot on the roster. Training camps will commence immediately following the national selections in May.'
+    content: 'The World Fitness Federation (WFF) International executive committee has officially selected Accra, Ghana to host the 2026 World Championships this September. This marks a historic moment as the prestigious event comes to our home soil.\n\nFor WFF Ghana, this presents an unprecedented opportunity. "We are aiming to field our largest and most competitive team yet," stated WFF Ghana President Victor Ahenkorah Baiden. "Defending our home turf means our athletes will have the entire nation behind them."\n\nThe national qualifiers will be more competitive than ever, as athletes vie for a spot on the roster. Training camps will commence immediately following the national selections in May.'
   },
   {
     id: 2,

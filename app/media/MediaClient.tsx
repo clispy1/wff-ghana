@@ -128,10 +128,10 @@ export default function MediaClient() {
         <div ref={newsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-32">
           {[
             { id: 1, src: '/award-1.jpg', alt: 'WFF Ghana Awards 2025', aspect: 'aspect-square' },
-            { id: 2, src: '/award-2.jpg', alt: 'President Victor Baiden Citation', aspect: 'aspect-[3/4]' },
+            { id: 2, src: '/award-2.jpg', alt: 'President Victor Ahenkorah Baiden Citation', aspect: 'aspect-[3/4]' },
             { id: 3, src: '/award-3.jpg', alt: 'Fitness Ghana Awards', aspect: 'aspect-[4/3]' },
             { id: 4, src: '/award-4.jpg', alt: 'Athlete Medal Presentation', aspect: 'aspect-square' },
-            { id: 5, src: '/award-5.jpg', alt: 'President Victor Baiden Award', aspect: 'aspect-[3/4]' },
+            { id: 5, src: '/award-5.jpg', alt: 'President Victor Ahenkorah Baiden Award', aspect: 'aspect-[3/4]' },
             { id: 6, src: '/award-6.jpg', alt: 'WFF Ghana Leadership', aspect: 'aspect-[4/3]' },
             { id: 7, src: '/culture-1.jpg', alt: 'Ghanaian Culture & Heritage', aspect: 'aspect-square' },
             { id: 8, src: '/culture-2.jpg', alt: 'Traditional Attire', aspect: 'aspect-[3/4]' },

@@ -30,7 +30,7 @@ const allEvents = [
     id: 3,
     title: 'WFF World Championships',
     date: 'September 20-25, 2026',
-    location: 'Accra International Conference Centre, Ghana',
+    location: 'UPSA Auditorium, Accra, Ghana',
     type: 'Championship',
     categories: ['All Categories'],
     status: 'Upcoming'

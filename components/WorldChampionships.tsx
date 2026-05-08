@@ -77,23 +77,31 @@ export default function WorldChampionships() {
   return (
     <section id="ghana-2026" ref={sectionRef} className="bg-wff-dark relative">
       {/* Dramatic Banner */}
-      <div ref={bannerRef} className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden">
+      <div ref={bannerRef} className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden flex flex-col md:flex-row items-center justify-center">
         <Image 
           src="https://picsum.photos/seed/accra/1920/1080" 
           alt="WFF World Championships Ghana"
           fill
-          className="object-cover scale-110"
+          className="object-cover scale-110 grayscale"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-wff-dark via-wff-dark/50 to-transparent"></div>
-        <div className="absolute inset-0 bg-wff-red/20 mix-blend-multiply"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-wff-dark via-wff-dark/80 to-transparent"></div>
+        <div className="absolute inset-0 bg-wff-red/10 mix-blend-multiply"></div>
         
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-          <p className="font-sans text-wff-gold uppercase tracking-[0.3em] font-bold mb-4">The Ultimate Stage</p>
-          <h2 className="font-bebas text-6xl md:text-8xl lg:text-9xl tracking-tight mb-4 text-stroke">
-            WORLD CHAMPIONSHIPS
-          </h2>
-          <h3 className="font-bebas text-4xl md:text-6xl text-white">ACCRA, GHANA • SEP 2026</h3>
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-center text-center md:text-left px-6 max-w-7xl mx-auto w-full gap-12 pt-20">
+          
+          <div className="flex-1">
+            <p className="font-sans text-wff-gold uppercase tracking-[0.3em] font-bold mb-4">The Ultimate Stage</p>
+            <h2 className="font-bebas text-6xl md:text-8xl lg:text-9xl tracking-tight mb-4 text-stroke">
+              WORLD CHAMPIONSHIPS
+            </h2>
+            <h3 className="font-bebas text-4xl md:text-6xl text-white">ACCRA, GHANA • SEP 2026</h3>
+          </div>
+
+          <div className="relative w-64 h-64 md:w-96 md:h-96 shrink-0 drop-shadow-2xl hover:scale-105 transition-transform duration-700 mt-8 md:mt-0">
+             <Image src="/world-medal.jpg" alt="World Championship Medal" fill className="object-contain" />
+          </div>
+
         </div>
       </div>
 
