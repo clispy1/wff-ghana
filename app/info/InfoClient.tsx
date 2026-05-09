@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import AccommodationMap from './AccommodationMap';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -109,6 +110,10 @@ export default function InfoClient() {
             <p className="font-sans text-white/70 mb-8 max-w-3xl">
               We have partnered with leading highly-rated properties in the immediate vicinity of Kotoka International Airport. These provide the utmost comfort for peak-week prep and have discounted rates when using code <strong>WFF2026</strong>.
             </p>
+
+            <div className="mb-10">
+              <AccommodationMap />
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 font-sans">
               <div className="bg-black/50 border border-white/5 p-6 rounded-lg">
@@ -201,22 +206,22 @@ export default function InfoClient() {
                     <div className="bg-black/50 border border-white/5 p-6 rounded-lg w-full">
                       <p className="text-white/50 text-xs uppercase tracking-widest mb-4 font-bold border-b border-white/10 pb-2">Morning Session - 09:00 AM</p>
                       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-8 text-sm text-white/80 mb-6">
-                        <li>Women's Aerobics / Fitness</li>
-                        <li>Men's Beach Model (Juniors, Open, Masters)</li>
-                        <li>Women's Sports Model</li>
-                        <li>Men's Sports Model</li>
-                        <li>Women's Bikini (Short, Tall, Masters)</li>
+                        <li>Women&apos;s Aerobics / Fitness</li>
+                        <li>Men&apos;s Beach Model (Juniors, Open, Masters)</li>
+                        <li>Women&apos;s Sports Model</li>
+                        <li>Men&apos;s Sports Model</li>
+                        <li>Women&apos;s Bikini (Short, Tall, Masters)</li>
                       </ul>
 
                       <p className="text-white/50 text-xs uppercase tracking-widest mb-4 font-bold border-b border-white/10 pb-2">Afternoon Session - 02:00 PM</p>
                       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-8 text-sm text-white/80">
-                        <li>Men's Fitness</li>
-                        <li>Women's Figure</li>
-                        <li>Men's Performance</li>
-                        <li>Women's Physique</li>
-                        <li>Men's Athletic</li>
-                        <li>Men's Superbody</li>
-                        <li>Men's Extreme Bodybuilding</li>
+                        <li>Men&apos;s Fitness</li>
+                        <li>Women&apos;s Figure</li>
+                        <li>Men&apos;s Performance</li>
+                        <li>Women&apos;s Physique</li>
+                        <li>Men&apos;s Athletic</li>
+                        <li>Men&apos;s Superbody</li>
+                        <li>Men&apos;s Extreme Bodybuilding</li>
                       </ul>
                     </div>
                   </div>
@@ -232,7 +237,7 @@ export default function InfoClient() {
                       <ul className="space-y-3 text-sm text-white/80">
                         <li><strong className="text-wff-gold w-32 inline-block font-mono text-xs">12:00 PM</strong> Overall Amateur Line-ups & Pro Card Ceremonies</li>
                         <li><strong className="text-wff-gold w-32 inline-block font-mono text-xs">03:00 PM</strong> WFF Pro Division (Bikini & Sports Model)</li>
-                        <li><strong className="text-wff-gold w-32 inline-block font-mono text-xs">05:30 PM</strong> WFF Pro Division (Men's Bodybuilding)</li>
+                        <li><strong className="text-wff-gold w-32 inline-block font-mono text-xs">05:30 PM</strong> WFF Pro Division (Men&apos;s Bodybuilding)</li>
                         <li><strong className="text-wff-gold w-32 inline-block font-mono text-xs">08:00 PM</strong> Championship Banquet</li>
                       </ul>
                     </div>
