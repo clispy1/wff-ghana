@@ -1,11 +1,5 @@
-import { Metadata } from 'next';
-import PartnershipsClient from './PartnershipsClient';
-
-export const metadata: Metadata = {
-  title: 'Partnerships | WFF Ghana',
-  description: 'Become a sponsor for the 2026 All Africa Championship.',
-};
+import { redirect } from 'next/navigation';
 
 export default function PartnershipsPage() {
-  return <PartnershipsClient />;
+  redirect('/federation#partnerships');
 }

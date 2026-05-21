@@ -1,11 +1,5 @@
-import { Metadata } from 'next';
-import AthletesClient from './AthletesClient';
-
-export const metadata: Metadata = {
-  title: 'Athletes & Registration | WFF Ghana',
-  description: 'Meet Team Ghana and register for the 2026 All Africa Championship.',
-};
+import { redirect } from 'next/navigation';
 
 export default function AthletesPage() {
-  return <AthletesClient />;
+  redirect('/championship#portal');
 }

@@ -1,10 +1,5 @@
-import InfoClient from './InfoClient';
-
-export const metadata = {
-  title: 'Event Information - WFF Ghana',
-  description: 'Schedule, accommodation, and arrival information for the WFF World Championships 2026.',
-};
+import { redirect } from 'next/navigation';
 
 export default function InfoPage() {
-  return <InfoClient />;
+  redirect('/championship#schedule');
 }
