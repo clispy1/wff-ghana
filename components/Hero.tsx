@@ -19,7 +19,8 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface FeatureHighlight {
+// Correct Competition Divisions & Benefits for WFF Official Rulebook
+export interface FeatureHighlight {
   id: string;
   title: string;
   subtitle: string;
@@ -27,29 +28,79 @@ interface FeatureHighlight {
   accentColor: string;
 }
 
-const HIGHLIGHTS: FeatureHighlight[] = [
-  {
-    id: 'pro-status',
-    title: 'WFF Pro Status',
-    subtitle: '6 PRO CARDS AWARDED',
-    detail: 'Overall winners in each major division instantly secure a certified global WFF Pro Card, unlocking international stages.',
-    accentColor: 'border-wff-gold text-wff-gold bg-wff-gold/5'
+export const HERO_CONTENT = {
+  ticker: {
+    title: "WORLD FITNESS FEDERATION GHANA OFFICIAL LAUNCH",
+    venue: "UPSA AUDITORIUM, ACCRA",
+    badge: "INAUGURAL PRO-AM CUP"
   },
-  {
-    id: 'prizes',
-    title: 'Mega Cash Pools',
-    subtitle: '₵ 350,000+ TOTAL PURSE',
-    detail: 'Ghana chapter and international corporate sponsors present massive financial rewards for top-tier absolute weight classes.',
-    accentColor: 'border-wff-red text-wff-red bg-wff-red/5'
+  tagline: "BUILDING THE FUTURE OF NATURAL AESTHETICS",
+  title: {
+    line1: "ALL AFRICA",
+    line2: "BODYBUILDING",
+    line3: "CHAMPIONSHIP",
+    year: "2026"
   },
-  {
-    id: 'judging',
-    title: 'Absolute Integrity',
-    subtitle: 'WFF GLOBAL COMMITTEE',
-    detail: 'Fair, certified judging metrics backed by legendary world champions to ensure transparent state-scoring parameters.',
-    accentColor: 'border-white text-white bg-white/5'
-  }
-];
+  details: [
+    {
+      id: "host",
+      label: "HOST CHAPTER",
+      value: "Accra, Ghana",
+      icon: MapPin,
+      iconColor: "text-wff-gold"
+    },
+    {
+      id: "date",
+      label: "UPCOMING CUP",
+      value: "Sept 26, 2026",
+      icon: Calendar,
+      iconColor: "text-wff-red"
+    },
+    {
+      id: "status",
+      label: "ACCREDITATION",
+      value: "WFF Authorized",
+      icon: Award,
+      iconColor: "text-wff-green"
+    }
+  ],
+  highlights: [
+    {
+      id: 'pro-status',
+      title: 'Global Pro Status',
+      subtitle: 'PRO CARDS TO BE WON',
+      detail: 'Overall class champions in the upcoming championship secure a certified global WFF Pro Card, unlocking prestigious international stages.',
+      accentColor: 'border-wff-gold text-wff-gold bg-wff-gold/5'
+    },
+    {
+      id: 'prizes',
+      title: 'Aesthetic Platform',
+      subtitle: 'CHAPTER SUPPORT & DEALS',
+      detail: 'Founding class winners secure national sponsorships, brand ambassadorships, and official support for continental representations.',
+      accentColor: 'border-wff-red text-wff-red bg-wff-red/5'
+    },
+    {
+      id: 'judging',
+      title: 'Uncompromised Integrity',
+      subtitle: 'OFFICIAL WFF SCORING',
+      detail: 'Scored by an accredited panel using correct WFF International rules, focusing strictly on muscle symmetry, density, and stage carriage.',
+      accentColor: 'border-white text-white bg-white/5'
+    }
+  ] as FeatureHighlight[],
+  stats: {
+    athleteLabel: "LAUNCH RESERVATIONS",
+    athleteValue: "Open for Entries",
+    classLabel: "COMPETITION CLASSES",
+    classValue: "4 Major Categories",
+    weighInLabel: "WEIGH-IN SELECTION",
+    weighInValue: "Sept 25, 2026"
+  },
+  ctas: {
+    passes: { text: "SECURE PASSES", href: "/championship#tickets" },
+    portal: { text: "ATHLETE PORTAL", href: "/championship#portal" }
+  },
+  disclaimer: "★ DECLARED UNDER THE WORLD FITNESS FEDERATION INTERNATIONAL CHARTER"
+};
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -183,13 +234,13 @@ export default function Hero() {
           <div className="flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-wff-green animate-pulse"></span>
             <span className="font-sans font-extrabold text-[9px] md:text-xs uppercase tracking-[0.25em] text-white/50">
-              WORLD FITNESS FEDERATION GHANA OFFICIAL
+              {HERO_CONTENT.ticker.title}
             </span>
           </div>
           <div className="flex items-center gap-6 font-sans text-[10px] md:text-xs text-white/40 uppercase tracking-widest font-mono">
-            <span>UPSA AUDITORIUM, ACCRA</span>
+            <span>{HERO_CONTENT.ticker.venue}</span>
             <span>•</span>
-            <span className="text-wff-gold font-bold">PRO-AM CONTINENTAL EVENT</span>
+            <span className="text-wff-gold font-bold">{HERO_CONTENT.ticker.badge}</span>
           </div>
         </div>
 
@@ -203,70 +254,55 @@ export default function Hero() {
             <div className="animate-entrance inline-flex items-center gap-2 px-3 py-1 bg-wff-red/10 border border-wff-red/20 rounded-full w-max">
               <Trophy size={14} className="text-wff-red" />
               <span className="font-sans text-[10px] font-black uppercase tracking-[0.3em] text-white">
-                THE SHOWDOWN OF THE CENTURY
+                {HERO_CONTENT.tagline}
               </span>
             </div>
 
             {/* Huge Display Title */}
             <h1 className="font-bebas flex flex-col leading-[0.80] uppercase select-none">
               <span ref={titlePart1Ref} className="animate-entrance block text-[13vw] md:text-[8vw] xl:text-[7.5rem] text-white tracking-tight">
-                ALL AFRICA
+                {HERO_CONTENT.title.line1}
               </span>
               <span 
                 ref={titlePart2Ref} 
                 className="animate-entrance block text-[15vw] md:text-[9.5vw] xl:text-[9rem] text-transparent tracking-tighter"
                 style={{ WebkitTextStroke: '1.5px rgba(255,255,255,0.7)' }}
               >
-                BODYBUILDING
+                {HERO_CONTENT.title.line2}
               </span>
               <div className="animate-entrance flex items-center flex-wrap gap-x-4 md:gap-x-6">
                 <span ref={titlePart3Ref} className="block text-[11vw] md:text-[7.5vw] xl:text-[7rem] text-wff-red tracking-wide drop-shadow-[0_0_25px_rgba(206,17,38,0.4)]">
-                  CHAMPIONSHIP
+                  {HERO_CONTENT.title.line3}
                 </span>
                 <span className="block text-[11vw] md:text-[7.5vw] xl:text-[7rem] text-white/80 font-outline">
-                  2026
+                  {HERO_CONTENT.title.year}
                 </span>
               </div>
             </h1>
 
             {/* Core Location/Date Information Pills */}
             <div className="animate-entrance grid grid-cols-1 sm:grid-cols-3 gap-3 border-y border-white/5 py-4 w-full">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-white/5 text-wff-gold">
-                  <MapPin size={16} />
-                </div>
-                <div className="font-sans">
-                  <span className="block text-[9px] uppercase tracking-widest text-white/40 font-bold">HOST CITY</span>
-                  <span className="text-white text-xs font-extrabold uppercase">Accra, Ghana</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-white/5 text-wff-red">
-                  <Calendar size={16} />
-                </div>
-                <div className="font-sans">
-                  <span className="block text-[9px] uppercase tracking-widest text-white/40 font-bold">SHOW DATE</span>
-                  <span className="text-white text-xs font-extrabold uppercase">Sept 26, 2026</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-white/5 text-wff-green">
-                  <Award size={16} />
-                </div>
-                <div className="font-sans">
-                  <span className="block text-[9px] uppercase tracking-widest text-white/40 font-bold">CLASSIFICATION</span>
-                  <span className="text-white text-xs font-extrabold uppercase">PRO-AM Showdown</span>
-                </div>
-              </div>
+              {HERO_CONTENT.details.map((detail) => {
+                const IconComponent = detail.icon;
+                return (
+                  <div key={detail.id} className="flex items-center gap-3">
+                    <div className={`p-2 rounded-xl bg-white/5 ${detail.iconColor}`}>
+                      <IconComponent size={16} />
+                    </div>
+                    <div className="font-sans">
+                      <span className="block text-[9px] uppercase tracking-widest text-white/40 font-bold">{detail.label}</span>
+                      <span className="text-white text-xs font-extrabold uppercase">{detail.value}</span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Interactive Highlights Bento Panel */}
             <div className="animate-entrance bg-[#070707]/90 border border-white/10 rounded-2xl p-5 md:p-6 backdrop-blur-md">
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/5">
                 <span className="font-sans text-[10px] font-black uppercase tracking-widest text-wff-gold flex items-center gap-2">
-                  <Activity size={14} className="animate-pulse" /> CHAMPIONSHIP BENEFITS
+                  <Activity size={14} className="animate-pulse" /> INAUGURAL PLATFORM VALUES
                 </span>
                 <span className="font-sans text-[9px] text-white/30 uppercase tracking-wider font-mono">
                   SELECT ACCENT TO VIEW DETAILS
@@ -275,7 +311,7 @@ export default function Hero() {
 
               {/* Toggles */}
               <div className="grid grid-cols-3 gap-2.5 mb-4">
-                {HIGHLIGHTS.map((hl) => (
+                {HERO_CONTENT.highlights.map((hl) => (
                   <button
                     key={hl.id}
                     onClick={() => setActiveHighlight(hl.id)}
@@ -293,7 +329,7 @@ export default function Hero() {
 
               {/* Display Content info */}
               <div className="min-h-[50px] transition-all duration-300">
-                {HIGHLIGHTS.map((hl) => {
+                {HERO_CONTENT.highlights.map((hl) => {
                   if (activeHighlight !== hl.id) return null;
                   return (
                     <p key={hl.id} className="font-sans text-xs text-white/60 leading-relaxed animate-fade-in">
@@ -331,7 +367,7 @@ export default function Hero() {
                 </div>
                 <div className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-lg">
                   <span className="font-mono text-[9px] tracking-widest text-[#00A86B] font-bold uppercase animate-pulse">
-                    ● TIER 1 TICKETS ACTIVE
+                    ● BOOKINGS ACTIVE
                   </span>
                 </div>
               </div>
@@ -339,7 +375,7 @@ export default function Hero() {
               {/* Sports-Tech Countdown Ticker */}
               <div className="mb-8">
                 <span className="font-sans text-[9px] uppercase tracking-[0.25em] text-white/40 block mb-3 font-semibold">
-                  CHAMPIONSHIP SECONDS ELAPSED
+                  INAUGURAL SHOWDOWN TIMER
                 </span>
                 
                 <div className="grid grid-cols-4 gap-3 bg-black/60 p-4 rounded-2xl border border-white/5">
@@ -361,32 +397,32 @@ export default function Hero() {
                 </div>
               </div>
 
-              {/* Key Event Ticker Metrics */}
+              {/* Key Event Ticker Metrics - Authentic Launch Info */}
               <div className="space-y-3.5 mb-8">
                 <div className="flex items-center justify-between text-xs py-2 border-b border-white/5 font-sans">
                   <span className="text-white/50 flex items-center gap-2 font-semibold">
-                    <Users size={12} className="text-wff-red" /> ENROLLED SPORT ATHLETES
+                    <Users size={12} className="text-wff-red" /> {HERO_CONTENT.stats.athleteLabel}
                   </span>
                   <span className="text-white font-extrabold font-mono text-xs uppercase">
-                    540 Registered
+                    {HERO_CONTENT.stats.athleteValue}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between text-xs py-2 border-b border-white/5 font-sans">
                   <span className="text-white/50 flex items-center gap-2 font-semibold">
-                    <ShieldCheck size={12} className="text-wff-gold" /> PHYSICAL AUDITING TIERS
+                    <ShieldCheck size={12} className="text-wff-gold" /> {HERO_CONTENT.stats.classLabel}
                   </span>
                   <span className="text-white font-extrabold font-mono text-xs uppercase">
-                    9 Weight Classes
+                    {HERO_CONTENT.stats.classValue}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between text-xs py-2 border-b border-white/5 font-sans">
                   <span className="text-white/50 flex items-center gap-2 font-semibold">
-                    <Clock size={12} className="text-wff-green" /> WEIGH-IN SELECTION
+                    <Clock size={12} className="text-wff-green" /> {HERO_CONTENT.stats.weighInLabel}
                   </span>
                   <span className="text-white font-extrabold font-mono text-xs uppercase">
-                    Sept 25, 2026
+                    {HERO_CONTENT.stats.weighInValue}
                   </span>
                 </div>
               </div>
@@ -394,18 +430,18 @@ export default function Hero() {
               {/* ACTION CALLOUT HUBS */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Link 
-                  href="/championship#tickets" 
+                  href={HERO_CONTENT.ctas.passes.href} 
                   className="group relative flex items-center justify-center gap-1.5 bg-wff-red text-white py-3 px-4 rounded-xl font-bebas text-xl tracking-widest hover:bg-white hover:text-black transition-all shadow-[0_10px_20px_rgba(206,17,38,0.25)] hover:scale-103 duration-300 font-bold uppercase"
                 >
-                  SECURE PASSES
+                  {HERO_CONTENT.ctas.passes.text}
                   <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
 
                 <Link 
-                  href="/championship#portal" 
+                  href={HERO_CONTENT.ctas.portal.href} 
                   className="flex items-center justify-center gap-1.5 bg-white/5 border border-white/10 hover:border-wff-gold text-white hover:text-wff-gold py-3 px-4 rounded-xl font-bebas text-xl tracking-widest transition-all hover:bg-white/10 duration-300 font-bold uppercase"
                 >
-                  ATHLETE PORTAL
+                  {HERO_CONTENT.ctas.portal.text}
                 </Link>
               </div>
 
@@ -413,7 +449,7 @@ export default function Hero() {
 
             {/* Tiny disclaimer note */}
             <div className="text-center mt-4 font-sans text-[10px] text-white/30 tracking-widest font-semibold">
-              ★ OFFICIAL AFFILIATION WITH WORLD FITNESS FEDERATION INTERNATIONAL
+              {HERO_CONTENT.disclaimer}
             </div>
 
           </div>
