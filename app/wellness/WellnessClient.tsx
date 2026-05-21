@@ -5,8 +5,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Heart, Activity, Brain, Users, Play } from 'lucide-react';
 import Image from 'next/image';
-import { Canvas } from '@react-three/fiber';
-import WaterRipple from '@/components/WaterRipple';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -110,13 +108,8 @@ export default function WellnessClient() {
   return (
     <main ref={containerRef} className="pt-32 pb-24 min-h-screen relative overflow-hidden">
       
-      {/* 3D Water Ripple Background */}
-      <div className="absolute inset-0 z-0 opacity-60 pointer-events-none">
-        <Canvas camera={{ position: [0, 0, 5] }}>
-          <ambientLight intensity={0.5} />
-          <WaterRipple />
-        </Canvas>
-      </div>
+      {/* Ambient Teal Glow Background */}
+      <div className="absolute inset-0 z-0 opacity-25 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(0,168,107,0.15) 0%, transparent 70%)' }}></div>
 
       <div className="container mx-auto px-6 relative z-10">
         

@@ -4,8 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
-import { Canvas } from '@react-three/fiber';
-import KenteMesh from '@/components/KenteMesh';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -143,12 +141,8 @@ export default function FederationClient() {
         <h2 className="ghost-text font-bebas text-[20vw] leading-none text-white whitespace-nowrap -ml-10">STRONG</h2>
       </div>
 
-      {/* 3D Kente Mesh Background */}
-      <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
-        <Canvas camera={{ position: [0, 0, 10] }}>
-          <KenteMesh />
-        </Canvas>
-      </div>
+      {/* Ambient Gold Glow Background */}
+      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(252,209,22,0.12) 0%, transparent 70%)' }}></div>
 
       <div className="container mx-auto px-6 relative z-10">
         

@@ -1,8 +1,6 @@
 import type {Metadata} from 'next';
 import { Teko, DM_Sans } from 'next/font/google';
 import './globals.css'; // Global styles
-import CustomCursor from '@/components/CustomCursor';
-import Loader from '@/components/Loader';
 import ScrubberNavbar from '@/components/ScrubberNavbar';
 import Footer from '@/components/Footer';
 import SmoothScrolling from '@/components/SmoothScrolling';
@@ -31,9 +29,6 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       <body className="text-white font-sans antialiased overflow-x-hidden selection:bg-wff-red selection:text-white" suppressHydrationWarning>
         <CartProvider>
           <SmoothScrolling>
-            <div className="noise-overlay"></div>
-            <CustomCursor />
-            <Loader />
             <ScrubberNavbar />
             <CartDrawer />
             {children}

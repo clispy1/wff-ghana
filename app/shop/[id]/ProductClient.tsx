@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/lib/CartContext';
@@ -78,20 +78,26 @@ const products = [
 
 export default function ProductClient({ id }: { id: string }) {
   const { addToCart } = useCart();
-  const [product, setProduct] = useState<any>(null);
-  const [selectedSize, setSelectedSize] = useState<string>('');
+
+  const product = useMemo(() => {
+    return products.find(p => p.id === id) || null;
+  }, [id]);
+
+  const [selectedSize, setSelectedSize] = useState<string>(() => {
+    const found = products.find(p => p.id === id);
+    return found && found.sizes.length > 0 ? found.sizes[0] : '';
+  });
+
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
 
+  // Sync selected size if the product ID changes
   useEffect(() => {
-    const found = products.find(p => p.id === id);
-    if (found) {
-      setProduct(found);
-      if (found.sizes.length > 0) {
-        setSelectedSize(found.sizes[0]);
-      }
+    if (product && product.sizes.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedSize(product.sizes[0]);
     }
-  }, [id]);
+  }, [product]);
 
   const handleAddToCart = () => {
     if (product) {

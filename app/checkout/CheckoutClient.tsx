@@ -30,7 +30,7 @@ export default function CheckoutClient() {
           <CheckCircle className="w-24 h-24 text-wff-gold mx-auto mb-8" />
           <h1 className="font-bebas text-6xl md:text-8xl mb-6">ORDER <span className="text-wff-red">CONFIRMED</span></h1>
           <p className="font-sans text-white/60 text-lg mb-12">
-            Thank you for your purchase. Your gear is being prepared for battle. We'll send a confirmation email with tracking details shortly.
+            Thank you for your purchase. Your gear is being prepared for battle. We&apos;ll send a confirmation email with tracking details shortly.
           </p>
           <Link 
             href="/shop"

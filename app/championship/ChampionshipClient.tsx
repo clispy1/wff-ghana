@@ -5,8 +5,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
 import { MapPin, Calendar, Clock, Ticket, Check } from 'lucide-react';
-import { Canvas } from '@react-three/fiber';
-import FireTunnel from '@/components/FireTunnel';
 import { useCart } from '@/lib/CartContext';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -115,12 +113,8 @@ export default function ChampionshipClient() {
   return (
     <main ref={containerRef} className="h-screen w-full relative overflow-hidden flex items-center justify-center bg-wff-dark">
       
-      {/* 3D Fire Tunnel Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <Canvas camera={{ position: [0, 0, 0] }}>
-          <FireTunnel />
-        </Canvas>
-      </div>
+      {/* Ambient Red Glow Background */}
+      <div className="absolute inset-0 z-0 opacity-25 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(206,17,38,0.15) 0%, transparent 70%)' }}></div>
 
       {/* Overlay Gradient */}
       <div className="absolute inset-0 z-1 bg-gradient-to-b from-wff-dark/80 via-wff-dark/50 to-wff-dark"></div>

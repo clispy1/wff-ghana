@@ -6,9 +6,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Hero from '@/components/Hero';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Canvas } from '@react-three/fiber';
-import FireTunnel from '@/components/FireTunnel';
-import ParticleSilhouette from '@/components/ParticleSilhouette';
 import WorldChampionships from '@/components/WorldChampionships';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -156,7 +153,7 @@ export default function Home() {
               <h2 className="font-bebas text-6xl md:text-8xl text-wff-gold mb-6">THE FEDERATION</h2>
               <div className="space-y-6 font-sans text-lg text-white/70 leading-relaxed mb-10">
                 <p className="text-xl text-white italic border-l-4 border-wff-red pl-6 py-2">
-                  "Our vision is to provide a world-class platform for Ghanaian athletes to showcase their hard work, dedication, and aesthetic excellence on the global stage."
+                  &ldquo;Our vision is to provide a world-class platform for Ghanaian athletes to showcase their hard work, dedication, and aesthetic excellence on the global stage.&rdquo;
                 </p>
                 <p>
                   World Fitness Federation (WFF) Ghana is the premier destination for aesthetic and athletic excellence. We are bringing the global standard of bodybuilding and fitness modeling to the heart of West Africa, ensuring fair judging, athlete welfare, and community building.
@@ -213,11 +210,7 @@ export default function Home() {
 
       {/* 5. Championship Feature */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black py-32">
-        <div className="absolute inset-0 z-0">
-          <Canvas camera={{ position: [0, 0, 5] }}>
-            <FireTunnel />
-          </Canvas>
-        </div>
+        <div className="absolute inset-0 z-0" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(206,17,38,0.15) 0%, transparent 70%)' }}></div>
         <div className="absolute inset-0 bg-gradient-to-t from-wff-dark via-transparent to-wff-dark z-0"></div>
         
         <div className="container mx-auto px-6 relative z-10">
@@ -234,11 +227,11 @@ export default function Home() {
             <div className="bg-black/60 backdrop-blur-md border border-white/10 p-8 reveal-target rounded-xl">
               <h3 className="font-bebas text-3xl text-wff-gold mb-4">CATEGORIES</h3>
               <ul className="space-y-2 font-sans text-white/70">
-                <li>• Men's Bodybuilding</li>
-                <li>• Men's Physique</li>
+                <li>• Men&apos;s Bodybuilding</li>
+                <li>• Men&apos;s Physique</li>
                 <li>• Classic Physique</li>
-                <li>• Women's Bikini</li>
-                <li>• Women's Wellness</li>
+                <li>• Women&apos;s Bikini</li>
+                <li>• Women&apos;s Wellness</li>
               </ul>
             </div>
             
@@ -264,7 +257,7 @@ export default function Home() {
                 Castle Rd, Accra, Ghana
               </p>
               <p className="font-sans text-white/70 text-sm">
-                Experience the electrifying atmosphere in Ghana's premier event space, featuring state-of-the-art lighting and stage design.
+                Experience the electrifying atmosphere in Ghana&apos;s premier event space, featuring state-of-the-art lighting and stage design.
               </p>
             </div>
           </div>
@@ -285,11 +278,7 @@ export default function Home() {
 
       {/* 6. Athletes */}
       <section className="py-32 relative bg-[#0A0A0A] overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-20">
-          <Canvas camera={{ position: [0, 0, 8] }}>
-            <ParticleSilhouette />
-          </Canvas>
-        </div>
+        <div className="absolute inset-0 z-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(252,209,22,0.1) 0%, transparent 70%)' }}></div>
         <div className="container mx-auto px-6 relative z-10">
           <div className="text-center mb-20 reveal-target">
             <h2 className="font-bebas text-6xl md:text-8xl text-white">TEAM <span className="text-wff-red">GHANA</span></h2>

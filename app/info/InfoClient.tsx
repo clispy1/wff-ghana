@@ -2,7 +2,6 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import AccommodationMap from './AccommodationMap';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -110,10 +109,6 @@ export default function InfoClient() {
             <p className="font-sans text-white/70 mb-8 max-w-3xl">
               We have partnered with leading highly-rated properties in the immediate vicinity of Kotoka International Airport. These provide the utmost comfort for peak-week prep and have discounted rates when using code <strong>WFF2026</strong>.
             </p>
-
-            <div className="mb-10">
-              <AccommodationMap />
-            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 font-sans">
               <div className="bg-black/50 border border-white/5 p-6 rounded-lg">

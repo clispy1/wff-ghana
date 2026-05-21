@@ -5,8 +5,6 @@ import Image from 'next/image';
 import { X, Upload, Music, FileText } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Canvas } from '@react-three/fiber';
-import ParticleSilhouette from '@/components/ParticleSilhouette';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -148,14 +146,8 @@ export default function AthletesClient() {
   return (
     <main className="pt-32 pb-24 min-h-screen bg-wff-dark relative overflow-hidden">
       
-      {/* 3D Particle Silhouette Background */}
-      <div className="absolute inset-0 z-0 opacity-30 pointer-events-none flex items-center justify-center">
-        <div className="w-[100vw] h-[100vh] md:w-[50vw]">
-          <Canvas camera={{ position: [0, 0, 8] }}>
-            <ParticleSilhouette />
-          </Canvas>
-        </div>
-      </div>
+      {/* Ambient Red Glow Background */}
+      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(206,17,38,0.12) 0%, transparent 70%)' }}></div>
 
       <div className="container mx-auto px-6 relative z-10">
         
