@@ -61,7 +61,7 @@ const HOME_DATA_CONFIG = {
       title: 'ASCENSION',
       subtitle: 'EARN REST, SEIZE GLORY.',
       type: 'image',
-      src: 'https://images.unsplash.com/photo-1552674605-171ff3ea36f6?q=80&w=2070&auto=format&fit=crop'
+      src: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070&auto=format&fit=crop'
     }
   ],
   championship: {
@@ -109,7 +109,7 @@ const HOME_DATA_CONFIG = {
         id: "amb-3",
         title: "WELLNESS",
         desc: "Balance, Muscle Tone & Presentation",
-        image: "https://images.unsplash.com/photo-1552674605-171ff3ea36f6?q=80&w=800&auto=format&fit=crop",
+        image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800&auto=format&fit=crop",
         badge: "Women's Wellness Slot"
       }
     ],
@@ -609,7 +609,7 @@ export default function Home() {
             {[
               "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800&auto=format&fit=crop",
               "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop",
-              "https://images.unsplash.com/photo-1552674605-171ff3ea36f6?q=80&w=800&auto=format&fit=crop",
+              "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800&auto=format&fit=crop",
               "https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=800&auto=format&fit=crop"
             ].map((src, i) => (
               <div 

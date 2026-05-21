@@ -39,7 +39,7 @@ const navItems: NavItem[] = [
       { name: 'Hourly Timetable', href: '/championship#schedule', desc: 'Official schedule, weighing slots & division sessions.' },
       { name: 'Host Hotels & Visas', href: '/championship#logistics', desc: 'Airport transfers, health rules & host hotels.' },
       { name: 'Ghana Roster', href: '/championship#roster', desc: 'The national squad profiles and elite achievements.' },
-      { name: 'Athlete Portal', href: '/championship#portal', desc: 'Athletes registration & music tracks uploader.' }
+      { name: 'Athlete Portal', href: '/register', desc: 'Athletes registration & music tracks uploader.' }
     ]
   },
   {
@@ -208,7 +208,7 @@ export default function ScrubberNavbar() {
             <div className="flex items-center gap-2 md:gap-4">
               {/* Registration CTA button on desktop */}
               <Link 
-                href="/championship#portal"
+                href="/register"
                 className="hidden sm:inline-flex items-center justify-center bg-wff-red text-white text-[10px] font-bold uppercase tracking-widest px-6 py-2.5 rounded-full hover:bg-white hover:text-black transition-all shadow-md hover:scale-105 active:scale-95 duration-200"
               >
                 Register Athlete
@@ -323,7 +323,7 @@ export default function ScrubberNavbar() {
           {/* Quick Contact & Register Options */}
           <div className="mt-8 space-y-4">
             <Link 
-              href="/championship#portal"
+              href="/register"
               className="flex items-center justify-center w-full bg-wff-red hover:bg-white text-white hover:text-black py-4 rounded-xl font-bebas text-2xl tracking-widest transition-colors shadow-lg"
             >
               REGISTER ATHLETE NOW
