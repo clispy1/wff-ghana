@@ -35,6 +35,7 @@ const ACCOMMODATIONS = [
 export default function RegisterPage() {
   const [activeTab, setActiveTab] = useState<'athlete' | 'spectator'>('athlete');
   const [selectedAccommodation, setSelectedAccommodation] = useState<string | null>(null);
+  const [hasCrossover, setHasCrossover] = useState(false);
 
   return (
     <main className="min-h-screen bg-wff-dark pt-32 pb-24 relative overflow-hidden">
@@ -134,18 +135,131 @@ export default function RegisterPage() {
                 {activeTab === 'athlete' && (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-white/5">
-                      <div className="space-y-2">
-                        <label className="font-sans text-xs font-bold text-white/70 uppercase tracking-widest flex items-center gap-2">
-                          <Activity size={14} className="text-wff-red" />
-                          Division
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <label className="font-sans text-xs font-bold text-white/70 uppercase tracking-widest flex items-center gap-2">
+                            <Activity size={14} className="text-wff-red" />
+                            Primary Division
+                          </label>
+                          <select className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-wff-red transition-colors font-sans text-sm appearance-none">
+                            <option value="">Select Division</option>
+                            <optgroup label="Men's Bodybuilding & Figure">
+                              <option>Men Juniors</option>
+                              <option>Men Bodybuilding Masters over 50</option>
+                              <option>Men Bodybuilding Grand Masters over 60</option>
+                              <option>Men Bodybuilding Grand Masters over 70</option>
+                              <option>Bodybuilding PRO</option>
+                            </optgroup>
+                            <optgroup label="Men's Physique & Sportmodel">
+                              <option>Men Sportmodel Open</option>
+                              <option>Men Sportmodel Masters over 40</option>
+                              <option>Men Sportmodel PRO</option>
+                              <option>Bermuda Juniors</option>
+                              <option>Bermuda Open</option>
+                              <option>Bermuda Masters over 40</option>
+                              <option>Bermuda PRO</option>
+                            </optgroup>
+                            <optgroup label="Men's Fitness & Athletic">
+                              <option>Men Fitness</option>
+                              <option>Men Performance</option>
+                              <option>Men Athletic</option>
+                              <option>Men Superbody</option>
+                              <option>Men Extremebody</option>
+                              <option>Warrior Open Class</option>
+                            </optgroup>
+                            <optgroup label="Women's Bikini & Glamour">
+                              <option>Bikini Model Juniors</option>
+                              <option>Bikini Model Open</option>
+                              <option>Bikini Model Masters over 40</option>
+                              <option>Bikini Model Masters over 50</option>
+                              <option>Bikini Model PRO</option>
+                              <option>Glamour Model</option>
+                            </optgroup>
+                            <optgroup label="Women's Sportmodel & Figure">
+                              <option>Women Sportmodel Open</option>
+                              <option>Women Sportmodel Masters over 40</option>
+                              <option>Women Sportmodel PRO</option>
+                              <option>Latino Figure</option>
+                              <option>Women Figure Masters over 50</option>
+                              <option>Figure PRO</option>
+                            </optgroup>
+                            <optgroup label="Women's Fitness & Aerobic">
+                              <option>Aerobic Juniors 13 to 16 Years</option>
+                              <option>Women Aerobic</option>
+                              <option>Women Fitness / Performance</option>
+                              <option>Women Athletic</option>
+                              <option>Women Superbody</option>
+                              <option>Women Extrembody</option>
+                            </optgroup>
+                          </select>
+                        </div>
+                        
+                        <label className="flex items-center gap-3 cursor-pointer group mt-2">
+                          <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${hasCrossover ? 'bg-wff-red border-wff-red' : 'bg-[#111] border-white/20 group-hover:border-white/50'}`}>
+                            {hasCrossover && <Check size={14} className="text-white" strokeWidth={3} />}
+                          </div>
+                          <input type="checkbox" className="hidden" checked={hasCrossover} onChange={() => setHasCrossover(!hasCrossover)} />
+                          <span className="font-sans text-[13px] text-white/70 group-hover:text-white transition-colors">Start in an additional class (+$50)</span>
                         </label>
-                        <select className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-wff-red transition-colors font-sans text-sm appearance-none">
-                          <option>Men&apos;s Bodybuilding</option>
-                          <option>Men&apos;s Physique</option>
-                          <option>Classic Physique</option>
-                          <option>Women&apos;s Bikini</option>
-                          <option>Women&apos;s Wellness</option>
-                        </select>
+                        
+                        {hasCrossover && (
+                          <div className="space-y-2 mt-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                            <label className="font-sans text-[10px] font-bold text-white/50 uppercase tracking-widest flex items-center gap-2">
+                              Secondary Division
+                            </label>
+                            <select className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-wff-red transition-colors font-sans text-sm appearance-none">
+                              <option value="">Select Additional Class</option>
+                              <optgroup label="Men's Bodybuilding & Figure">
+                                <option>Men Juniors</option>
+                                <option>Men Bodybuilding Masters over 50</option>
+                                <option>Men Bodybuilding Grand Masters over 60</option>
+                                <option>Men Bodybuilding Grand Masters over 70</option>
+                                <option>Bodybuilding PRO</option>
+                              </optgroup>
+                              <optgroup label="Men's Physique & Sportmodel">
+                                <option>Men Sportmodel Open</option>
+                                <option>Men Sportmodel Masters over 40</option>
+                                <option>Men Sportmodel PRO</option>
+                                <option>Bermuda Juniors</option>
+                                <option>Bermuda Open</option>
+                                <option>Bermuda Masters over 40</option>
+                                <option>Bermuda PRO</option>
+                              </optgroup>
+                              <optgroup label="Men's Fitness & Athletic">
+                                <option>Men Fitness</option>
+                                <option>Men Performance</option>
+                                <option>Men Athletic</option>
+                                <option>Men Superbody</option>
+                                <option>Men Extremebody</option>
+                                <option>Warrior Open Class</option>
+                              </optgroup>
+                              <optgroup label="Women's Bikini & Glamour">
+                                <option>Bikini Model Juniors</option>
+                                <option>Bikini Model Open</option>
+                                <option>Bikini Model Masters over 40</option>
+                                <option>Bikini Model Masters over 50</option>
+                                <option>Bikini Model PRO</option>
+                                <option>Glamour Model</option>
+                              </optgroup>
+                              <optgroup label="Women's Sportmodel & Figure">
+                                <option>Women Sportmodel Open</option>
+                                <option>Women Sportmodel Masters over 40</option>
+                                <option>Women Sportmodel PRO</option>
+                                <option>Latino Figure</option>
+                                <option>Women Figure Masters over 50</option>
+                                <option>Figure PRO</option>
+                              </optgroup>
+                              <optgroup label="Women's Fitness & Aerobic">
+                                <option>Aerobic Juniors 13 to 16 Years</option>
+                                <option>Women Aerobic</option>
+                                <option>Women Fitness / Performance</option>
+                                <option>Women Athletic</option>
+                                <option>Women Superbody</option>
+                                <option>Women Extrembody</option>
+                              </optgroup>
+                            </select>
+                          </div>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <label className="font-sans text-xs font-bold text-white/70 uppercase tracking-widest flex items-center gap-2">
@@ -250,6 +364,15 @@ export default function RegisterPage() {
                   <span className="text-white font-bold">$100.00</span>
                 </div>
                 
+                {activeTab === 'athlete' && hasCrossover && (
+                  <div className="flex justify-between items-center text-sm font-sans text-wff-red">
+                    <span className="flex items-center gap-2">
+                      <Activity size={14} /> Additional Class
+                    </span>
+                    <span className="font-bold">+$50.00</span>
+                  </div>
+                )}
+                
                 {selectedAccommodation && (
                   <div className="flex justify-between items-center text-sm font-sans text-wff-gold">
                     <span className="flex items-center gap-2">
@@ -261,14 +384,21 @@ export default function RegisterPage() {
                 
                 <div className="flex justify-between items-center text-sm font-sans">
                   <span className="text-white/60">Tax / Handling (2%)</span>
-                  <span className="text-white font-bold">${selectedAccommodation ? '3.00' : '2.00'}</span>
+                  <span className="text-white font-bold">
+                    ${((100 + (hasCrossover && activeTab === 'athlete' ? 50 : 0) + (selectedAccommodation ? 50 : 0)) * 0.02).toFixed(2)}
+                  </span>
                 </div>
               </div>
               
               <div className="flex justify-between items-center border-t border-white/10 pt-4 mb-8">
                 <span className="font-sans text-xs uppercase tracking-widest text-white/70">Total Due</span>
                 <span className="font-bebas text-4xl text-wff-red">
-                  ${selectedAccommodation ? '153.00' : '102.00'}
+                  ${(
+                    100 + 
+                    (hasCrossover && activeTab === 'athlete' ? 50 : 0) + 
+                    (selectedAccommodation ? 50 : 0) + 
+                    ((100 + (hasCrossover && activeTab === 'athlete' ? 50 : 0) + (selectedAccommodation ? 50 : 0)) * 0.02)
+                  ).toFixed(2)}
                 </span>
               </div>
               

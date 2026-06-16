@@ -191,31 +191,6 @@ export default function Home() {
         );
       });
 
-      // Horizontal Scroll Logic
-      const horizontalSection = document.querySelector('.horizontal-scroll-container');
-      const horizontalContent = document.querySelector('.horizontal-scroll-content');
-      
-      if (horizontalSection && horizontalContent) {
-        const getScrollAmount = () => {
-          let horizontalWidth = horizontalContent.scrollWidth;
-          return -(horizontalWidth - window.innerWidth);
-        };
-
-        const tween = gsap.to(horizontalContent, {
-          x: getScrollAmount,
-          ease: "none"
-        });
-
-        ScrollTrigger.create({
-          trigger: horizontalSection,
-          start: "top top",
-          end: () => `+=${getScrollAmount() * -1}`,
-          pin: true,
-          animation: tween,
-          scrub: 1,
-          invalidateOnRefresh: true
-        });
-      }
       
       // Refresh ScrollTrigger after a short delay to account for any layout shifts
       setTimeout(() => {
@@ -301,43 +276,55 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. Horizontal Scroll Journey Panel */}
-      <section className="horizontal-scroll-container h-screen bg-black flex items-center overflow-hidden border-b border-white/5">
-        <div className="horizontal-scroll-content flex space-x-6 px-[10vw] items-center h-full w-max">
-          {HOME_DATA_CONFIG.journeyPanels.map((panel, idx) => (
-            <div key={idx} className="flex-shrink-0 flex flex-col justify-end w-[85vw] md:w-[50vw] h-[65vh] border border-white/10 bg-[#090909] relative overflow-hidden group cursor-pointer rounded-2xl shadow-xl">
-              
-              {/* Media Background */}
-              {panel.type === 'video' ? (
-                <video 
-                  src={panel.src} 
-                  autoPlay 
-                  loop 
-                  muted 
-                  playsInline 
-                  className="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:opacity-50 transition-opacity duration-700 grayscale group-hover:grayscale-0"
-                />
-              ) : (
-                <div 
-                  className="absolute inset-0 w-full h-full bg-cover bg-center opacity-25 group-hover:opacity-50 transition-opacity duration-700 grayscale group-hover:grayscale-0"
-                  style={{ backgroundImage: `url(${panel.src})` }}
-                />
-              )}
-              
-              {/* Overlapping dark scrims */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-              
-              {/* Content Panel */}
-              <div className="relative z-15 p-8 md:p-10 translate-y-6 group-hover:translate-y-0 transition-transform duration-500">
-                <p className="font-sans text-wff-red font-bold uppercase tracking-[0.2em] text-xs mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                  {panel.subtitle}
-                </p>
-                <h2 className="font-bebas text-5xl md:text-7xl leading-none text-white/70 group-hover:text-white transition-colors duration-700 tracking-wide select-none">
-                  {panel.title}
-                </h2>
-              </div>
-            </div>
-          ))}
+      {/* 4. Journey Panel (Grid layout instead of horizontal scroll) */}
+      <section className="py-24 bg-black border-b border-white/5">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="text-center mb-16 reveal-target">
+            <h2 className="font-bebas text-5xl md:text-7xl text-white">THE JOURNEY</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+            {HOME_DATA_CONFIG.journeyPanels.map((panel, idx) => {
+              // Custom span logic for bento grid feeling
+              let colSpan = "col-span-1 md:col-span-1 lg:col-span-2";
+              if (idx === 2) colSpan = "col-span-1 md:col-span-2 lg:col-span-2";
+              if (idx === 3 || idx === 4) colSpan = "col-span-1 md:col-span-1 lg:col-span-3";
+
+              return (
+                <div key={idx} className={`reveal-target flex flex-col justify-end h-[50vh] border border-white/10 bg-[#090909] relative overflow-hidden group cursor-pointer rounded-2xl shadow-xl ${colSpan}`}>
+                  
+                  {/* Media Background */}
+                  {panel.type === 'video' ? (
+                    <video 
+                      src={panel.src} 
+                      autoPlay 
+                      loop 
+                      muted 
+                      playsInline 
+                      className="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:opacity-50 transition-opacity duration-700 grayscale group-hover:grayscale-0"
+                    />
+                  ) : (
+                    <div 
+                      className="absolute inset-0 w-full h-full bg-cover bg-center opacity-25 group-hover:opacity-50 transition-opacity duration-700 grayscale group-hover:grayscale-0"
+                      style={{ backgroundImage: `url(${panel.src})` }}
+                    />
+                  )}
+                  
+                  {/* Overlapping dark scrims */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                  
+                  {/* Content Panel */}
+                  <div className="relative z-15 p-8 md:p-10 translate-y-6 group-hover:translate-y-0 transition-transform duration-500">
+                    <p className="font-sans text-wff-red font-bold uppercase tracking-[0.2em] text-xs mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                      {panel.subtitle}
+                    </p>
+                    <h2 className="font-bebas text-5xl md:text-7xl leading-none text-white/70 group-hover:text-white transition-colors duration-700 tracking-wide select-none">
+                      {panel.title}
+                    </h2>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
