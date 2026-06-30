@@ -109,7 +109,7 @@ export default function Navbar() {
           </div>
 
           <Link 
-            href="/athletes"
+            href="/register"
             className="bg-wff-red text-white font-bebas text-xl px-6 py-2 tracking-wider hover:bg-white hover:text-wff-red transition-colors duration-300"
           >
             JOIN TEAM GHANA
@@ -150,7 +150,7 @@ export default function Navbar() {
           );
         })}
         <Link 
-          href="/athletes"
+          href="/register"
           onClick={() => setIsOpen(false)}
           className="bg-wff-red text-white font-bebas text-3xl px-8 py-4 tracking-wider hover:bg-white hover:text-wff-red transition-colors duration-300 mt-8 relative z-10"
         >

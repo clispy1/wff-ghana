@@ -83,7 +83,7 @@ const HOME_DATA_CONFIG = {
     venueDetails: "Accra's state-of-the-art national-scale auditorium with premium production, professional athlete staging, and fully designed modern theater feedback.",
     ctas: {
       tickets: { text: "SECURE PASSES", href: "/championship" },
-      register: { text: "REGISTER TO COMPETE", href: "/athletes" }
+      register: { text: "REGISTER TO COMPETE", href: "/register" }
     }
   },
   ambassadorsSection: {
@@ -113,7 +113,7 @@ const HOME_DATA_CONFIG = {
         badge: "Women's Wellness Slot"
       }
     ],
-    cta: { text: "Apply For Stage Access", href: "/athletes" }
+    cta: { text: "Apply For Stage Access", href: "/register" }
   },
   wellness: {
     supertitle: "SUSTAIN THE BODY",

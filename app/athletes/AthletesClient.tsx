@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { X, Upload, Music, FileText } from 'lucide-react';
+import { X } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -52,7 +52,6 @@ export default function AthletesClient() {
   const modalRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const rosterRef = useRef<HTMLDivElement>(null);
-  const portalRef = useRef<HTMLDivElement>(null);
 
   // 3D Tilt Effect
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -122,22 +121,6 @@ export default function AthletesClient() {
           }
         );
       }
-
-      if (portalRef.current) {
-        gsap.fromTo(portalRef.current,
-          { opacity: 0, y: 50 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: portalRef.current,
-              start: 'top 80%',
-            }
-          }
-        );
-      }
     });
 
     return () => ctx.revert();
@@ -195,78 +178,6 @@ export default function AthletesClient() {
               <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-wff-red opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             </div>
           ))}
-        </div>
-
-        {/* Athlete Portal / Registration */}
-        <div ref={portalRef} className="max-w-5xl mx-auto bg-[#111] border border-white/10 p-8 md:p-12 opacity-0 rounded-xl">
-          <div className="text-center mb-12">
-            <h2 className="font-bebas text-5xl mb-4">ATHLETE <span className="text-wff-gold">PORTAL</span></h2>
-            <p className="font-sans text-white/60">Register for the 2026 All Africa Championship and manage your logistics.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {/* Registration Form */}
-            <div>
-              <h3 className="font-bebas text-3xl mb-6 border-b border-white/10 pb-4">REGISTRATION</h3>
-              <form className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">First Name</label>
-                    <input type="text" className="w-full bg-[#0A0A0A] border border-white/10 p-3 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
-                  </div>
-                  <div>
-                    <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Last Name</label>
-                    <input type="text" className="w-full bg-[#0A0A0A] border border-white/10 p-3 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Country</label>
-                  <select className="w-full bg-[#0A0A0A] border border-white/10 p-3 text-white focus:border-wff-red outline-none transition-colors appearance-none rounded-md">
-                    <option>Ghana</option>
-                    <option>Nigeria</option>
-                    <option>South Africa</option>
-                    <option>Egypt</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Category</label>
-                  <select className="w-full bg-[#0A0A0A] border border-white/10 p-3 text-white focus:border-wff-red outline-none transition-colors appearance-none rounded-md">
-                    <option>Men&apos;s Bodybuilding</option>
-                    <option>Classic Physique</option>
-                    <option>Men&apos;s Physique</option>
-                    <option>Bikini</option>
-                    <option>Sports Model</option>
-                  </select>
-                </div>
-                <button type="button" className="w-full bg-wff-red text-white font-bebas text-xl py-4 rounded-md hover:bg-white hover:text-wff-dark transition-colors mt-4">
-                  PROCEED TO PAYMENT
-                </button>
-              </form>
-            </div>
-
-            {/* Logistics */}
-            <div>
-              <h3 className="font-bebas text-3xl mb-6 border-b border-white/10 pb-4">LOGISTICS UPLOAD</h3>
-              <div className="space-y-6">
-                <div className="border border-dashed border-white/20 p-6 text-center hover:border-wff-gold transition-colors cursor-pointer group">
-                  <Music className="mx-auto mb-3 text-white/50 group-hover:text-wff-gold transition-colors" size={32} />
-                  <h4 className="font-bebas text-xl mb-1">POSING MUSIC</h4>
-                  <p className="font-sans text-xs text-white/50">MP3 format, max 60 seconds</p>
-                </div>
-                <div className="border border-dashed border-white/20 p-6 text-center hover:border-wff-gold transition-colors cursor-pointer group">
-                  <FileText className="mx-auto mb-3 text-white/50 group-hover:text-wff-gold transition-colors" size={32} />
-                  <h4 className="font-bebas text-xl mb-1">PASSPORT / ID</h4>
-                  <p className="font-sans text-xs text-white/50">PDF or JPG format</p>
-                </div>
-                <div className="bg-[#0A0A0A] p-4 border border-white/5 rounded-lg">
-                  <p className="font-sans text-xs text-white/60 leading-relaxed">
-                    <span className="text-wff-red font-bold">NOTE:</span> All uploads must be completed by September 10th, 2026. Failure to upload posing music will result in default house music being played.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
       </div>
