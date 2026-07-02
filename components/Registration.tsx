@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import confetti from 'canvas-confetti';
+import { supabase } from '@/lib/supabase';
 import {
   User, Trophy, Users, FileText, CreditCard,
   Upload, CheckCircle, ChevronRight, ChevronLeft,
@@ -117,7 +118,7 @@ interface FileUploadProps {
   accept?: string;
   hint?: string;
   fileName?: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (file: File | null) => void;
 }
 const FileUpload = ({ label, required, accept = 'image/*', hint, fileName, onChange }: FileUploadProps) => {
   const ref = useRef<HTMLInputElement>(null);
@@ -133,7 +134,7 @@ const FileUpload = ({ label, required, accept = 'image/*', hint, fileName, onCha
           {fileName || 'Click to upload'}
         </p>
         {hint && <p className="text-[10px] text-white/25 mt-1">{hint}</p>}
-        <input type="file" ref={ref} className="hidden" accept={accept} onChange={onChange} />
+        <input type="file" ref={ref} className="hidden" accept={accept} onChange={(e) => onChange(e.target.files?.[0] || null)} />
       </div>
     </div>
   );
@@ -206,14 +207,14 @@ const RadioGroup = ({
 // ─────────────────────────────────────────────
 
 // ── STEP 1: PERSONAL INFORMATION ──
-function Step1({ register, errors, watch, setValue }: {
+function Step1({ register, errors, watch, setValue, files, onFileChange }: {
   register: ReturnType<typeof useForm<FormData>>['register'];
   errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
   watch: ReturnType<typeof useForm<FormData>>['watch'];
   setValue: ReturnType<typeof useForm<FormData>>['setValue'];
+  files: Record<string, File | null>;
+  onFileChange: (key: string, file: File | null) => void;
 }) {
-  const [passportPhoto, setPassportPhoto] = useState('');
-  const [athletePhoto, setAthletePhoto] = useState('');
 
   return (
     <div className="space-y-0">
@@ -282,15 +283,15 @@ function Step1({ register, errors, watch, setValue }: {
           label="Passport Photo"
           required
           hint="JPEG / PNG · Max 2MB · White background preferred"
-          fileName={passportPhoto}
-          onChange={e => setPassportPhoto(e.target.files?.[0]?.name || '')}
+          fileName={files.passportPhoto?.name || ''}
+          onChange={f => onFileChange('passportPhoto', f)}
         />
         <FileUpload
           label="Athlete Photo"
           required
           hint="Full-face, competition or gym photo"
-          fileName={athletePhoto}
-          onChange={e => setAthletePhoto(e.target.files?.[0]?.name || '')}
+          fileName={files.athletePhoto?.name || ''}
+          onChange={f => onFileChange('athletePhoto', f)}
         />
       </div>
 
@@ -515,18 +516,19 @@ function Step3({ register, errors }: {
 }
 
 // ── STEP 4: DOCUMENTS & VERIFICATION ──
-function Step4({ register, errors, watch, setValue }: {
+function Step4({ register, errors, watch, setValue, files, onFileChange }: {
   register: ReturnType<typeof useForm<FormData>>['register'];
   errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
   watch: ReturnType<typeof useForm<FormData>>['watch'];
   setValue: ReturnType<typeof useForm<FormData>>['setValue'];
+  files: Record<string, File | null>;
+  onFileChange: (key: string, file: File | null) => void;
 }) {
-  const [files, setFiles] = useState<Record<string, string>>({});
   const medicalDeclaration = watch('medicalDeclaration') || false;
   const fitnessDeclaration = watch('fitnessDeclaration') || false;
 
-  const handleFile = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFiles(prev => ({ ...prev, [key]: e.target.files?.[0]?.name || '' }));
+  const handleFile = (key: string) => (f: File | null) => {
+    onFileChange(key, f);
   };
 
   return (
@@ -534,21 +536,21 @@ function Step4({ register, errors, watch, setValue }: {
       <SectionHeading>Required Documents</SectionHeading>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
         <FileUpload label="Passport Copy" required hint="First page with photo · PDF or JPEG"
-          fileName={files.passport} onChange={handleFile('passport')} accept="image/*,.pdf" />
+          fileName={files.passport?.name || ''} onChange={handleFile('passport')} accept="image/*,.pdf" />
         <FileUpload label="National ID" hint="Government-issued national ID card"
-          fileName={files.nationalId} onChange={handleFile('nationalId')} accept="image/*,.pdf" />
+          fileName={files.nationalId?.name || ''} onChange={handleFile('nationalId')} accept="image/*,.pdf" />
         <FileUpload label="Athlete Headshot" required hint="Professional headshot, plain background"
-          fileName={files.headshot} onChange={handleFile('headshot')} />
+          fileName={files.headshot?.name || ''} onChange={handleFile('headshot')} />
         <FileUpload label="Full Body Competition Photo" required hint="Recent competition or stage photo"
-          fileName={files.fullBody} onChange={handleFile('fullBody')} />
+          fileName={files.fullBody?.name || ''} onChange={handleFile('fullBody')} />
       </div>
 
       <SectionHeading>Optional Documents</SectionHeading>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
         <FileUpload label="Previous Competition Photos" hint="Up to 3 photos · ZIP or individual"
-          fileName={files.prevPhotos} onChange={handleFile('prevPhotos')} />
+          fileName={files.prevPhotos?.name || ''} onChange={handleFile('prevPhotos')} />
         <FileUpload label="Championship Certificates" hint="PDF preferred · Previous wins & placements"
-          fileName={files.certs} onChange={handleFile('certs')} accept="image/*,.pdf" />
+          fileName={files.certs?.name || ''} onChange={handleFile('certs')} accept="image/*,.pdf" />
       </div>
 
       <SectionHeading>Medical Declarations</SectionHeading>
@@ -575,15 +577,16 @@ function Step4({ register, errors, watch, setValue }: {
 }
 
 // ── STEP 5: PAYMENT INFORMATION ──
-function Step5({ register, errors, watch, setValue }: {
+function Step5({ register, errors, watch, setValue, files, onFileChange }: {
   register: ReturnType<typeof useForm<FormData>>['register'];
   errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
   watch: ReturnType<typeof useForm<FormData>>['watch'];
   setValue: ReturnType<typeof useForm<FormData>>['setValue'];
+  files: Record<string, File | null>;
+  onFileChange: (key: string, file: File | null) => void;
 }) {
   const feePaid       = watch('feePaid') || '';
   const paymentMethod = watch('paymentMethod') || '';
-  const [screenshot, setScreenshot] = useState('');
 
   return (
     <div>
@@ -640,8 +643,8 @@ function Step5({ register, errors, watch, setValue }: {
           <FileUpload
             label="Payment Screenshot / Receipt"
             hint="JPEG or PNG · Clear screenshot of payment confirmation"
-            fileName={screenshot}
-            onChange={e => setScreenshot(e.target.files?.[0]?.name || '')}
+            fileName={files.paymentScreenshot?.name || ''}
+            onChange={f => onFileChange('paymentScreenshot', f)}
           />
         </div>
       )}
@@ -757,7 +760,10 @@ export default function Registration() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [files, setFiles] = useState<Record<string, File | null>>({});
   const topRef = useRef<HTMLDivElement>(null);
+
+  const onFileChange = (key: string, file: File | null) => setFiles(prev => ({ ...prev, [key]: file }));
 
   const { register, handleSubmit, formState: { errors }, watch, setValue, trigger, reset } =
     useForm<FormData>({ resolver: zodResolver(schema), mode: 'onBlur' });
@@ -777,19 +783,98 @@ export default function Registration() {
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
-    // Replace with real Supabase insert
-    await new Promise(r => setTimeout(r, 2000));
-    setIsSubmitting(false);
-    setIsSuccess(true);
+    
+    try {
+      const uploadFile = async (file: File | null | undefined) => {
+        if (!file) return null;
+        const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
+        const { data: udata, error } = await supabase.storage.from('athlete-documents').upload(filename, file);
+        if (error) throw error;
+        const { data: { publicUrl } } = supabase.storage.from('athlete-documents').getPublicUrl(udata.path);
+        return publicUrl;
+      };
 
-    const duration = 4000;
-    const end = Date.now() + duration;
-    const frame = () => {
-      confetti({ particleCount: 6, angle: 60, spread: 60, origin: { x: 0 }, colors: ['#CE1126', '#FCD116', '#FFFFFF', '#006B3F'] });
-      confetti({ particleCount: 6, angle: 120, spread: 60, origin: { x: 1 }, colors: ['#CE1126', '#FCD116', '#FFFFFF', '#006B3F'] });
-      if (Date.now() < end) requestAnimationFrame(frame);
-    };
-    frame();
+      const passportUrl = await uploadFile(files.passportPhoto || files.passport);
+      const athletePhotoUrl = await uploadFile(files.athletePhoto);
+      const nationalIdUrl = await uploadFile(files.nationalId);
+      const headshotUrl = await uploadFile(files.headshot) || athletePhotoUrl;
+      const fullBodyUrl = await uploadFile(files.fullBody);
+      const prevPhotosUrl = await uploadFile(files.prevPhotos);
+      const certsUrl = await uploadFile(files.certs);
+      const paymentScreenshotUrl = await uploadFile(files.paymentScreenshot);
+
+      const { error } = await supabase.from('registrations').insert({
+        first_name: data.firstName,
+        last_name: data.lastName,
+        middle_name: data.middleName || null,
+        gender: data.gender,
+        dob: data.dob,
+        nationality: data.nationality,
+        country_representing: data.countryRepresenting,
+        passport_number: data.passportNumber || null,
+        national_id: data.nationalId || null,
+        email: data.email,
+        mobile: data.mobile,
+        whatsapp: data.whatsapp || null,
+        address: data.address,
+        city: data.city,
+        country: data.country,
+        athlete_type: data.athleteType,
+        category: data.category,
+        division: data.division,
+        weight_class: data.weightClass || null,
+        height_class: data.heightClass || null,
+        team_name: data.teamName || null,
+        club_name: data.clubName || null,
+        team_country: data.teamCountry || null,
+        coach_name: data.coachName || null,
+        manager_name: data.managerName || null,
+        manager_contact: data.managerContact || null,
+        federation_affiliation: data.federationAffiliation || null,
+        medical_declaration: data.medicalDeclaration,
+        fitness_declaration: data.fitnessDeclaration,
+        passport_url: passportUrl,
+        national_id_url: nationalIdUrl,
+        headshot_url: headshotUrl,
+        full_body_url: fullBodyUrl,
+        prev_photos_urls: prevPhotosUrl ? [prevPhotosUrl] : [],
+        certs_url: certsUrl,
+        fee_paid_status: data.feePaid,
+        payment_method: data.paymentMethod || null,
+        transaction_id: data.transactionId || null,
+        paystack_ref: data.paystackRef || null,
+        payment_screenshot_url: paymentScreenshotUrl,
+        emergency_name: data.emergencyName,
+        emergency_relation: data.emergencyRelation,
+        emergency_phone: data.emergencyPhone,
+        instagram: data.instagram || null,
+        facebook: data.facebook || null,
+        tiktok: data.tiktok || null,
+        arrival_date: data.arrivalDate || null,
+        departure_date: data.departureDate || null,
+        needs_pickup: data.needsPickup || null,
+        needs_accommodation: data.needsAccommodation || null,
+        media_consent: data.mediaConsent || false,
+        terms_agreed: data.termsAgreed,
+      });
+
+      if (error) throw error;
+      
+      setIsSubmitting(false);
+      setIsSuccess(true);
+      const duration = 4000;
+      const end = Date.now() + duration;
+      const frame = () => {
+        confetti({ particleCount: 6, angle: 60, spread: 60, origin: { x: 0 }, colors: ['#CE1126', '#FCD116', '#FFFFFF', '#006B3F'] });
+        confetti({ particleCount: 6, angle: 120, spread: 60, origin: { x: 1 }, colors: ['#CE1126', '#FCD116', '#FFFFFF', '#006B3F'] });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      };
+      frame();
+    } catch (e: any) {
+      console.error(e);
+      alert('Submission failed: ' + e.message);
+      setIsSubmitting(false);
+    }
   };
 
   const progress = ((currentStep - 1) / (STEPS.length - 1)) * 100;
@@ -918,11 +1003,11 @@ export default function Registration() {
             {/* ── FORM PANEL ── */}
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="bg-[#0a0a0a] border border-white/8 p-8 md:p-12 min-h-[500px]">
-                {currentStep === 1 && <Step1 register={register} errors={errors} watch={watch} setValue={setValue} />}
+                {currentStep === 1 && <Step1 register={register} errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} />}
                 {currentStep === 2 && <Step2 register={register} errors={errors} watch={watch} setValue={setValue} />}
                 {currentStep === 3 && <Step3 register={register} errors={errors} />}
-                {currentStep === 4 && <Step4 register={register} errors={errors} watch={watch} setValue={setValue} />}
-                {currentStep === 5 && <Step5 register={register} errors={errors} watch={watch} setValue={setValue} />}
+                {currentStep === 4 && <Step4 register={register} errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} />}
+                {currentStep === 5 && <Step5 register={register} errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} />}
               </div>
 
               {/* ── NAVIGATION BUTTONS ── */}
