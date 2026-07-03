@@ -5,53 +5,48 @@ import Image from 'next/image';
 import { X } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { supabase } from '@/lib/supabase';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const athletes = [
-  {
-    id: 1,
-    name: 'Kofi Mensah',
-    category: 'Men\'s Bodybuilding',
-    weightClass: 'Over 90kg',
-    image: '/award-1.jpg',
-    bio: 'A veteran of the Ghanaian bodybuilding scene, Kofi brings unmatched mass and conditioning. He is a 3-time national champion aiming for his pro card.',
-    achievements: ['2025 WFF Ghana Overall Champion', '2024 West African Classic Winner']
-  },
-  {
-    id: 2,
-    name: 'Ama Osei',
-    category: 'Bikini',
-    weightClass: 'Open',
-    image: '/culture-1.jpg',
-    bio: 'Ama\'s perfect symmetry and stage presence make her a standout in the Bikini division. She has been training for 4 years and is ready for the world stage.',
-    achievements: ['2025 WFF Ghana Bikini Champion', '2025 Arnold Classic Africa Top 5']
-  },
-  {
-    id: 3,
-    name: 'Kwesi Appiah',
-    category: 'Classic Physique',
-    weightClass: 'Under 85kg',
-    image: '/award-4.jpg',
-    bio: 'Embodying the golden era of bodybuilding, Kwesi focuses on aesthetics, tiny waist, and wide shoulders. His posing routines are legendary.',
-    achievements: ['2025 WFF Ghana Classic Physique Winner']
-  },
-  {
-    id: 4,
-    name: 'Abena Yeboah',
-    category: 'Sports Modelling',
-    weightClass: 'Open',
-    image: '/culture-2.jpg',
-    bio: 'Abena combines athletic performance with fitness modeling. Her dynamic routines and athletic build make her a top contender.',
-    achievements: ['2024 WFF Universe Top 10', '2025 WFF Ghana Sports Model Winner']
-  }
-];
-
+const initialAthletes: any[] = [];
 export default function AthletesClient() {
-  const [selectedAthlete, setSelectedAthlete] = useState<typeof athletes[0] | null>(null);
+  const [athletes, setAthletes] = useState<any[]>(initialAthletes);
+  const [selectedAthlete, setSelectedAthlete] = useState<any | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const rosterRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchAthletes = async () => {
+      const { data, error } = await supabase
+        .from('memberships')
+        .select(`
+          id,
+          first_name,
+          last_name,
+          country,
+          bio,
+          profile_image_url,
+          athlete_achievements ( title )
+        `);
+
+      if (data && !error) {
+        const parsed = data.map((m: any) => ({
+          id: m.id,
+          name: `${m.first_name} ${m.last_name}`,
+          category: 'WFF Athlete', // Placeholder until categories are linked directly
+          weightClass: m.country,
+          image: m.profile_image_url,
+          bio: m.bio,
+          achievements: m.athlete_achievements?.map((a: any) => a.title) || []
+        }));
+        setAthletes(parsed);
+      }
+    };
+    
+    fetchAthletes();
+  }, []);
 
   // 3D Tilt Effect
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -229,7 +224,7 @@ export default function AthletesClient() {
               <div>
                 <h4 className="font-bebas text-2xl mb-4 text-white/50">Key Achievements</h4>
                 <ul className="space-y-3">
-                  {selectedAthlete.achievements.map((ach, i) => (
+                  {selectedAthlete.achievements.map((ach: string, i: number) => (
                     <li key={i} className="flex items-start font-sans text-sm text-white/80">
                       <span className="text-wff-gold mr-3">★</span>
                       {ach}

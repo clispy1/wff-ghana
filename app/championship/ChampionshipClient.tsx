@@ -21,90 +21,14 @@ import {
   ShieldAlert 
 } from 'lucide-react';
 import { useCart } from '@/lib/CartContext';
+import { supabase } from '@/lib/supabase';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const TICKETS = [
-  {
-    id: 'ticket-ga',
-    name: 'General Admission Ticket',
-    price: 150.00,
-    image: 'https://images.unsplash.com/photo-1540039155732-6761b54f228a?q=80&w=800&auto=format&fit=crop',
-    category: 'Tickets',
-    description: 'General admission to the 2026 All Africa Championship.'
-  },
-  {
-    id: 'ticket-vip',
-    name: 'VIP Backstage Pass',
-    price: 800.00,
-    image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop',
-    category: 'Tickets',
-    description: 'VIP access including backstage pass, premium seating, and meet & greet.'
-  }
-];
-
-const ATHLETES = [
-  {
-    id: 1,
-    name: 'Kofi Mensah',
-    category: 'Men\'s Bodybuilding',
-    weightClass: 'Over 90kg',
-    image: 'https://picsum.photos/seed/kofimensah/600/800',
-    bio: 'A veteran of the Ghanaian bodybuilding scene, Kofi brings unmatched mass and conditioning. He is a 3-time national champion aiming for his pro card.',
-    achievements: ['2025 WFF Ghana Overall Champion', '2024 West African Classic Winner']
-  },
-  {
-    id: 2,
-    name: 'Ama Osei',
-    category: 'Bikini',
-    weightClass: 'Open',
-    image: 'https://picsum.photos/seed/amaosei/600/800',
-    bio: 'Ama\'s perfect symmetry and stage presence make her a standout in the Bikini division. She has been training for 4 years and is ready for the world stage.',
-    achievements: ['2025 WFF Ghana Bikini Champion', '2025 Arnold Classic Africa Top 5']
-  },
-  {
-    id: 3,
-    name: 'Kwesi Appiah',
-    category: 'Classic Physique',
-    weightClass: 'Under 85kg',
-    image: 'https://picsum.photos/seed/kwesiappiah/600/800',
-    bio: 'Embodying the golden era of bodybuilding, Kwesi focuses on aesthetics, tiny waist, and wide shoulders. His posing routines are legendary.',
-    achievements: ['2025 WFF Ghana Classic Physique Winner']
-  },
-  {
-    id: 4,
-    name: 'Abena Yeboah',
-    category: 'Sports Modelling',
-    weightClass: 'Open',
-    image: 'https://picsum.photos/seed/abenayeboah/600/800',
-    bio: 'Abena combines athletic performance with fitness modeling. Her dynamic routines and athletic build make her a top contender.',
-    achievements: ['2024 WFF Universe Top 10', '2025 WFF Ghana Sports Model Winner']
-  }
-];
-
-const HOTELS = [
-  {
-    type: 'Official VIP Host',
-    name: 'Accra Marriott Hotel',
-    location: 'Airport City (2 mins from ACC)',
-    desc: 'The absolute pinnacle of comfort. Host to our pro-division athletes and federation VIPs. Extensive gym and premium culinary options.',
-    labelColor: 'bg-wff-red/20 text-wff-red'
-  },
-  {
-    type: 'Premium Partner',
-    name: 'Holiday Inn Accra',
-    location: 'Airport City (3 mins from ACC)',
-    desc: 'Exceptional comfort seamlessly located near the airport with wide access to restaurants and prep groceries. A major hub for national teams.',
-    labelColor: 'bg-wff-gold/20 text-wff-gold'
-  },
-  {
-    type: 'Standard & Economy',
-    name: 'Ibis Styles Accra',
-    location: 'Airport City (5 mins from ACC)',
-    desc: 'Convenient and cost-effective for large national teams while remaining inside the security and comfort of Airport City.',
-    labelColor: 'bg-white/10 text-white/80'
-  }
-];
+const initialTickets: any[] = [];
+const initialAthletes: any[] = [];
+const initialHotels: any[] = [];
+// Database states are initialized inside the component.
 
 export default function ChampionshipClient() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -112,7 +36,36 @@ export default function ChampionshipClient() {
   
   const { addToCart } = useCart();
   const [addedTicketId, setAddedTicketId] = useState<string | null>(null);
-  const [selectedAthlete, setSelectedAthlete] = useState<typeof ATHLETES[0] | null>(null);
+  const [selectedAthlete, setSelectedAthlete] = useState<any | null>(null);
+
+  const [TICKETS, setTickets] = useState<any[]>(initialTickets);
+  const [ATHLETES, setAthletes] = useState<any[]>(initialAthletes);
+  const [HOTELS, setHotels] = useState<any[]>(initialHotels);
+  const [championshipEvent, setChampionshipEvent] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchChampionshipData = async () => {
+      try {
+        const [ticketsRes, athletesRes, hotelsRes, eventsRes] = await Promise.all([
+          supabase.from('ticket_tiers').select('*').order('price', { ascending: true }),
+          supabase.from('memberships').select('id, first_name, last_name, country, bio, profile_image_url, athlete_achievements(title)').limit(4),
+          supabase.from('accommodations').select('*'),
+          supabase.from('events').select('*').limit(1)
+        ]);
+
+        if (ticketsRes.data?.length) setTickets(ticketsRes.data.map(t => ({ id: t.id, name: t.name, price: Number(t.price), image: 'https://images.unsplash.com/photo-1540039155732-6761b54f228a?q=80&w=800&auto=format&fit=crop', category: 'Tickets', description: t.description })));
+        if (athletesRes.data?.length) {
+          setAthletes(athletesRes.data.map((m: any) => ({ id: m.id, name: `${m.first_name} ${m.last_name}`, category: 'WFF Athlete', weightClass: m.country, image: m.profile_image_url, bio: m.bio, achievements: m.athlete_achievements?.map((a:any) => a.title) || [] })));
+        }
+        if (hotelsRes.data?.length) setHotels(hotelsRes.data.map(h => ({ type: h.type, name: h.name, location: h.location, desc: h.description, labelColor: h.label_color })));
+        if (eventsRes.data?.length) setChampionshipEvent(eventsRes.data[0]);
+
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchChampionshipData();
+  }, []);
 
   const handleAddTicket = (ticketId: string) => {
     const ticket = TICKETS.find(t => t.id === ticketId);
@@ -158,15 +111,14 @@ export default function ChampionshipClient() {
           <p className="font-sans text-wff-gold font-bold uppercase tracking-[0.3em] mb-4">2026 Continental Summit</p>
           <h1 className="font-bebas text-6xl md:text-8xl mb-6">THE ULTIMATE <span className="text-wff-red">SHOWDOWN</span></h1>
           <p className="font-sans text-lg text-white/70 leading-relaxed md:px-12">
-            On September 20-22, 2026, the preeminent physiques from across Africa will converge in Accra, Ghana. Experience state-of-the-art stage layout, fair judging, and unmatched energy.
+            {championshipEvent ? championshipEvent.description : 'On September 26, 2026, the preeminent physiques from across Africa will converge in Accra, Ghana. Experience state-of-the-art stage layout, fair judging, and unmatched energy.'}
           </p>
         </div>
 
-        {/* Core Quick Details Widget */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-16">
           {[
-            { icon: <MapPin className="text-wff-red" size={24} />, title: 'UPSA Auditorium', subtitle: 'Madina, Accra, Ghana' },
-            { icon: <Calendar className="text-wff-gold" size={24} />, title: 'September 20-22', subtitle: '2026 Championship' },
+            { icon: <MapPin className="text-wff-red" size={24} />, title: championshipEvent?.venue_name || 'UPSA Auditorium', subtitle: championshipEvent?.venue_location || 'Madina, Accra' },
+            { icon: <Calendar className="text-wff-gold" size={24} />, title: 'September 26, 2026', subtitle: 'Main Stage' },
             { icon: <Ticket className="text-white" size={24} />, title: 'Pre-Sale Live', subtitle: 'Exquisite Seating Plans' },
             { icon: <Award className="text-wff-gold" size={24} />, title: 'WFF Pro Cards', subtitle: 'Multiple Divisions Offered' }
           ].map((item, idx) => (

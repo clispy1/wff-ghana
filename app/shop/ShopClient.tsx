@@ -7,70 +7,36 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/lib/CartContext';
+import { supabase } from '@/lib/supabase';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const products = [
-  {
-    id: '1',
-    name: 'Official Team Ghana Track Jacket',
-    price: 450.00,
-    image: 'https://picsum.photos/seed/jacket/600/600',
-    category: 'Outerwear',
-    description: 'Premium track jacket with WFF Ghana embroidery.',
-    tag: 'New Arrival'
-  },
-  {
-    id: '2',
-    name: 'WFF Ghana Performance Tee',
-    price: 150.00,
-    image: 'https://picsum.photos/seed/tee/600/600',
-    category: 'T-Shirts',
-    description: 'Moisture-wicking performance tee for intense workouts.',
-    tag: 'Bestseller'
-  },
-  {
-    id: '3',
-    name: '2026 All Africa Champs Cap',
-    price: 120.00,
-    image: 'https://picsum.photos/seed/cap/600/600',
-    category: 'Accessories',
-    description: 'Adjustable snapback cap with 2026 Championship logo.',
-    tag: 'Limited Edition'
-  },
-  {
-    id: '4',
-    name: 'Premium Lifting Belt',
-    price: 350.00,
-    image: 'https://picsum.photos/seed/belt/600/600',
-    category: 'Gear',
-    description: 'Genuine leather lifting belt for heavy compound movements.',
-    tag: 'Gear'
-  },
-  {
-    id: '5',
-    name: 'WFF Stringer Tank',
-    price: 100.00,
-    image: 'https://picsum.photos/seed/tank/600/600',
-    category: 'Tanks',
-    description: 'Classic stringer tank top to show off your physique.',
-    tag: ''
-  },
-  {
-    id: '6',
-    name: 'Ghana Meets Africa Hoodie',
-    price: 300.00,
-    image: 'https://picsum.photos/seed/hoodie/600/600',
-    category: 'Outerwear',
-    description: 'Heavyweight hoodie celebrating the All Africa Championship.',
-    tag: 'Exclusive'
-  }
-];
+// Default fallback layout, will be overridden by DB state.
+const initialProducts: any[] = [];
 
 export default function ShopClient() {
   const headerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const { addToCart, setIsCartOpen } = useCart();
+  const [products, setProducts] = useState<any[]>(initialProducts);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data, error } = await supabase.from('ecommerce_products').select('*');
+      if (data && !error) {
+        setProducts(data.map(p => ({
+          id: p.id,
+          name: p.name,
+          price: Number(p.price),
+          image: p.image_url,
+          category: p.category,
+          description: p.description,
+          tag: p.tag
+        })));
+      }
+    };
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {

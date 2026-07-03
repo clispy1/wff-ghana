@@ -1,16 +1,17 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Hero from '@/components/Hero';
 import Link from 'next/link';
 import Image from 'next/image';
 import WorldChampionships from '@/components/WorldChampionships';
+import { supabase } from '@/lib/supabase';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Centralized CMS-Ready Home Page Configuration
+// Centralized CMS-Ready Home Page Configuration (Fallback Data)
 const HOME_DATA_CONFIG = {
   sponsors: [
     { name: "ACCRA ATHLETIC CLUB", role: "FOUNDING GYM" },
@@ -169,6 +170,36 @@ const HOME_DATA_CONFIG = {
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Dynamic State mapping to Supabase
+  const [sponsors, setSponsors] = useState<any[]>(HOME_DATA_CONFIG.sponsors);
+  const [news, setNews] = useState<any[]>(HOME_DATA_CONFIG.newsSection.posts);
+  const [products, setProducts] = useState<any[]>(HOME_DATA_CONFIG.armory.products);
+  const [eventData, setEventData] = useState<any>(null);
+  
+  useEffect(() => {
+    // Fetch Dynamic CMS Data
+    const fetchHomeData = async () => {
+      try {
+        const [sponsorsRes, newsRes, productsRes, eventsRes] = await Promise.all([
+          supabase.from('sponsors').select('*').order('display_order', { ascending: true }),
+          supabase.from('news_articles').select('*').order('publish_date', { ascending: false }).limit(3),
+          supabase.from('ecommerce_products').select('*').limit(4),
+          supabase.from('events').select('*').limit(1)
+        ]);
+
+        if (sponsorsRes.data?.length) setSponsors(sponsorsRes.data.map(s => ({ name: s.name, role: s.tier })));
+        if (newsRes.data?.length) setNews(newsRes.data.map(n => ({ id: n.id, date: n.publish_date, title: n.title, summary: n.summary })));
+        if (productsRes.data?.length) setProducts(productsRes.data.map(p => ({ id: p.id, name: p.name, price: Number(p.price), img: p.image_url, category: p.category, description: p.description })));
+        if (eventsRes.data?.length) setEventData(eventsRes.data[0]);
+
+      } catch (error) {
+        console.error("Error fetching homepage config:", error);
+      }
+    };
+    fetchHomeData();
+
+  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -211,7 +242,7 @@ export default function Home() {
       {/* 2. Authentic Partners / Sponsors Strip (Moving Marquee) */}
       <section className="py-6 border-y border-white/5 bg-[#050505] overflow-hidden relative z-10">
         <div className="flex space-x-12 animate-[marquee_25s_linear_infinite] whitespace-nowrap opacity-60 hover:opacity-100 transition-opacity duration-500">
-          {[...HOME_DATA_CONFIG.sponsors, ...HOME_DATA_CONFIG.sponsors].map((sponsor, i) => (
+          {[...sponsors, ...sponsors, ...sponsors].map((sponsor, i) => (
             <div key={i} className="inline-flex items-center space-x-3 text-white font-sans text-xs select-none">
               <span className="font-bebas text-lg tracking-widest text-wff-gold">{sponsor.name}</span>
               <span className="text-[10px] text-white/30 font-bold uppercase font-mono">[{sponsor.role}]</span>
@@ -338,10 +369,10 @@ export default function Home() {
               {HOME_DATA_CONFIG.championship.supertitle}
             </p>
             <h2 className="font-bebas text-6xl md:text-8xl text-white mb-6 leading-none select-none">
-              {HOME_DATA_CONFIG.championship.title}
+              {eventData ? eventData.title : HOME_DATA_CONFIG.championship.title}
             </h2>
             <p className="font-sans text-base text-white/70 max-w-2xl mx-auto leading-relaxed">
-              {HOME_DATA_CONFIG.championship.description}
+              {eventData ? eventData.description : HOME_DATA_CONFIG.championship.description}
             </p>
           </div>
 
@@ -398,10 +429,10 @@ export default function Home() {
                   VENUE PORTAL
                 </h3>
                 <p className="font-sans text-white font-extrabold text-sm mb-1 uppercase">
-                  {HOME_DATA_CONFIG.championship.venueTitle}
+                  {eventData ? eventData.venue_name : HOME_DATA_CONFIG.championship.venueTitle}
                 </p>
                 <p className="font-sans text-wff-red text-xs font-semibold mb-6">
-                  {HOME_DATA_CONFIG.championship.venueLocation}
+                  {eventData ? eventData.venue_location : HOME_DATA_CONFIG.championship.venueLocation}
                 </p>
                 <p className="font-sans text-white/70 text-xs leading-relaxed">
                   {HOME_DATA_CONFIG.championship.venueDetails}
@@ -534,7 +565,7 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {HOME_DATA_CONFIG.armory.products.map((product) => (
+            {products.map((product) => (
               <Link 
                 href={`/shop/${product.id}`} 
                 key={product.id} 
@@ -555,11 +586,11 @@ export default function Home() {
                     </span>
                   </div>
                 </div>
-                <h3 className="font-bebas text-2xl text-white mb-0.5 group-hover:text-wff-red transition-colors tracking-wide">
+                <h3 className="font-bebas text-2xl text-white mb-0.5 group-hover:text-wff-red transition-colors tracking-wide truncate">
                   {product.name}
                 </h3>
                 <p className="font-sans text-xs text-white/50">
-                  ₵ {product.price.toFixed(2)}
+                  {typeof product.price === 'number' ? `₵ ${product.price.toFixed(2)}` : `₵ ${product.price}`}
                 </p>
               </Link>
             ))}
@@ -632,7 +663,7 @@ export default function Home() {
             {HOME_DATA_CONFIG.newsSection.title}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {HOME_DATA_CONFIG.newsSection.posts.map((post) => (
+            {news.map((post) => (
               <div 
                 key={post.id} 
                 className="reveal-target bg-[#070707] border border-white/10 p-8 hover:-translate-y-1.5 transition-transform duration-500 rounded-2xl flex flex-col justify-between"
