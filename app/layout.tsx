@@ -1,11 +1,14 @@
 import type {Metadata} from 'next';
-import { Teko, DM_Sans } from 'next/font/google';
+import { Teko, DM_Sans, Geist } from 'next/font/google';
 import './globals.css'; // Global styles
 import ScrubberNavbar from '@/components/ScrubberNavbar';
 import Footer from '@/components/Footer';
 import SmoothScrolling from '@/components/SmoothScrolling';
 import { CartProvider } from '@/lib/CartContext';
 import CartDrawer from '@/components/CartDrawer';
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const teko = Teko({
   subsets: ['latin'],
@@ -25,7 +28,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="en" className={`${teko.variable} ${dmSans.variable}`}>
+    <html lang="en" className={cn(teko.variable, dmSans.variable, "font-sans", geist.variable)}>
       <body className="text-white font-sans antialiased overflow-x-hidden selection:bg-wff-red selection:text-white" suppressHydrationWarning>
         <CartProvider>
           <SmoothScrolling>
