@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -16,12 +16,24 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Middleware bounces people here with a reason attached. Reading it
+  // from the URL directly avoids needing a Suspense boundary for
+  // useSearchParams on this otherwise-static page.
+  useEffect(() => {
+    const reason = new URLSearchParams(window.location.search).get("error");
+    if (reason === "forbidden") {
+      setError(
+        "That account is signed in but is not a federation administrator. Contact a super admin to be added.",
+      );
+    }
+  }, []);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -29,9 +41,28 @@ export default function AdminLogin() {
     if (signInError) {
       setError(signInError.message);
       setLoading(false);
-    } else {
-      router.push("/admin");
+      return;
     }
+
+    // Signing in is not the same as being an admin — the dashboard is
+    // gated on admin_users, so check before sending them onward.
+    const { data: adminRow } = await supabase
+      .from("admin_users")
+      .select("user_id")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
+
+    if (!adminRow) {
+      await supabase.auth.signOut();
+      setError("This account does not have administrator access.");
+      setLoading(false);
+      return;
+    }
+
+    const next = new URLSearchParams(window.location.search).get("next") || "/admin";
+    // refresh() so middleware picks up the new session cookie.
+    router.replace(next);
+    router.refresh();
   };
 
   return (

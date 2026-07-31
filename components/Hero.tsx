@@ -100,7 +100,7 @@ export const HERO_CONTENT = {
   },
   ctas: {
     passes: { text: "SECURE PASSES", href: "/championship#tickets" },
-    portal: { text: "ATHLETE PORTAL", href: "/championship#portal" },
+    portal: { text: "ATHLETE PORTAL", href: "/register" },
   },
   disclaimer:
     "★ DECLARED UNDER THE WORLD FITNESS FEDERATION INTERNATIONAL CHARTER",

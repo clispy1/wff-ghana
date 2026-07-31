@@ -10,7 +10,7 @@ import {
   User, Trophy, Users, FileText, CreditCard,
   Upload, CheckCircle, ChevronRight, ChevronLeft,
   Camera, Shield, AlertCircle, Instagram, Facebook,
-  Phone, MapPin, Plane, X, Check
+  Phone, MapPin, Plane, X, Check, Lock
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────
@@ -66,7 +66,9 @@ const schema = z.object({
   fitnessDeclaration:  z.boolean().refine(v => v === true, 'You must confirm your fitness declaration'),
 
   // Step 5 — Payment
-  feePaid:             z.string().min(1, 'Please indicate payment status'),
+  // How the athlete intends to settle the entry fee. Whether it is
+  // actually paid is decided by Paystack, never by this form.
+  feePaid:             z.string().min(1, 'Please choose how you want to pay'),
   paymentMethod:       z.string().optional(),
   transactionId:       z.string().optional(),
   paystackRef:         z.string().optional(),
@@ -586,7 +588,6 @@ function Step5({ register, errors, watch, setValue, files, onFileChange }: {
   onFileChange: (key: string, file: File | null) => void;
 }) {
   const feePaid       = watch('feePaid') || '';
-  const paymentMethod = watch('paymentMethod') || '';
 
   return (
     <div>
@@ -601,44 +602,48 @@ function Step5({ register, errors, watch, setValue, files, onFileChange }: {
       </div>
 
       <RadioGroup
-        label="Has the fee been paid?"
+        label="How would you like to pay?"
         name="feePaid"
         required
         value={feePaid}
         onChange={v => setValue('feePaid', v)}
         error={errors.feePaid?.message}
         options={[
-          { value: 'paid',    label: 'Yes, paid' },
-          { value: 'pending', label: 'Not yet — will pay' },
+          { value: 'paystack', label: 'Pay now online' },
+          { value: 'offline',  label: 'Pay by bank / mobile money transfer' },
         ]}
       />
 
-      {feePaid === 'paid' && (
+      {feePaid === 'paystack' && (
+        <div className="mt-6 flex gap-3 items-start bg-wff-gold/5 border border-wff-gold/20 p-5 rounded-xl">
+          <Lock size={18} className="text-wff-gold mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-white/60 leading-relaxed">
+            When you submit this form you will be taken to <span className="text-white font-bold">Paystack</span> to
+            pay the entry fee by card, bank transfer or mobile money. Your entry is only
+            forwarded to the selection committee once payment clears — you can close the payment
+            page and come back to it, your details are already saved.
+          </p>
+        </div>
+      )}
+
+      {feePaid === 'offline' && (
         <div className="mt-6 space-y-4">
-          <SectionHeading>Payment Details</SectionHeading>
-          <RadioGroup
-            label="Payment Method"
-            name="paymentMethod"
-            value={paymentMethod}
-            onChange={v => setValue('paymentMethod', v)}
-            options={[
-              { value: 'paystack',     label: 'Paystack' },
-              { value: 'mobile-money', label: 'Mobile Money' },
-              { value: 'bank-transfer',label: 'Bank Transfer' },
-              { value: 'cash',         label: 'Cash' },
-            ]}
-          />
+          <div className="flex gap-3 items-start bg-white/[0.03] border border-white/10 p-5 rounded-xl">
+            <CreditCard size={18} className="text-white/40 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-white/60 leading-relaxed">
+              Transfer the entry fee to the federation account, then upload your receipt below.
+              An official will confirm your payment manually — this normally takes 1–2 working days.
+            </p>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label>Transaction / Reference ID</Label>
               <input {...register('transactionId')} className={inputClass} placeholder="TXN-XXXXXXXX" />
             </div>
-            {paymentMethod === 'paystack' && (
-              <div>
-                <Label>Paystack Reference ID</Label>
-                <input {...register('paystackRef')} className={inputClass} placeholder="pay_XXXXXXXXXXXXXXXX" />
-              </div>
-            )}
+            <div>
+              <Label>Paying From (Bank / MoMo number)</Label>
+              <input {...register('paymentMethod')} className={inputClass} placeholder="MTN MoMo · 024 000 0000" />
+            </div>
           </div>
           <FileUpload
             label="Payment Screenshot / Receipt"
@@ -785,13 +790,18 @@ export default function Registration() {
     setIsSubmitting(true);
     
     try {
+      // The athlete-documents bucket is private — these are passport and
+      // ID scans. We store the object path and the admin dashboard reads
+      // it through a short-lived signed URL, so nothing is world-readable.
       const uploadFile = async (file: File | null | undefined) => {
         if (!file) return null;
-        const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
-        const { data: udata, error } = await supabase.storage.from('athlete-documents').upload(filename, file);
+        const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '');
+        const path = `registrations/${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${safeName}`;
+        const { data: udata, error } = await supabase.storage
+          .from('athlete-documents')
+          .upload(path, file);
         if (error) throw error;
-        const { data: { publicUrl } } = supabase.storage.from('athlete-documents').getPublicUrl(udata.path);
-        return publicUrl;
+        return udata.path;
       };
 
       const passportUrl = await uploadFile(files.passportPhoto || files.passport);
@@ -803,7 +813,7 @@ export default function Registration() {
       const certsUrl = await uploadFile(files.certs);
       const paymentScreenshotUrl = await uploadFile(files.paymentScreenshot);
 
-      const { error } = await supabase.from('registrations').insert({
+      const { data: inserted, error } = await supabase.from('registrations').insert({
         first_name: data.firstName,
         last_name: data.lastName,
         middle_name: data.middleName || null,
@@ -839,8 +849,10 @@ export default function Registration() {
         full_body_url: fullBodyUrl,
         prev_photos_urls: prevPhotosUrl ? [prevPhotosUrl] : [],
         certs_url: certsUrl,
-        fee_paid_status: data.feePaid,
-        payment_method: data.paymentMethod || null,
+        // Always 'pending' here. Only a verified Paystack transaction or
+        // an admin can move this to 'paid' — RLS rejects anything else.
+        fee_paid_status: 'pending',
+        payment_method: data.feePaid === 'paystack' ? 'paystack' : (data.paymentMethod || 'offline'),
         transaction_id: data.transactionId || null,
         paystack_ref: data.paystackRef || null,
         payment_screenshot_url: paymentScreenshotUrl,
@@ -856,10 +868,30 @@ export default function Registration() {
         needs_accommodation: data.needsAccommodation || null,
         media_consent: data.mediaConsent || false,
         terms_agreed: data.termsAgreed,
-      });
+      }).select('id').single();
 
       if (error) throw error;
-      
+
+      // Paying online: hand off to Paystack. The entry is already saved,
+      // so an abandoned payment loses nothing but the fee.
+      if (data.feePaid === 'paystack' && inserted?.id) {
+        const res = await fetch('/api/checkout/registration', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ registration_id: inserted.id }),
+        });
+        const payment = await res.json();
+
+        if (!res.ok) {
+          throw new Error(
+            `${payment.error || 'Could not start payment.'} Your entry was saved — contact us to pay the fee.`,
+          );
+        }
+
+        window.location.href = payment.authorization_url;
+        return;
+      }
+
       setIsSubmitting(false);
       setIsSuccess(true);
       const duration = 4000;

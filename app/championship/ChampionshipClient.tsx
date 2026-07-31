@@ -9,19 +9,14 @@ import {
   Calendar,
   Clock,
   Ticket,
-  Check,
   X,
-  Upload,
-  Music,
-  FileText,
-  Trophy,
   Hotel,
   Plane,
   Award,
   ShieldAlert,
 } from "lucide-react";
-import { useCart } from "@/lib/CartContext";
 import { supabase } from "@/lib/supabase";
+import TicketPurchaseModal, { type TicketTier } from "@/components/TicketPurchaseModal";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -34,8 +29,7 @@ export default function ChampionshipClient() {
   const containerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
 
-  const { addToCart } = useCart();
-  const [addedTicketId, setAddedTicketId] = useState<string | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<TicketTier | null>(null);
   const [selectedAthlete, setSelectedAthlete] = useState<any | null>(null);
 
   const [TICKETS, setTickets] = useState<any[]>(initialTickets);
@@ -106,13 +100,9 @@ export default function ChampionshipClient() {
     fetchChampionshipData();
   }, []);
 
-  const handleAddTicket = (ticketId: string) => {
+  const handleBuyTicket = (ticketId: string) => {
     const ticket = TICKETS.find((t) => t.id === ticketId);
-    if (ticket) {
-      addToCart(ticket, 1);
-      setAddedTicketId(ticketId);
-      setTimeout(() => setAddedTicketId(null), 2000);
-    }
+    if (ticket) setSelectedTicket(ticket);
   };
 
   useEffect(() => {
@@ -274,18 +264,14 @@ export default function ChampionshipClient() {
                       </span>
                     </div>
                     <button
-                      onClick={() => handleAddTicket(ticket.id)}
+                      onClick={() => handleBuyTicket(ticket.id)}
                       className={`font-bebas text-sm uppercase tracking-widest px-6 py-2.5 rounded-full transition-all duration-200 ${
                         ticket.id === "ticket-vip"
                           ? "bg-wff-gold text-black hover:bg-white hover:text-black font-bold"
                           : "bg-wff-red text-white hover:bg-white hover:text-black font-bold"
                       }`}
                     >
-                      {addedTicketId === ticket.id ? (
-                        <Check size={16} />
-                      ) : (
-                        "Buy Now"
-                      )}
+                      Buy Now
                     </button>
                   </div>
                 </div>
@@ -553,74 +539,15 @@ export default function ChampionshipClient() {
             ))}
           </div>
         </div>
-
-        {/* Integrated Athlete Portal & Registration Forms */}
-        <div id="portal" className="mt-24 pt-16 border-t border-white/10">
-          <div className="bg-[#111] border border-white/10 rounded-2xl p-8 md:p-12">
-            <div className="text-center mb-12 max-w-2xl mx-auto">
-              <h2 className="font-bebas text-4xl md:text-5xl text-wff-gold mb-4">
-                ATHLETE REGISTRATION PORTAL
-              </h2>
-              <p className="font-sans text-sm text-white/50">
-                Secure your entry for the amateur line-up, request visa
-                invitations, or upload event logistics data easily.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              {/* Registration submission */}
-              <div>
-                <h3 className="font-bebas text-2xl mb-6 text-white border-b border-white/10 pb-2">
-                  ATHLETE SIGNUP Form
-                </h3>
-                <AthleteRegistrationForm />
-              </div>
-
-              {/* File logistics upload mock/client */}
-              <div className="space-y-6">
-                <h3 className="font-bebas text-2xl mb-6 text-white border-b border-white/10 pb-2">
-                  LOGISTICS FILE UPLOAD
-                </h3>
-
-                <div className="border border-dashed border-white/10 hover:border-wff-gold hover:bg-white/[0.02] p-8 text-center cursor-pointer transition-all duration-300 rounded-xl group relative">
-                  <Music
-                    className="mx-auto mb-4 text-white/40 group-hover:text-wff-gold transition-colors"
-                    size={32}
-                  />
-                  <h4 className="font-bebas text-xl text-white mb-1">
-                    POSING AUDIOTRACKS
-                  </h4>
-                  <p className="font-sans text-xs text-white/50">
-                    MP3 format, maximum length 60s
-                  </p>
-                </div>
-
-                <div className="border border-dashed border-white/10 hover:border-wff-gold hover:bg-white/[0.02] p-8 text-center cursor-pointer transition-all duration-300 rounded-xl group relative">
-                  <FileText
-                    className="mx-auto mb-4 text-white/40 group-hover:text-wff-gold transition-colors"
-                    size={32}
-                  />
-                  <h4 className="font-bebas text-xl text-white mb-1">
-                    PASSPORTS & OFFICIAL ID DOCUMENTS
-                  </h4>
-                  <p className="font-sans text-xs text-white/50">
-                    Clear PDF or JPG copies
-                  </p>
-                </div>
-
-                <div className="bg-[#0A0A0A] p-5 border border-white/5 rounded-xl">
-                  <p className="font-sans text-xs text-white/60 leading-relaxed">
-                    🚨 <strong>Required Timeline:</strong> All posing audios and
-                    passport scans must be submitted before September 10th,
-                    2026. Lack of uploaded posing audio results in default host
-                    tracks played on showday.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
+
+      {/* Ticket Purchase Modal */}
+      {selectedTicket && (
+        <TicketPurchaseModal
+          tier={selectedTicket}
+          onClose={() => setSelectedTicket(null)}
+        />
+      )}
 
       {/* Roster Modal */}
       {selectedAthlete && (
@@ -680,116 +607,3 @@ export default function ChampionshipClient() {
   );
 }
 
-// Interactive registration form helper
-function AthleteRegistrationForm() {
-  const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
-    }, 1500);
-  };
-
-  if (success) {
-    return (
-      <div className="bg-black/60 border border-wff-gold/20 p-8 rounded-xl text-center space-y-4 font-sans text-xs">
-        <div className="w-12 h-12 rounded-full bg-wff-gold/10 text-wff-gold flex items-center justify-center mx-auto border border-wff-gold/20">
-          <Check size={24} />
-        </div>
-        <h4 className="font-bebas text-xl text-white">
-          REGISTRATION INITIATED
-        </h4>
-        <p className="text-white/60 leading-relaxed">
-          Logistics submission approved. Check your email or phone for invoice
-          details regarding athlete weight tickets.
-        </p>
-        <button
-          onClick={() => setSuccess(false)}
-          className="font-bebas text-sm text-wff-gold hover:underline font-bold uppercase tracking-widest block mx-auto pt-4"
-        >
-          Register Another Athlete
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4 font-sans text-xs">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-white/40 uppercase tracking-widest mb-1.5 font-bold">
-            First Name
-          </label>
-          <input
-            required
-            type="text"
-            className="w-full bg-black border border-white/10 p-3 text-white focus:border-wff-gold outline-none transition-colors rounded-md"
-          />
-        </div>
-        <div>
-          <label className="block text-white/40 uppercase tracking-widest mb-1.5 font-bold">
-            Last Name
-          </label>
-          <input
-            required
-            type="text"
-            className="w-full bg-black border border-white/10 p-3 text-white focus:border-wff-gold outline-none transition-colors rounded-md"
-          />
-        </div>
-      </div>
-      <div>
-        <label className="block text-white/40 uppercase tracking-widest mb-1.5 font-bold">
-          Contact Email
-        </label>
-        <input
-          required
-          type="email"
-          className="w-full bg-black border border-white/10 p-3 text-white focus:border-wff-gold outline-none transition-colors rounded-md"
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-white/40 uppercase tracking-widest mb-1.5 font-bold">
-            Country
-          </label>
-          <select
-            required
-            className="w-full bg-black border border-white/10 p-3 text-white focus:border-wff-gold outline-none transition-colors rounded-md appearance-none"
-          >
-            <option>Ghana</option>
-            <option>Nigeria</option>
-            <option>South Africa</option>
-            <option>Egypt</option>
-            <option>Kenya</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-white/40 uppercase tracking-widest mb-1.5 font-bold">
-            Division Category
-          </label>
-          <select
-            required
-            className="w-full bg-black border border-white/10 p-3 text-white focus:border-wff-gold outline-none transition-colors rounded-md appearance-none"
-          >
-            <option>Men&apos;s Bodybuilding</option>
-            <option>Classic Physique</option>
-            <option>Men&apos;s Physique</option>
-            <option>Bikini Model</option>
-            <option>Sports Fitness Model</option>
-          </select>
-        </div>
-      </div>
-      <button
-        type="submit"
-        className="w-full bg-wff-red text-white hover:bg-white hover:text-black font-bebas text-lg py-3 rounded-md transition-colors font-bold uppercase tracking-widest shadow-lg"
-      >
-        {loading ? "Registering..." : "Submitting Entry"}
-      </button>
-    </form>
-  );
-}
