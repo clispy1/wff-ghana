@@ -1,6 +1,20 @@
 "use client";
 
-import { Home, Users, Calendar, ShoppingBag, Settings, LogOut } from "lucide-react";
+import {
+  Home,
+  Users,
+  Calendar,
+  ShoppingBag,
+  Settings,
+  LogOut,
+  ClipboardList,
+  Ticket,
+  Receipt,
+  Newspaper,
+  Handshake,
+  UserSquare,
+  Mail,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -21,8 +35,15 @@ import { useRouter } from "next/navigation";
 const items = [
   { title: "Dashboard", url: "/admin", icon: Home },
   { title: "Events & Logistics", url: "/admin/events", icon: Calendar },
+  { title: "Athlete Registrations", url: "/admin/registrations", icon: ClipboardList },
   { title: "Athletes Roster", url: "/admin/athletes", icon: Users },
+  { title: "Ticket Tiers", url: "/admin/tickets", icon: Ticket },
+  { title: "Orders", url: "/admin/orders", icon: Receipt },
   { title: "Armory Shop", url: "/admin/shop", icon: ShoppingBag },
+  { title: "News & Media", url: "/admin/news", icon: Newspaper },
+  { title: "Sponsors", url: "/admin/sponsors", icon: Handshake },
+  { title: "Federation Staff", url: "/admin/staff", icon: UserSquare },
+  { title: "Inbox", url: "/admin/messages", icon: Mail },
   { title: "System Settings", url: "/admin/settings", icon: Settings },
 ];
 
@@ -49,15 +70,15 @@ export function AppSidebar() {
                 const isActive = pathname === item.url;
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton 
-                      asChild 
+                    {/* Base UI composes via `render`, not Radix's `asChild`. */}
+                    <SidebarMenuButton
+                      render={<Link href={item.url} className="flex items-center" />}
+                      isActive={isActive}
                       className={`hover:bg-wff-red/10 hover:text-wff-red transition-all ${isActive ? 'bg-wff-red/10 text-wff-red border-r-2 border-wff-red' : 'text-white/60'}`}
                       tooltip={item.title}
                     >
-                      <Link href={item.url} className="flex items-center">
-                        <item.icon className="h-5 w-5 mr-2" />
-                        <span className="font-sans font-bold text-sm">{item.title}</span>
-                      </Link>
+                      <item.icon className="h-5 w-5 mr-2" />
+                      <span className="font-sans font-bold text-sm">{item.title}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );

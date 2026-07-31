@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil, Plus, Trash2 } from "lucide-react";
@@ -78,12 +78,13 @@ export default function AdminEventsPage() {
       <div className="flex justify-between items-center border-b border-white/10 pb-4">
         <h2 className="font-bebas text-4xl text-white">EVENTS & LOGISTICS</h2>
         
+        {/* The dialog is controlled by `isOpen`, so the button just opens
+            it — no DialogTrigger needed (Base UI has no `asChild`). */}
+        <Button onClick={openNew} className="bg-wff-red hover:bg-white hover:text-black font-bebas tracking-widest">
+          <Plus className="mr-2 h-4 w-4" /> NEW EVENT
+        </Button>
+
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={openNew} className="bg-wff-red hover:bg-white hover:text-black font-bebas tracking-widest">
-              <Plus className="mr-2 h-4 w-4" /> NEW EVENT
-            </Button>
-          </DialogTrigger>
           <DialogContent className="bg-[#111] text-white border-white/10 sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle className="font-bebas text-3xl tracking-widest text-wff-gold">

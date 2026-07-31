@@ -9,3 +9,4 @@ CREATE POLICY "Admin All Access Accommodations" ON public.accommodations FOR ALL
 CREATE POLICY "Admin All Access Memberships" ON public.memberships FOR ALL TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY "Admin All Access Ticket Tiers" ON public.ticket_tiers FOR ALL TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY "Admin All Access Products" ON public.ecommerce_products FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Admin All Access Registrations" ON public.registrations FOR ALL TO authenticated USING (true) WITH CHECK (true);

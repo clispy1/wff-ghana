@@ -4,51 +4,76 @@ import { useCart } from '@/lib/CartContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { CheckCircle } from 'lucide-react';
+import { Lock, AlertCircle } from 'lucide-react';
+
+const SHIPPING_FEE = Number(process.env.NEXT_PUBLIC_SHOP_SHIPPING_FEE || 0);
 
 export default function CheckoutClient() {
-  const { cart, cartTotal, clearCart } = useCart();
+  const { cart, cartTotal } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    region: '',
+  });
+
+  const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((prev) => ({ ...prev, [key]: e.target.value }));
+
+  const finalTotal = cartTotal + SHIPPING_FEE;
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsSubmitting(true);
-    
-    // Simulate API call for checkout
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      clearCart();
-    }, 2000);
-  };
 
-  if (isSuccess) {
-    return (
-      <main className="pt-32 pb-24 min-h-screen bg-wff-dark flex items-center justify-center">
-        <div className="container mx-auto px-6 text-center max-w-2xl">
-          <CheckCircle className="w-24 h-24 text-wff-gold mx-auto mb-8" />
-          <h1 className="font-bebas text-6xl md:text-8xl mb-6">ORDER <span className="text-wff-red">CONFIRMED</span></h1>
-          <p className="font-sans text-white/60 text-lg mb-12">
-            Thank you for your purchase. Your gear is being prepared for battle. We&apos;ll send a confirmation email with tracking details shortly.
-          </p>
-          <Link 
-            href="/shop"
-            className="inline-block border border-wff-gold text-wff-gold font-bebas text-2xl px-12 py-4 hover:bg-wff-gold hover:text-black transition-colors"
-          >
-            RETURN TO ARMORY
-          </Link>
-        </div>
-      </main>
-    );
-  }
+    try {
+      const res = await fetch('/api/checkout/shop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          buyer_name: `${form.firstName} ${form.lastName}`.trim(),
+          buyer_email: form.email,
+          buyer_phone: form.phone,
+          shipping_address: form.address,
+          shipping_city: form.city,
+          shipping_country: form.region,
+          // Only ids and quantities — the server prices the order.
+          items: cart.map((item) => ({
+            product_id: item.id,
+            quantity: item.quantity,
+            size: item.size ?? null,
+          })),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Checkout failed. Please try again.');
+      }
+
+      // Hand off to Paystack. The cart is cleared only after the
+      // payment is confirmed, on /payment/status.
+      window.location.href = data.authorization_url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Checkout failed. Please try again.');
+      setIsSubmitting(false);
+    }
+  };
 
   if (cart.length === 0) {
     return (
       <main className="pt-32 pb-24 min-h-screen bg-wff-dark flex items-center justify-center">
         <div className="container mx-auto px-6 text-center">
           <h1 className="font-bebas text-6xl md:text-8xl mb-6">YOUR CART IS <span className="text-wff-red">EMPTY</span></h1>
-          <Link 
+          <Link
             href="/shop"
             className="inline-block border border-wff-gold text-wff-gold font-bebas text-2xl px-12 py-4 hover:bg-wff-gold hover:text-black transition-colors"
           >
@@ -59,32 +84,36 @@ export default function CheckoutClient() {
     );
   }
 
-  const tax = cartTotal * 0.15; // 15% tax
-  const shipping = 50.00; // Flat shipping
-  const finalTotal = cartTotal + tax + shipping;
+  const inputClass =
+    'w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md';
+  const labelClass =
+    'block font-sans text-xs uppercase tracking-widest text-white/50 mb-2';
 
   return (
     <main className="pt-32 pb-24 min-h-screen bg-wff-dark">
       <div className="container mx-auto px-6 max-w-6xl">
         <h1 className="font-bebas text-6xl md:text-8xl mb-12 border-b border-white/10 pb-6">SECURE <span className="text-wff-red">CHECKOUT</span></h1>
-        
+
         <div className="flex flex-col lg:flex-row gap-12">
-          
+
           {/* Checkout Form */}
           <div className="lg:w-2/3">
             <form onSubmit={handleSubmit} className="space-y-12">
-              
+
               {/* Contact Info */}
               <section>
                 <h2 className="font-bebas text-3xl mb-6 text-wff-gold">1. CONTACT INFORMATION</h2>
                 <div className="space-y-4">
                   <div>
-                    <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Email Address</label>
-                    <input required type="email" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
+                    <label className={labelClass}>Email Address</label>
+                    <input required type="email" value={form.email} onChange={set('email')} className={inputClass} />
+                    <p className="font-sans text-[11px] text-white/30 mt-2">
+                      Your receipt and tracking details go here.
+                    </p>
                   </div>
                   <div>
-                    <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Phone Number</label>
-                    <input required type="tel" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
+                    <label className={labelClass}>Phone Number</label>
+                    <input required type="tel" value={form.phone} onChange={set('phone')} className={inputClass} />
                   </div>
                 </div>
               </section>
@@ -94,59 +123,54 @@ export default function CheckoutClient() {
                 <h2 className="font-bebas text-3xl mb-6 text-wff-gold">2. SHIPPING ADDRESS</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">First Name</label>
-                    <input required type="text" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
+                    <label className={labelClass}>First Name</label>
+                    <input required type="text" value={form.firstName} onChange={set('firstName')} className={inputClass} />
                   </div>
                   <div>
-                    <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Last Name</label>
-                    <input required type="text" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
+                    <label className={labelClass}>Last Name</label>
+                    <input required type="text" value={form.lastName} onChange={set('lastName')} className={inputClass} />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Street Address</label>
-                    <input required type="text" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors" />
+                    <label className={labelClass}>Street Address</label>
+                    <input required type="text" value={form.address} onChange={set('address')} className={inputClass} />
                   </div>
                   <div>
-                    <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">City</label>
-                    <input required type="text" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors" />
+                    <label className={labelClass}>City</label>
+                    <input required type="text" value={form.city} onChange={set('city')} className={inputClass} />
                   </div>
                   <div>
-                    <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Region / State</label>
-                    <input required type="text" className="w-full bg-[#111] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors" />
+                    <label className={labelClass}>Region / Country</label>
+                    <input required type="text" value={form.region} onChange={set('region')} className={inputClass} />
                   </div>
                 </div>
               </section>
 
-              {/* Payment Info */}
+              {/* Payment */}
               <section>
-                <h2 className="font-bebas text-3xl mb-6 text-wff-gold">3. PAYMENT DETAILS</h2>
-                <div className="bg-[#111] border border-white/10 p-6 space-y-4 rounded-xl">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-full h-12 bg-white/5 border border-white/10 flex items-center justify-center text-white/50 font-sans text-sm rounded-md">Credit Card</div>
-                    <div className="w-full h-12 bg-white/5 border border-white/10 flex items-center justify-center text-white/50 font-sans text-sm rounded-md">Mobile Money</div>
-                  </div>
-                  <div>
-                    <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Card Number</label>
-                    <input required type="text" placeholder="0000 0000 0000 0000" className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Expiry Date</label>
-                      <input required type="text" placeholder="MM/YY" className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
-                    </div>
-                    <div>
-                      <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">CVC</label>
-                      <input required type="text" placeholder="123" className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
-                    </div>
+                <h2 className="font-bebas text-3xl mb-6 text-wff-gold">3. PAYMENT</h2>
+                <div className="bg-[#111] border border-white/10 p-6 rounded-xl flex gap-4 items-start">
+                  <Lock className="text-wff-gold flex-shrink-0 mt-1" size={20} />
+                  <div className="font-sans text-sm text-white/60 leading-relaxed">
+                    You will be redirected to <span className="text-white font-bold">Paystack</span> to
+                    complete payment by card, bank transfer or mobile money. Your card details are
+                    entered on Paystack&apos;s secure page and never touch our servers.
                   </div>
                 </div>
               </section>
 
-              <button 
-                type="submit" 
+              {error && (
+                <div className="flex gap-3 items-start bg-wff-red/10 border border-wff-red/30 p-4 rounded-md">
+                  <AlertCircle className="text-wff-red flex-shrink-0 mt-0.5" size={18} />
+                  <p className="font-sans text-sm text-wff-red">{error}</p>
+                </div>
+              )}
+
+              <button
+                type="submit"
                 disabled={isSubmitting}
                 className="w-full bg-wff-red text-white font-bebas text-3xl py-6 rounded-md hover:bg-white hover:text-wff-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'PROCESSING...' : `PAY ₵ ${finalTotal.toFixed(2)}`}
+                {isSubmitting ? 'REDIRECTING TO PAYSTACK...' : `PAY ₵ ${finalTotal.toFixed(2)}`}
               </button>
             </form>
           </div>
@@ -155,15 +179,15 @@ export default function CheckoutClient() {
           <div className="lg:w-1/3">
             <div className="bg-[#111] border border-white/10 p-8 sticky top-32 rounded-xl">
               <h2 className="font-bebas text-3xl mb-8 border-b border-white/10 pb-4">ORDER SUMMARY</h2>
-              
+
               <div className="space-y-6 mb-8 max-h-[40vh] overflow-y-auto no-scrollbar">
                 {cart.map((item) => (
                   <div key={`${item.id}-${item.size}`} className="flex gap-4">
                     <div className="relative w-20 h-20 bg-black border border-white/10 flex-shrink-0 rounded-md overflow-hidden">
-                      <Image 
-                        src={item.image} 
-                        alt={item.name} 
-                        fill 
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
                         className="object-cover"
                         referrerPolicy="no-referrer"
                       />
@@ -187,16 +211,15 @@ export default function CheckoutClient() {
                 </div>
                 <div className="flex justify-between font-sans text-sm text-white/70">
                   <span>Shipping</span>
-                  <span>₵ {shipping.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between font-sans text-sm text-white/70">
-                  <span>Estimated Tax (15%)</span>
-                  <span>₵ {tax.toFixed(2)}</span>
+                  <span>{SHIPPING_FEE > 0 ? `₵ ${SHIPPING_FEE.toFixed(2)}` : 'Free'}</span>
                 </div>
                 <div className="flex justify-between font-bebas text-3xl text-white pt-4 border-t border-white/10">
                   <span>TOTAL</span>
                   <span className="text-wff-red">₵ {finalTotal.toFixed(2)}</span>
                 </div>
+                <p className="font-sans text-[11px] text-white/30 pt-2">
+                  Final amount is confirmed by our server before payment is taken.
+                </p>
               </div>
             </div>
           </div>
