@@ -9,6 +9,7 @@ export interface WffEvent {
   venue_location: string | null;
   description: string | null;
   is_active: boolean;
+  registration_deadline: string | null;
 }
 
 /**

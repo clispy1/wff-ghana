@@ -1,15 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Image from "next/image";
+import Link from "next/link";
 import {
   MapPin,
   Calendar,
-  Clock,
   Ticket,
-  X,
   Hotel,
   Plane,
   Award,
@@ -56,7 +54,6 @@ const AWARD_ICON_STYLES = [
 ];
 
 const initialTickets: any[] = [];
-const initialAthletes: any[] = [];
 const initialHotels: any[] = [];
 // Database states are initialized inside the component.
 
@@ -65,10 +62,8 @@ export default function ChampionshipClient() {
   const headerRef = useRef<HTMLDivElement>(null);
 
   const [selectedTicket, setSelectedTicket] = useState<TicketTier | null>(null);
-  const [selectedAthlete, setSelectedAthlete] = useState<any | null>(null);
 
   const [TICKETS, setTickets] = useState<any[]>(initialTickets);
-  const [ATHLETES, setAthletes] = useState<any[]>(initialAthletes);
   const [HOTELS, setHotels] = useState<any[]>(initialHotels);
   const [championshipEvent, setChampionshipEvent] = useState<WffEvent | null>(null);
   const [pageContent, setPageContent] = useState<EventPageContent>(EVENT_CONTENT_DEFAULTS);
@@ -76,18 +71,12 @@ export default function ChampionshipClient() {
   useEffect(() => {
     const fetchChampionshipData = async () => {
       try {
-        const [ticketsRes, athletesRes, hotelsRes, eventsRes, contentRes] =
+        const [ticketsRes, hotelsRes, eventsRes, contentRes] =
           await Promise.all([
             supabase
               .from("ticket_tiers")
               .select("*")
               .order("price", { ascending: true }),
-            supabase
-              .from("memberships")
-              .select(
-                "id, first_name, last_name, country, bio, profile_image_url, athlete_achievements(title)",
-              )
-              .limit(4),
             supabase.from("accommodations").select("*"),
             fetchActiveEvent(),
             fetchEventPageContent(),
@@ -99,26 +88,11 @@ export default function ChampionshipClient() {
               id: t.id,
               name: t.name,
               price: Number(t.price),
-              image:
-                "https://images.unsplash.com/photo-1540039155732-6761b54f228a?q=80&w=800&auto=format&fit=crop",
+              isVip: Boolean(t.type?.toLowerCase().includes("vip")),
               category: "Tickets",
               description: t.description,
             })),
           );
-        if (athletesRes.data?.length) {
-          setAthletes(
-            athletesRes.data.map((m: any) => ({
-              id: m.id,
-              name: `${m.first_name} ${m.last_name}`,
-              category: "WFF Athlete",
-              weightClass: m.country,
-              image: m.profile_image_url,
-              bio: m.bio,
-              achievements:
-                m.athlete_achievements?.map((a: any) => a.title) || [],
-            })),
-          );
-        }
         if (hotelsRes.data?.length)
           setHotels(
             hotelsRes.data.map((h) => ({
@@ -205,12 +179,12 @@ export default function ChampionshipClient() {
           {[
             {
               icon: <MapPin className="text-wff-red" size={24} />,
-              title: championshipEvent?.venue_name || "UPSA Auditorium",
-              subtitle: championshipEvent?.venue_location || "Madina, Accra",
+              title: championshipEvent?.venue_name || "Venue To Be Announced",
+              subtitle: championshipEvent?.venue_location || "Accra, Ghana",
             },
             {
               icon: <Calendar className="text-wff-gold" size={24} />,
-              title: formatEventDate(championshipEvent?.start_date) || "September 26, 2026",
+              title: formatEventDate(championshipEvent?.start_date) || "Date To Be Announced",
               subtitle:
                 formatEventRange(
                   championshipEvent?.start_date,
@@ -296,58 +270,62 @@ export default function ChampionshipClient() {
             </div>
 
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {TICKETS.map((ticket) => (
-                <div
-                  key={ticket.id}
-                  className={`p-8 border rounded-xl flex flex-col justify-between h-80 ${
-                    ticket.id === "ticket-vip"
-                      ? "border-wff-gold bg-wff-gold/5 relative overflow-hidden group"
-                      : "border-white/10 bg-black/40 group"
-                  }`}
-                >
-                  <div>
-                    <div className="flex justify-between items-start mb-4">
-                      <span className="font-bebas text-2xl tracking-widest text-white group-hover:text-wff-red transition-colors">
-                        {ticket.id === "ticket-vip"
-                          ? "VIP UNLIMITED"
-                          : "GENERAL SEAT"}
-                      </span>
-                      {ticket.id === "ticket-vip" && (
-                        <span className="text-[9px] uppercase tracking-wider bg-wff-gold text-black font-extrabold px-2 py-0.5 rounded-sm">
-                          Hot Seller
-                        </span>
-                      )}
-                    </div>
-                    <h5 className="font-bebas text-3xl mb-1 text-white">
-                      {ticket.name}
-                    </h5>
-                    <p className="font-sans text-xs text-white/50 leading-relaxed mb-6">
-                      {ticket.description}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-auto">
+              {TICKETS.length === 0 ? (
+                <p className="text-white/40 text-sm col-span-full">
+                  Ticket tiers will be announced shortly.
+                </p>
+              ) : (
+                TICKETS.map((ticket) => (
+                  <div
+                    key={ticket.id}
+                    className={`p-8 border rounded-xl flex flex-col justify-between h-80 ${
+                      ticket.isVip
+                        ? "border-wff-gold bg-wff-gold/5 relative overflow-hidden group"
+                        : "border-white/10 bg-black/40 group"
+                    }`}
+                  >
                     <div>
-                      <span className="text-[10px] font-sans text-white/40 block">
-                        Price
-                      </span>
-                      <span className="font-sans font-bold text-lg text-white">
-                        ₵ {ticket.price.toFixed(2)}
-                      </span>
+                      <div className="flex justify-between items-start mb-4">
+                        <span className="font-bebas text-2xl tracking-widest text-white group-hover:text-wff-red transition-colors">
+                          {ticket.isVip ? "VIP UNLIMITED" : "GENERAL SEAT"}
+                        </span>
+                        {ticket.isVip && (
+                          <span className="text-[9px] uppercase tracking-wider bg-wff-gold text-black font-extrabold px-2 py-0.5 rounded-sm">
+                            Hot Seller
+                          </span>
+                        )}
+                      </div>
+                      <h5 className="font-bebas text-3xl mb-1 text-white">
+                        {ticket.name}
+                      </h5>
+                      <p className="font-sans text-xs text-white/50 leading-relaxed mb-6">
+                        {ticket.description}
+                      </p>
                     </div>
-                    <button
-                      onClick={() => handleBuyTicket(ticket.id)}
-                      className={`font-bebas text-sm uppercase tracking-widest px-6 py-2.5 rounded-full transition-all duration-200 ${
-                        ticket.id === "ticket-vip"
-                          ? "bg-wff-gold text-black hover:bg-white hover:text-black font-bold"
-                          : "bg-wff-red text-white hover:bg-white hover:text-black font-bold"
-                      }`}
-                    >
-                      Buy Now
-                    </button>
+
+                    <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-auto">
+                      <div>
+                        <span className="text-[10px] font-sans text-white/40 block">
+                          Price
+                        </span>
+                        <span className="font-sans font-bold text-lg text-white">
+                          ₵ {ticket.price.toFixed(2)}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleBuyTicket(ticket.id)}
+                        className={`font-bebas text-sm uppercase tracking-widest px-6 py-2.5 rounded-full transition-all duration-200 ${
+                          ticket.isVip
+                            ? "bg-wff-gold text-black hover:bg-white hover:text-black font-bold"
+                            : "bg-wff-red text-white hover:bg-white hover:text-black font-bold"
+                        }`}
+                      >
+                        Buy Now
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -528,50 +506,21 @@ export default function ChampionshipClient() {
           </div>
         </div>
 
-        {/* Team Ghana Elite Roster Segment */}
-        <div id="roster" className="mt-24 pt-16 border-t border-white/10">
-          <div className="text-center mb-16 max-w-2xl mx-auto">
-            <h2 className="font-bebas text-5xl md:text-7xl mb-4 text-white">
-              TEAM <span className="text-wff-red">GHANA</span> ROSTER
-            </h2>
-            <p className="font-sans text-sm text-white/50">
-              Meet the elite national squad defending the home turf against
-              incoming continental challengers.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {ATHLETES.map((ath) => (
-              <div
-                key={ath.id}
-                onClick={() => setSelectedAthlete(ath)}
-                className="bg-[#111] border border-white/10 cursor-pointer rounded-xl overflow-hidden relative group aspect-[3/4] hover:shadow-[0_10px_30px_rgba(0,0,0,0.8)] transition-all duration-300"
-              >
-                <div className="relative w-full h-full">
-                  <Image
-                    src={ath.image}
-                    alt={ath.name}
-                    fill
-                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-
-                  <div className="absolute bottom-6 left-6 right-6">
-                    <span className="font-sans text-[10px] uppercase tracking-widest text-wff-gold block mb-1">
-                      {ath.category}
-                    </span>
-                    <h3 className="font-bebas text-3xl text-white block mb-0.5">
-                      {ath.name}
-                    </h3>
-                    <p className="font-sans text-[11px] text-white/50">
-                      {ath.weightClass}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Team Ghana Roster CTA */}
+        <div id="roster" className="mt-24 pt-16 border-t border-white/10 text-center">
+          <h2 className="font-bebas text-5xl md:text-7xl mb-4 text-white">
+            TEAM <span className="text-wff-red">GHANA</span> ROSTER
+          </h2>
+          <p className="font-sans text-sm text-white/50 max-w-xl mx-auto mb-8">
+            Meet the elite national squad defending the home turf against
+            incoming continental challengers.
+          </p>
+          <Link
+            href="/championship/athletes"
+            className="inline-block bg-wff-red text-white font-bebas text-xl px-8 py-3 tracking-wider hover:bg-white hover:text-wff-red transition-colors duration-300"
+          >
+            VIEW FULL ROSTER
+          </Link>
         </div>
       </div>
 
@@ -581,61 +530,6 @@ export default function ChampionshipClient() {
           tier={selectedTicket}
           onClose={() => setSelectedTicket(null)}
         />
-      )}
-
-      {/* Roster Modal */}
-      {selectedAthlete && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/90 backdrop-blur-sm">
-          <div className="bg-[#111] border border-white/10 w-full max-w-3xl max-h-[90vh] overflow-y-auto relative flex flex-col md:flex-row rounded-xl">
-            <button
-              onClick={() => setSelectedAthlete(null)}
-              className="absolute top-4 right-4 z-10 bg-black/70 p-2.5 rounded-full text-white hover:text-wff-red transition-colors"
-            >
-              <X size={20} />
-            </button>
-
-            <div className="w-full md:w-1/2 relative aspect-[3/4] md:aspect-auto md:h-auto min-h-[300px]">
-              <Image
-                src={selectedAthlete.image}
-                alt={selectedAthlete.name}
-                fill
-                className="object-cover"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-
-            <div className="w-full md:w-1/2 p-8 md:p-10 flex flex-col justify-center">
-              <span className="font-sans text-[10px] uppercase tracking-widest text-wff-gold bg-wff-gold/15 px-3 py-1 rounded-sm w-fit mb-3">
-                {selectedAthlete.category}
-              </span>
-              <h3 className="font-bebas text-4xl text-white mb-1">
-                {selectedAthlete.name}
-              </h3>
-              <p className="font-sans text-xs text-white/50 uppercase tracking-widest mb-6 font-bold">
-                Class: {selectedAthlete.weightClass}
-              </p>
-
-              <p className="font-sans text-xs text-white/70 leading-relaxed mb-6">
-                {selectedAthlete.bio}
-              </p>
-
-              <div>
-                <h4 className="font-bebas text-lg text-wff-gold mb-3 uppercase tracking-wider">
-                  Achievements
-                </h4>
-                <ul className="space-y-1.5 font-sans text-xs text-white/80">
-                  {selectedAthlete.achievements.map(
-                    (ach: string, idx: number) => (
-                      <li key={idx} className="flex gap-2">
-                        <span className="text-wff-red">★</span> {ach}
-                      </li>
-                    ),
-                  )}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
     </main>
   );
