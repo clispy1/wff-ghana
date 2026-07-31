@@ -8,6 +8,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import WorldChampionships from '@/components/WorldChampionships';
 import { supabase } from '@/lib/supabase';
+import { fetchActiveEvent, formatEventRange, type WffEvent } from '@/lib/activeEvent';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -175,7 +176,7 @@ export default function Home() {
   const [sponsors, setSponsors] = useState<any[]>(HOME_DATA_CONFIG.sponsors);
   const [news, setNews] = useState<any[]>(HOME_DATA_CONFIG.newsSection.posts);
   const [products, setProducts] = useState<any[]>(HOME_DATA_CONFIG.armory.products);
-  const [eventData, setEventData] = useState<any>(null);
+  const [eventData, setEventData] = useState<WffEvent | null>(null);
   
   useEffect(() => {
     // Fetch Dynamic CMS Data
@@ -185,13 +186,13 @@ export default function Home() {
           supabase.from('sponsors').select('*').order('display_order', { ascending: true }),
           supabase.from('news_articles').select('*').order('publish_date', { ascending: false }).limit(3),
           supabase.from('ecommerce_products').select('*').limit(4),
-          supabase.from('events').select('*').limit(1)
+          fetchActiveEvent()
         ]);
 
         if (sponsorsRes.data?.length) setSponsors(sponsorsRes.data.map(s => ({ name: s.name, role: s.tier })));
         if (newsRes.data?.length) setNews(newsRes.data.map(n => ({ id: n.id, date: n.publish_date, title: n.title, summary: n.summary })));
         if (productsRes.data?.length) setProducts(productsRes.data.map(p => ({ id: p.id, name: p.name, price: Number(p.price), img: p.image_url, category: p.category, description: p.description })));
-        if (eventsRes.data?.length) setEventData(eventsRes.data[0]);
+        if (eventsRes) setEventData(eventsRes);
 
       } catch (error) {
         console.error("Error fetching homepage config:", error);
@@ -431,9 +432,14 @@ export default function Home() {
                 <p className="font-sans text-white font-extrabold text-sm mb-1 uppercase">
                   {eventData ? eventData.venue_name : HOME_DATA_CONFIG.championship.venueTitle}
                 </p>
-                <p className="font-sans text-wff-red text-xs font-semibold mb-6">
+                <p className="font-sans text-wff-red text-xs font-semibold mb-2">
                   {eventData ? eventData.venue_location : HOME_DATA_CONFIG.championship.venueLocation}
                 </p>
+                {eventData && (
+                  <p className="font-sans text-white/50 text-xs font-semibold mb-6 uppercase tracking-wider">
+                    {formatEventRange(eventData.start_date, eventData.end_date)}
+                  </p>
+                )}
                 <p className="font-sans text-white/70 text-xs leading-relaxed">
                   {HOME_DATA_CONFIG.championship.venueDetails}
                 </p>

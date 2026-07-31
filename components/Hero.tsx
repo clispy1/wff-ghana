@@ -6,6 +6,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
 import Image from "next/image";
 import {
+  fetchActiveEvent,
+  formatEventDateShort,
+  type WffEvent,
+} from "@/lib/activeEvent";
+import {
   Trophy,
   MapPin,
   Calendar,
@@ -18,6 +23,10 @@ import {
 } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Used until the active event loads, and if no event is marked live in
+// the admin dashboard.
+const FALLBACK_EVENT_DATE = "2026-09-26";
 
 // Correct Competition Divisions & Benefits for WFF Official Rulebook
 export interface FeatureHighlight {
@@ -117,11 +126,31 @@ export default function Hero() {
   const bannerRef = useRef<HTMLDivElement>(null);
 
   const [activeHighlight, setActiveHighlight] = useState<string>("pro-status");
+  const [event, setEvent] = useState<WffEvent | null>(null);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0,
+  });
+
+  useEffect(() => {
+    fetchActiveEvent().then(setEvent);
+  }, []);
+
+  // Host chapter and date come from the active event when there is one;
+  // the hardcoded config is the fallback.
+  const heroDetails = HERO_CONTENT.details.map((detail) => {
+    if (detail.id === "host" && event?.venue_location) {
+      return { ...detail, value: event.venue_location };
+    }
+    if (detail.id === "date" && event?.start_date) {
+      return {
+        ...detail,
+        value: formatEventDateShort(event.start_date) || detail.value,
+      };
+    }
+    return detail;
   });
 
   useEffect(() => {
@@ -184,14 +213,24 @@ export default function Hero() {
       });
     }
 
-    // Countdown Logic - September 26, 2026
-    const targetDate = new Date("2026-09-26T00:00:00").getTime();
+  }, []);
+
+  // Countdown runs against the active event's start date, so changing
+  // the date in the admin dashboard moves the clock.
+  useEffect(() => {
+    const targetDate = new Date(
+      `${event?.start_date || FALLBACK_EVENT_DATE}T00:00:00`,
+    ).getTime();
+
+    if (Number.isNaN(targetDate)) return;
 
     const updateTimer = () => {
-      const now = new Date().getTime();
-      const distance = targetDate - now;
+      const distance = targetDate - Date.now();
 
-      if (distance < 0) return;
+      if (distance < 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
 
       setTimeLeft({
         days: Math.floor(distance / (1000 * 60 * 60 * 24)),
@@ -207,7 +246,7 @@ export default function Hero() {
     const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [event?.start_date]);
 
   return (
     <section
@@ -248,7 +287,11 @@ export default function Hero() {
             </span>
           </div>
           <div className="flex items-center gap-6 font-sans text-[10px] md:text-xs text-white/40 uppercase tracking-widest font-mono">
-            <span>{HERO_CONTENT.ticker.venue}</span>
+            <span>
+              {event?.venue_name
+                ? [event.venue_name, event.venue_location].filter(Boolean).join(", ")
+                : HERO_CONTENT.ticker.venue}
+            </span>
             <span>•</span>
             <span className="text-wff-gold font-bold">
               {HERO_CONTENT.ticker.badge}
@@ -301,7 +344,7 @@ export default function Hero() {
 
             {/* Core Location/Date Information Pills */}
             <div className="animate-entrance grid grid-cols-1 sm:grid-cols-3 gap-3 border-y border-white/5 py-4 w-full">
-              {HERO_CONTENT.details.map((detail) => {
+              {heroDetails.map((detail) => {
                 const IconComponent = detail.icon;
                 return (
                   <div key={detail.id} className="flex items-center gap-3">

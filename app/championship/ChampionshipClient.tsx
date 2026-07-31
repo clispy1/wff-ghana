@@ -17,6 +17,12 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import TicketPurchaseModal, { type TicketTier } from "@/components/TicketPurchaseModal";
+import {
+  fetchActiveEvent,
+  formatEventDate,
+  formatEventRange,
+  type WffEvent,
+} from "@/lib/activeEvent";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -35,7 +41,7 @@ export default function ChampionshipClient() {
   const [TICKETS, setTickets] = useState<any[]>(initialTickets);
   const [ATHLETES, setAthletes] = useState<any[]>(initialAthletes);
   const [HOTELS, setHotels] = useState<any[]>(initialHotels);
-  const [championshipEvent, setChampionshipEvent] = useState<any>(null);
+  const [championshipEvent, setChampionshipEvent] = useState<WffEvent | null>(null);
 
   useEffect(() => {
     const fetchChampionshipData = async () => {
@@ -53,7 +59,7 @@ export default function ChampionshipClient() {
               )
               .limit(4),
             supabase.from("accommodations").select("*"),
-            supabase.from("events").select("*").limit(1),
+            fetchActiveEvent(),
           ]);
 
         if (ticketsRes.data?.length)
@@ -92,7 +98,7 @@ export default function ChampionshipClient() {
               labelColor: h.label_color,
             })),
           );
-        if (eventsRes.data?.length) setChampionshipEvent(eventsRes.data[0]);
+        if (eventsRes) setChampionshipEvent(eventsRes);
       } catch (e) {
         console.error(e);
       }
@@ -167,8 +173,12 @@ export default function ChampionshipClient() {
             },
             {
               icon: <Calendar className="text-wff-gold" size={24} />,
-              title: "September 26, 2026",
-              subtitle: "Main Stage",
+              title: formatEventDate(championshipEvent?.start_date) || "September 26, 2026",
+              subtitle:
+                formatEventRange(
+                  championshipEvent?.start_date,
+                  championshipEvent?.end_date,
+                ) || "Main Stage",
             },
             {
               icon: <Ticket className="text-white" size={24} />,

@@ -22,7 +22,8 @@ export default function AdminEventsPage() {
     end_date: "",
     venue_name: "",
     venue_location: "",
-    description: ""
+    description: "",
+    is_active: true,
   });
 
   const fetchEvents = async () => {
@@ -54,6 +55,12 @@ export default function AdminEventsPage() {
     }
   };
 
+  // Mirrors fetchActiveEvent(): the site shows the active event with the
+  // soonest start date, so the dashboard labels that same row "Live".
+  const liveEventId = events
+    .filter((e) => e.is_active)
+    .sort((a, b) => String(a.start_date).localeCompare(String(b.start_date)))[0]?.id;
+
   const openEdit = (event: any) => {
     setEditId(event.id);
     setFormData({
@@ -62,14 +69,23 @@ export default function AdminEventsPage() {
       end_date: event.end_date,
       venue_name: event.venue_name || "",
       venue_location: event.venue_location || "",
-      description: event.description || ""
+      description: event.description || "",
+      is_active: event.is_active ?? true,
     });
     setIsOpen(true);
   };
 
   const openNew = () => {
     setEditId(null);
-    setFormData({ title: "", start_date: "", end_date: "", venue_name: "", venue_location: "", description: "" });
+    setFormData({
+      title: "",
+      start_date: "",
+      end_date: "",
+      venue_name: "",
+      venue_location: "",
+      description: "",
+      is_active: true,
+    });
     setIsOpen(true);
   };
 
@@ -116,8 +132,33 @@ export default function AdminEventsPage() {
               </div>
               <div className="space-y-2">
                 <Label>Description</Label>
-                <Input value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="bg-black border-white/10" />
+                <textarea
+                  value={formData.description}
+                  onChange={e => setFormData({...formData, description: e.target.value})}
+                  rows={4}
+                  className="w-full bg-black border border-white/10 rounded-md p-3 text-sm text-white outline-none focus:border-wff-gold transition-colors resize-none"
+                />
+                <p className="text-[11px] text-white/30">
+                  Shown as the intro paragraph on the homepage and championship page.
+                </p>
               </div>
+
+              <div className="space-y-2 border-t border-white/10 pt-4">
+                <label className="flex items-center gap-3 text-sm text-white/70 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_active}
+                    onChange={e => setFormData({...formData, is_active: e.target.checked})}
+                    className="w-4 h-4 accent-wff-red"
+                  />
+                  Live on the public website
+                </label>
+                <p className="text-[11px] text-white/30">
+                  The site promotes the active event with the soonest start date. Untick to
+                  archive an event without deleting it.
+                </p>
+              </div>
+
               <Button type="submit" className="w-full bg-wff-gold text-black hover:bg-white font-bebas tracking-widest">SAVE CONFIGURATION</Button>
             </form>
           </DialogContent>
@@ -131,17 +172,18 @@ export default function AdminEventsPage() {
               <TableHead className="text-white/40 uppercase font-bold text-[10px] tracking-widest hover:bg-transparent cursor-default">Title</TableHead>
               <TableHead className="text-white/40 uppercase font-bold text-[10px] tracking-widest hover:bg-transparent cursor-default">Dates</TableHead>
               <TableHead className="text-white/40 uppercase font-bold text-[10px] tracking-widest hover:bg-transparent cursor-default">Venue</TableHead>
+              <TableHead className="text-white/40 uppercase font-bold text-[10px] tracking-widest hover:bg-transparent cursor-default">On Site</TableHead>
               <TableHead className="text-right text-white/40 uppercase font-bold text-[10px] tracking-widest hover:bg-transparent cursor-default">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow className="border-none hover:bg-transparent">
-                <TableCell colSpan={4} className="text-center py-8 text-white/40 font-sans text-xs">Loading data...</TableCell>
+                <TableCell colSpan={5} className="text-center py-8 text-white/40 font-sans text-xs">Loading data...</TableCell>
               </TableRow>
             ) : events.length === 0 ? (
               <TableRow className="border-none hover:bg-transparent">
-                <TableCell colSpan={4} className="text-center py-8 text-white/40 font-sans text-xs">No events found.</TableCell>
+                <TableCell colSpan={5} className="text-center py-8 text-white/40 font-sans text-xs">No events found.</TableCell>
               </TableRow>
             ) : (
               events.map((evt) => (
@@ -149,6 +191,21 @@ export default function AdminEventsPage() {
                   <TableCell className="font-bold text-white">{evt.title}</TableCell>
                   <TableCell className="text-white/60 font-mono text-xs">{evt.start_date} to {evt.end_date}</TableCell>
                   <TableCell className="text-white/60">{evt.venue_name}</TableCell>
+                  <TableCell>
+                    {evt.id === liveEventId ? (
+                      <span className="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest bg-green-500/20 text-green-400">
+                        Live
+                      </span>
+                    ) : evt.is_active ? (
+                      <span className="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest bg-wff-gold/20 text-wff-gold">
+                        Queued
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest bg-white/10 text-white/40">
+                        Archived
+                      </span>
+                    )}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => openEdit(evt)} className="text-white/40 hover:text-wff-gold hover:bg-transparent mr-2">
                       <Pencil className="h-4 w-4" />
