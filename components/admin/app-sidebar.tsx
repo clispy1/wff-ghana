@@ -15,6 +15,8 @@ import {
   UserSquare,
   Mail,
   LayoutTemplate,
+  CalendarClock,
+  Hotel,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,6 +39,8 @@ const items = [
   { title: "Dashboard", url: "/admin", icon: Home },
   { title: "Homepage Content", url: "/admin/homepage", icon: LayoutTemplate },
   { title: "Events & Logistics", url: "/admin/events", icon: Calendar },
+  { title: "Event Schedule", url: "/admin/schedule", icon: CalendarClock },
+  { title: "Accommodations", url: "/admin/accommodations", icon: Hotel },
   { title: "Athlete Registrations", url: "/admin/registrations", icon: ClipboardList },
   { title: "Athletes Roster", url: "/admin/athletes", icon: Users },
   { title: "Ticket Tiers", url: "/admin/tickets", icon: Ticket },

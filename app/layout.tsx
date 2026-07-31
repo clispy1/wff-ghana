@@ -1,10 +1,11 @@
 import type {Metadata} from 'next';
 import { Teko, DM_Sans, Geist } from 'next/font/google';
-import './globals.css'; // Global styles
 import SmoothScrolling from '@/components/SmoothScrolling';
 import { CartProvider } from '@/lib/CartContext';
 import SiteChrome from '@/components/SiteChrome';
+import './globals.css'; // Global styles
 import { cn } from "@/lib/utils";
+import {Analytics} from "@vercel/analytics/next";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -33,6 +34,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
             <SiteChrome>{children}</SiteChrome>
           </SmoothScrolling>
         </CartProvider>
+        <Analytics/>
       </body>
     </html>
   );

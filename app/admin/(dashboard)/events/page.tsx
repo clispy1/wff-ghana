@@ -23,6 +23,7 @@ export default function AdminEventsPage() {
     venue_name: "",
     venue_location: "",
     description: "",
+    registration_deadline: "",
     is_active: true,
   });
 
@@ -39,10 +40,16 @@ export default function AdminEventsPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    // An empty date input is "", which Postgres rejects for a DATE
+    // column — null means "no deadline set" instead.
+    const payload = {
+      ...formData,
+      registration_deadline: formData.registration_deadline || null,
+    };
     if (editId) {
-      await supabase.from('events').update(formData).eq('id', editId);
+      await supabase.from('events').update(payload).eq('id', editId);
     } else {
-      await supabase.from('events').insert([formData]);
+      await supabase.from('events').insert([payload]);
     }
     setIsOpen(false);
     fetchEvents();
@@ -70,6 +77,7 @@ export default function AdminEventsPage() {
       venue_name: event.venue_name || "",
       venue_location: event.venue_location || "",
       description: event.description || "",
+      registration_deadline: event.registration_deadline || "",
       is_active: event.is_active ?? true,
     });
     setIsOpen(true);
@@ -84,6 +92,7 @@ export default function AdminEventsPage() {
       venue_name: "",
       venue_location: "",
       description: "",
+      registration_deadline: "",
       is_active: true,
     });
     setIsOpen(true);
@@ -140,6 +149,20 @@ export default function AdminEventsPage() {
                 />
                 <p className="text-[11px] text-white/30">
                   Shown as the intro paragraph on the homepage and championship page.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Registration Deadline</Label>
+                <Input
+                  type="date"
+                  value={formData.registration_deadline}
+                  onChange={e => setFormData({...formData, registration_deadline: e.target.value})}
+                  className="bg-black border-white/10"
+                />
+                <p className="text-[11px] text-white/30">
+                  Shown on the Info page. Leave blank to hide the registration status card&apos;s
+                  closing date.
                 </p>
               </div>
 

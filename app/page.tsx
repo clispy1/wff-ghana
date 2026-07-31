@@ -431,7 +431,7 @@ export default function Home() {
             {content.wellness.body}
           </p>
           <Link
-            href="/wellness"
+            href="/federation#wellness"
             className="inline-block border border-teal-500 text-teal-400 font-sans text-xs font-black uppercase tracking-widest px-8 py-4 rounded-xl hover:bg-teal-500 hover:text-black transition-all duration-300"
           >
             {content.wellness.cta.text}
@@ -593,7 +593,7 @@ export default function Home() {
             {content.partnerships.body}
           </p>
           <Link
-            href="/partnerships"
+            href="/federation#partnerships"
             className="inline-block border border-white/10 hover:border-white text-white font-sans text-xs font-black uppercase tracking-widest px-8 py-4 rounded-xl transition-all duration-300"
           >
             {content.partnerships.cta.text}

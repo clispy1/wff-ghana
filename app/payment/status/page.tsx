@@ -82,7 +82,7 @@ export default async function PaymentStatusPage({
           </Link>
           {status !== 'success' && (
             <Link
-              href={purpose === 'shop' ? '/checkout' : purpose === 'ticket' ? '/championship#tickets' : '/register'}
+              href={purpose === 'shop' ? '/shop/checkout' : purpose === 'ticket' ? '/championship#tickets' : '/register'}
               className="inline-block border border-white/20 text-white font-bebas text-2xl px-10 py-3 hover:bg-white hover:text-black transition-colors"
             >
               TRY AGAIN

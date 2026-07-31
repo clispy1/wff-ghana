@@ -50,7 +50,7 @@ export default function FeaturedAthletes() {
           <h2 className="font-bebas text-6xl md:text-8xl text-white leading-none">THE <span className="text-wff-red">ELITE</span></h2>
           <p className="font-sans text-white/50 uppercase tracking-widest text-sm mt-4">Team Ghana Prospects</p>
         </div>
-        <Link href="/athletes" className="hidden md:inline-block border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-6 py-3 hover:bg-white hover:text-black transition-colors">
+        <Link href="/championship/athletes" className="hidden md:inline-block border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-6 py-3 hover:bg-white hover:text-black transition-colors">
           View Full Roster
         </Link>
       </div>
@@ -78,7 +78,7 @@ export default function FeaturedAthletes() {
       </div>
       
       <div className="container mx-auto px-6 mt-12 md:hidden">
-        <Link href="/athletes" className="block text-center border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-6 py-4 hover:bg-white hover:text-black transition-colors">
+        <Link href="/championship/athletes" className="block text-center border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-6 py-4 hover:bg-white hover:text-black transition-colors">
           View Full Roster
         </Link>
       </div>

@@ -9,12 +9,11 @@ import { usePathname } from 'next/navigation';
 const navLinks = [
   { name: 'Federation', href: '/federation' },
   { name: 'Championship', href: '/championship' },
-  { name: 'Event Info', href: '/info' },
-  { name: 'Athletes', href: '/athletes' },
-  { name: 'Wellness', href: '/wellness' },
+  { name: 'Athletes', href: '/championship/athletes' },
+  { name: 'Wellness', href: '/federation#wellness' },
   { name: 'Shop', href: '/shop' },
   { name: 'Media', href: '/media' },
-  { name: 'Partnerships', href: '/partnerships' },
+  { name: 'Partnerships', href: '/federation#partnerships' },
   { name: 'Contact', href: '/contact' },
 ];
 

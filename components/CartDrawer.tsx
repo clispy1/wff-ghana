@@ -126,7 +126,7 @@ export default function CartDrawer() {
             </div>
             <p className="font-sans text-xs text-white/40 mb-6 text-center">Shipping and taxes calculated at checkout.</p>
             <Link 
-              href="/checkout" 
+              href="/shop/checkout"
               onClick={() => setIsCartOpen(false)}
               className="block w-full bg-wff-red text-white text-center font-bebas text-2xl py-4 hover:bg-white hover:text-wff-red transition-colors"
             >

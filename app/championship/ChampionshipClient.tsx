@@ -14,6 +14,9 @@ import {
   Plane,
   Award,
   ShieldAlert,
+  Globe2,
+  ClipboardCheck,
+  Download,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import TicketPurchaseModal, { type TicketTier } from "@/components/TicketPurchaseModal";
@@ -23,8 +26,34 @@ import {
   formatEventRange,
   type WffEvent,
 } from "@/lib/activeEvent";
+import {
+  EVENT_CONTENT_DEFAULTS,
+  fetchEventPageContent,
+  formatScheduleDayHeading,
+  type EventPageContent,
+} from "@/lib/eventContent";
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Fixed per-card styling for the first three award cards — visual choices,
+// not content, so they stay in code. A 4th admin-added award reuses the last style.
+const AWARD_ICON_STYLES = [
+  {
+    ring: "bg-wff-red/10 border-wff-red/20 shadow-[0_0_15px_rgba(206,17,38,0.2)]",
+    stroke: "text-wff-red",
+    path: "M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z",
+  },
+  {
+    ring: "bg-wff-gold/10 border-wff-gold/20 shadow-[0_0_15px_rgba(212,175,55,0.2)]",
+    stroke: "text-wff-gold",
+    path: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
+  },
+  {
+    ring: "bg-green-500/10 border-green-500/20 shadow-[0_0_15px_rgba(34,197,94,0.2)]",
+    stroke: "text-green-500",
+    path: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+  },
+];
 
 const initialTickets: any[] = [];
 const initialAthletes: any[] = [];
@@ -42,11 +71,12 @@ export default function ChampionshipClient() {
   const [ATHLETES, setAthletes] = useState<any[]>(initialAthletes);
   const [HOTELS, setHotels] = useState<any[]>(initialHotels);
   const [championshipEvent, setChampionshipEvent] = useState<WffEvent | null>(null);
+  const [pageContent, setPageContent] = useState<EventPageContent>(EVENT_CONTENT_DEFAULTS);
 
   useEffect(() => {
     const fetchChampionshipData = async () => {
       try {
-        const [ticketsRes, athletesRes, hotelsRes, eventsRes] =
+        const [ticketsRes, athletesRes, hotelsRes, eventsRes, contentRes] =
           await Promise.all([
             supabase
               .from("ticket_tiers")
@@ -60,6 +90,7 @@ export default function ChampionshipClient() {
               .limit(4),
             supabase.from("accommodations").select("*"),
             fetchActiveEvent(),
+            fetchEventPageContent(),
           ]);
 
         if (ticketsRes.data?.length)
@@ -99,6 +130,7 @@ export default function ChampionshipClient() {
             })),
           );
         if (eventsRes) setChampionshipEvent(eventsRes);
+        setPageContent(contentRes);
       } catch (e) {
         console.error(e);
       }
@@ -110,6 +142,11 @@ export default function ChampionshipClient() {
     const ticket = TICKETS.find((t) => t.id === ticketId);
     if (ticket) setSelectedTicket(ticket);
   };
+
+  const registrationDeadline = championshipEvent?.registration_deadline
+    ? new Date(championshipEvent.registration_deadline)
+    : null;
+  const registrationOpen = !registrationDeadline || registrationDeadline.getTime() > Date.now();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -190,6 +227,18 @@ export default function ChampionshipClient() {
               title: "WFF Pro Cards",
               subtitle: "Multiple Divisions Offered",
             },
+            {
+              icon: <Globe2 className="text-wff-red" size={24} />,
+              title: pageContent.logistics.hostNationName,
+              subtitle: pageContent.logistics.hostNationTagline,
+            },
+            {
+              icon: <ClipboardCheck className="text-wff-gold" size={24} />,
+              title: registrationOpen ? "Registration Open" : "Registration Closed",
+              subtitle: registrationDeadline
+                ? `Closes ${formatEventDate(championshipEvent!.registration_deadline)}`
+                : "Details to follow",
+            },
           ].map((item, idx) => (
             <div
               key={idx}
@@ -205,6 +254,19 @@ export default function ChampionshipClient() {
             </div>
           ))}
         </div>
+
+        {pageContent.logistics.pdfUrl && (
+          <div className="flex justify-center mb-16">
+            <a
+              href={pageContent.logistics.pdfUrl}
+              download
+              className="inline-flex items-center gap-2 border border-white/20 text-white font-bebas text-lg px-6 py-2.5 rounded hover:bg-white hover:text-black transition-colors"
+            >
+              <Download size={18} />
+              Download Event PDF
+            </a>
+          </div>
+        )}
 
         {/* Tickets Section */}
         <div
@@ -300,112 +362,40 @@ export default function ChampionshipClient() {
           </h2>
 
           <div className="space-y-12 font-sans">
-            {[
-              {
-                day: "Friday, Sept 20 - Registration",
-                dotColor: "bg-wff-red shadow-[0_0_10px_rgba(206,17,38,0.8)]",
-                list: [
-                  {
-                    time: "10:00 - 18:00",
-                    task: "Athlete Check-in, Weigh-in & Height Measurement",
-                  },
-                  {
-                    time: "15:00 - 16:30",
-                    task: "WFF Africa Certified Judges Seminar",
-                  },
-                  {
-                    time: "19:00 - 20:30",
-                    task: "Official Press Conference & Celebrity Meet-and-Greet",
-                  },
-                ],
-              },
-              {
-                day: "Saturday, Sept 21 - Show Day 1 (Amateur & Pro Qualifier)",
-                dotColor: "bg-wff-red",
-                sections: [
-                  {
-                    title: "Morning Session - 09:00 AM",
-                    items: [
-                      "Women's Aerobics / Fitness Modeling",
-                      "Men's Beach Model (Juniors, Open & Masters)",
-                      "Women's Sports Modeling",
-                      "Men's Sports Modeling",
-                      "Women's Bikini (Short, Tall & Masters Divisions)",
-                    ],
-                  },
-                  {
-                    title: "Afternoon Session - 02:00 PM",
-                    items: [
-                      "Men's Fitness Division",
-                      "Women's Figure Championships",
-                      "Men's Performance Class",
-                      "Women's Physique Line-ups",
-                      "Men's Athletic Showdown",
-                      "Men's Superbody Grand Prix",
-                      "Men's Extreme Bodybuilding Overall",
-                    ],
-                  },
-                ],
-              },
-              {
-                day: "Sunday, Sept 22 - Show Day 2 (Pro Division & Overall Awards)",
-                dotColor: "bg-wff-gold shadow-[0_0_10px_rgba(252,209,22,0.8)]",
-                list: [
-                  {
-                    time: "12:00 PM",
-                    task: "Overall Amateur Line-ups & Pro Card Convocations",
-                  },
-                  {
-                    time: "03:00 PM",
-                    task: "WFF Pro Division Battles (Bikini & Sports Model)",
-                  },
-                  {
-                    time: "05:30 PM",
-                    task: "WFF Pro Division Highlight (Men's Bodybuilding Pro Cup)",
-                  },
-                  {
-                    time: "08:00 PM",
-                    task: "Continental Championship Celebration Banquet",
-                  },
-                ],
-              },
-            ].map((section, idx) => (
-              <div key={idx} className="relative pl-8 border-l border-white/10">
-                <div
-                  className={`absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full ${section.dotColor}`}
-                ></div>
-                <h3 className="font-bebas text-2xl md:text-3xl text-white mb-4 uppercase tracking-wider">
-                  {section.day}
-                </h3>
+            {pageContent.schedule.days.map((day, idx) => {
+              // Last day gets the gold dot (final/awards day); every
+              // other day gets red — matches the original design intent
+              // without needing a color field in the admin form.
+              const isLast = idx === pageContent.schedule.days.length - 1;
+              const dotColor = isLast
+                ? "bg-wff-gold shadow-[0_0_10px_rgba(252,209,22,0.8)]"
+                : "bg-wff-red shadow-[0_0_10px_rgba(206,17,38,0.8)]";
 
-                {section.list && (
-                  <div className="bg-black/40 border border-white/5 p-6 rounded-xl space-y-3">
-                    {section.list.map((it, iIdx) => (
-                      <div
-                        key={iIdx}
-                        className="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm text-white/80 border-b border-white/5 pb-2 last:border-b-0 last:pb-0"
-                      >
-                        <strong className="text-wff-gold w-32 font-mono text-xs">
-                          {it.time}
-                        </strong>
-                        <span>{it.task}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              return (
+                <div key={idx} className="relative pl-8 border-l border-white/10">
+                  <div
+                    className={`absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full ${dotColor}`}
+                  ></div>
+                  <h3 className="font-bebas text-2xl md:text-3xl text-white mb-1 uppercase tracking-wider">
+                    {formatScheduleDayHeading(day)}
+                  </h3>
+                  {(day.venueName || day.venueLocation) && (
+                    <p className="font-sans text-xs text-wff-gold mb-4">
+                      {[day.venueName, day.venueLocation].filter(Boolean).join(" — ")}
+                    </p>
+                  )}
 
-                {section.sections && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {section.sections.map((sect, sIdx) => (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    {day.blocks.map((block, bIdx) => (
                       <div
-                        key={sIdx}
+                        key={bIdx}
                         className="bg-black/45 border border-white/5 p-6 rounded-xl"
                       >
-                        <p className="text-wff-gold text-xs uppercase tracking-widest font-bold mb-4 border-b border-white/10 pb-2">
-                          {sect.title}
+                        <p className="text-wff-gold text-xs uppercase tracking-widest font-bold mb-4 border-b border-white/10 pb-2 font-mono">
+                          {block.label}
                         </p>
                         <ul className="space-y-2 text-xs text-white/70 leading-relaxed">
-                          {sect.items.map((item, itemIdx) => (
+                          {block.items.map((item, itemIdx) => (
                             <li key={itemIdx} className="flex items-start">
                               <span className="text-wff-red mr-2">•</span>
                               {item}
@@ -415,9 +405,9 @@ export default function ChampionshipClient() {
                       </div>
                     ))}
                   </div>
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -436,19 +426,14 @@ export default function ChampionshipClient() {
                 AIRPORTS & VISAS
               </h3>
               <p className="font-sans text-xs text-white/60 leading-relaxed space-y-4">
-                <span>
-                  Please book flights arriving directly into{" "}
-                  <strong>Kotoka International Airport (ACC)</strong>. Shuttles
-                  run on September 19-20th for registered athletes.
-                </span>
+                <span>{pageContent.logistics.airportIntro}</span>
+                <br />
+                <br />
+                <span>{pageContent.logistics.transportNote}</span>
                 <br />
                 <br />
                 <span>
-                  ECOWAS & African Union citizens qualify for automatic
-                  Visa-on-Arrival or visa-free entry. WFF Ghana will supply
-                  official visa invocation letters to other international
-                  candidates upon request. Yellow Fever inoculation booklets are
-                  mandatory.
+                  {pageContent.logistics.visaNote} {pageContent.logistics.yellowFeverNote}
                 </span>
               </p>
             </div>
@@ -469,11 +454,11 @@ export default function ChampionshipClient() {
               </h3>
             </div>
             <p className="font-sans text-xs text-white/50 mb-6 leading-relaxed">
-              We have partnered leading Airport properties offering
-              custom-curated food prep packages and airport shuttle channels.
-              Use discount code{" "}
-              <span className="text-wff-gold font-bold">WFF2026</span> when
-              securing rooms.
+              {pageContent.logistics.hotelIntro} Use discount code{" "}
+              <span className="text-wff-gold font-bold">
+                {pageContent.logistics.hotelDiscountCode}
+              </span>{" "}
+              when securing rooms.
             </p>
 
             <div className="space-y-4 font-sans text-xs">
@@ -501,6 +486,45 @@ export default function ChampionshipClient() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Awards & Prizes */}
+        <div
+          id="awards"
+          className="bg-[#111]/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 md:p-12 mb-16"
+        >
+          <h2 className="font-bebas text-4xl md:text-5xl text-wff-gold mb-8 pb-4 border-b border-white/10">
+            AWARDS &amp; PRIZES
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 font-sans">
+            {pageContent.awards.items.map((award, i) => {
+              const style = AWARD_ICON_STYLES[Math.min(i, AWARD_ICON_STYLES.length - 1)];
+              return (
+                <div key={i} className="flex flex-col">
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 border ${style.ring}`}
+                  >
+                    <svg
+                      className={`w-6 h-6 ${style.stroke}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d={style.path}
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold mb-2 text-white">{award.title}</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">{award.description}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
 
