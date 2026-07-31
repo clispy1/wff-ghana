@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Home,
   Users,
@@ -18,6 +19,8 @@ import {
   CalendarClock,
   Hotel,
   Images,
+  ChevronRight,
+  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -32,32 +35,106 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
-const items = [
-  { title: "Dashboard", url: "/admin", icon: Home },
-  { title: "Homepage Content", url: "/admin/homepage", icon: LayoutTemplate },
-  { title: "Events & Logistics", url: "/admin/events", icon: Calendar },
-  { title: "Event Schedule", url: "/admin/schedule", icon: CalendarClock },
-  { title: "Accommodations", url: "/admin/accommodations", icon: Hotel },
-  { title: "Athlete Registrations", url: "/admin/registrations", icon: ClipboardList },
-  { title: "Athletes Roster", url: "/admin/athletes", icon: Users },
-  { title: "Ticket Tiers", url: "/admin/tickets", icon: Ticket },
-  { title: "Orders", url: "/admin/orders", icon: Receipt },
-  { title: "Armory Shop", url: "/admin/shop", icon: ShoppingBag },
-  { title: "News & Media", url: "/admin/news", icon: Newspaper },
-  { title: "Gallery", url: "/admin/gallery", icon: Images },
-  { title: "Sponsors", url: "/admin/sponsors", icon: Handshake },
-  { title: "Federation Staff", url: "/admin/staff", icon: UserSquare },
-  { title: "Inbox", url: "/admin/messages", icon: Mail },
-  { title: "System Settings", url: "/admin/settings", icon: Settings },
+interface NavItem {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+}
+
+interface NavGroup {
+  title: string;
+  icon: LucideIcon;
+  items: NavItem[];
+}
+
+const topLevelItem: NavItem = { title: "Dashboard", url: "/admin", icon: Home };
+
+const navGroups: NavGroup[] = [
+  {
+    title: "Content",
+    icon: LayoutTemplate,
+    items: [
+      { title: "Homepage Content", url: "/admin/homepage", icon: LayoutTemplate },
+      { title: "Gallery", url: "/admin/gallery", icon: Images },
+      { title: "News & Media", url: "/admin/news", icon: Newspaper },
+    ],
+  },
+  {
+    title: "Championship Event",
+    icon: Calendar,
+    items: [
+      { title: "Events & Logistics", url: "/admin/events", icon: Calendar },
+      { title: "Event Schedule", url: "/admin/schedule", icon: CalendarClock },
+      { title: "Accommodations", url: "/admin/accommodations", icon: Hotel },
+      { title: "Ticket Tiers", url: "/admin/tickets", icon: Ticket },
+      { title: "Athlete Registrations", url: "/admin/registrations", icon: ClipboardList },
+      { title: "Athletes Roster", url: "/admin/athletes", icon: Users },
+    ],
+  },
+  {
+    title: "Commerce",
+    icon: ShoppingBag,
+    items: [
+      { title: "Armory Shop", url: "/admin/shop", icon: ShoppingBag },
+      { title: "Orders", url: "/admin/orders", icon: Receipt },
+    ],
+  },
+  {
+    title: "Federation",
+    icon: Handshake,
+    items: [
+      { title: "Sponsors", url: "/admin/sponsors", icon: Handshake },
+      { title: "Federation Staff", url: "/admin/staff", icon: UserSquare },
+    ],
+  },
+  {
+    title: "System",
+    icon: Settings,
+    items: [
+      { title: "Inbox", url: "/admin/messages", icon: Mail },
+      { title: "System Settings", url: "/admin/settings", icon: Settings },
+    ],
+  },
 ];
+
+function groupContaining(pathname: string): string | undefined {
+  return navGroups.find((g) => g.items.some((i) => i.url === pathname))?.title;
+}
 
 export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+
+  // Whichever group holds the current page starts open; toggling never
+  // closes a group the user is actively inside, only ones they collapse
+  // themselves.
+  const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
+    const active = groupContaining(pathname);
+    return new Set(active ? [active] : []);
+  });
+
+  useEffect(() => {
+    const active = groupContaining(pathname);
+    if (active) {
+      setOpenGroups((prev) => (prev.has(active) ? prev : new Set(prev).add(active)));
+    }
+  }, [pathname]);
+
+  const toggleGroup = (title: string) => {
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(title)) next.delete(title);
+      else next.add(title);
+      return next;
+    });
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -74,20 +151,56 @@ export function AppSidebar() {
           <SidebarGroupLabel className="text-white/40 uppercase tracking-widest font-sans font-bold text-[10px] my-2">Management Modules</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => {
-                const isActive = pathname === item.url;
+              {/* Dashboard: always visible, not nested under a group */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  render={<Link href={topLevelItem.url} className="flex items-center" />}
+                  isActive={pathname === topLevelItem.url}
+                  className={`hover:bg-wff-red/10 hover:text-wff-red transition-all ${pathname === topLevelItem.url ? 'bg-wff-red/10 text-wff-red border-r-2 border-wff-red' : 'text-white/60'}`}
+                  tooltip={topLevelItem.title}
+                >
+                  <topLevelItem.icon className="h-5 w-5 mr-2" />
+                  <span className="font-sans font-bold text-sm">{topLevelItem.title}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {navGroups.map((group) => {
+                const isOpen = openGroups.has(group.title);
+                const hasActiveChild = group.items.some((i) => i.url === pathname);
+
                 return (
-                  <SidebarMenuItem key={item.title}>
-                    {/* Base UI composes via `render`, not Radix's `asChild`. */}
+                  <SidebarMenuItem key={group.title}>
                     <SidebarMenuButton
-                      render={<Link href={item.url} className="flex items-center" />}
-                      isActive={isActive}
-                      className={`hover:bg-wff-red/10 hover:text-wff-red transition-all ${isActive ? 'bg-wff-red/10 text-wff-red border-r-2 border-wff-red' : 'text-white/60'}`}
-                      tooltip={item.title}
+                      onClick={() => toggleGroup(group.title)}
+                      className={`hover:bg-white/5 transition-all ${hasActiveChild ? 'text-wff-gold' : 'text-white/60'}`}
+                      tooltip={group.title}
                     >
-                      <item.icon className="h-5 w-5 mr-2" />
-                      <span className="font-sans font-bold text-sm">{item.title}</span>
+                      <group.icon className="h-5 w-5 mr-2" />
+                      <span className="font-sans font-bold text-sm flex-1">{group.title}</span>
+                      <ChevronRight
+                        className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-90' : ''}`}
+                      />
                     </SidebarMenuButton>
+
+                    {isOpen && (
+                      <SidebarMenuSub>
+                        {group.items.map((item) => {
+                          const isActive = pathname === item.url;
+                          return (
+                            <SidebarMenuSubItem key={item.title}>
+                              <SidebarMenuSubButton
+                                render={<Link href={item.url} className="flex items-center" />}
+                                isActive={isActive}
+                                className={`hover:bg-wff-red/10 hover:text-wff-red transition-all ${isActive ? 'bg-wff-red/10 text-wff-red' : 'text-white/50'}`}
+                              >
+                                <item.icon className="h-4 w-4 mr-2" />
+                                <span className="font-sans text-xs font-bold">{item.title}</span>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          );
+                        })}
+                      </SidebarMenuSub>
+                    )}
                   </SidebarMenuItem>
                 );
               })}
