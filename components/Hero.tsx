@@ -406,7 +406,7 @@ export default function Hero() {
               {/* Sports-Tech Countdown Ticker */}
               <div className="mb-8">
                 <span className="font-sans text-[9px] uppercase tracking-[0.25em] text-white/40 block mb-3 font-semibold">
-                  INAUGURAL SHOWDOWN TIMER
+                  CHAMPIONSHIP TIMER
                 </span>
 
                 <div className="grid grid-cols-4 gap-3 bg-black/60 p-4 rounded-2xl border border-white/5">
