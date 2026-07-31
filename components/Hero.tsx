@@ -105,11 +105,11 @@ export const HERO_CONTENT = {
     classLabel: "COMPETITION CLASSES",
     classValue: "4 Major Categories",
     weighInLabel: "WEIGH-IN SELECTION",
-    weighInValue: "Sept 25, 2026",
+    weighInValue: "Oct 2nd, 2026",
   },
   ctas: {
-    passes: { text: "SECURE PASSES", href: "/championship#tickets" },
-    portal: { text: "ATHLETE PORTAL", href: "/register" },
+    passes: { text: "GET TICKETS", href: "/championship#tickets" },
+    portal: { text: "REGISTER ATHLETE", href: "/register" },
   },
   disclaimer:
     "★ DECLARED UNDER THE WORLD FITNESS FEDERATION INTERNATIONAL CHARTER",

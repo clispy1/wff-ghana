@@ -14,6 +14,7 @@ import {
   Handshake,
   UserSquare,
   Mail,
+  LayoutTemplate,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -34,6 +35,7 @@ import { useRouter } from "next/navigation";
 
 const items = [
   { title: "Dashboard", url: "/admin", icon: Home },
+  { title: "Homepage Content", url: "/admin/homepage", icon: LayoutTemplate },
   { title: "Events & Logistics", url: "/admin/events", icon: Calendar },
   { title: "Athlete Registrations", url: "/admin/registrations", icon: ClipboardList },
   { title: "Athletes Roster", url: "/admin/athletes", icon: Users },

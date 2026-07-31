@@ -9,190 +9,79 @@ import Image from 'next/image';
 import WorldChampionships from '@/components/WorldChampionships';
 import { supabase } from '@/lib/supabase';
 import { fetchActiveEvent, formatEventRange, type WffEvent } from '@/lib/activeEvent';
+import { HOME_CONTENT_DEFAULTS, fetchHomeContent, type HomeContent } from '@/lib/homeContent';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Centralized CMS-Ready Home Page Configuration (Fallback Data)
-const HOME_DATA_CONFIG = {
-  sponsors: [
-    { name: "ACCRA ATHLETIC CLUB", role: "FOUNDING GYM" },
-    { name: "PRIME PHYSIQUE GH", role: "ATHLETIC SUPPORT" },
-    { name: "IRON FORCE EQUIPMENT", role: "HARDWARE PARTNER" },
-    { name: "GOLD STANDARD SPORTS", role: "NUTRITION DIVISION" },
-    { name: "WEST AFRICA ACTIVE", role: "OFFICIAL HOST PORTAL" },
-    { name: "PRESTIGE WELLNESS INC.", role: "PHYSIOLOGY DIVISION" }
-  ],
-  presidentSection: {
-    title: "THE FEDERATION",
-    quote: "Our vision is to provide a world-class platform for Ghanaian athletes to showcase their hard work, dedication, and aesthetic excellence on the global stage.",
-    body1: "World Fitness Federation (WFF) Ghana is the premier destination for aesthetic and athletic excellence. We are bringing the global standard of bodybuilding and fitness modeling to the heart of West Africa, ensuring fair judging, athlete welfare, and community building.",
-    body2: "Under authorized international rules, the inaugural chapter serves as the key pathway for outstanding local athletes to represent Ghana globally.",
-    cta: { text: "Discover Our Alliance", href: "/federation" },
-    president: {
-      name: "VICTOR AHENKORAH BAIDEN",
-      role: "President, WFF Ghana",
-      image: "/wff-president.jpg"
-    }
+// Fallback data for the three sections that already have real tables
+// (sponsors, news_articles, ecommerce_products) — shown until that
+// fetch resolves. Everything else on this page is sourced from
+// lib/homeContent.ts / the site_content table, editable at
+// Admin -> Homepage Content.
+const DEFAULT_SPONSORS = [
+  { name: "ACCRA ATHLETIC CLUB", role: "FOUNDING GYM" },
+  { name: "PRIME PHYSIQUE GH", role: "ATHLETIC SUPPORT" },
+  { name: "IRON FORCE EQUIPMENT", role: "HARDWARE PARTNER" },
+  { name: "GOLD STANDARD SPORTS", role: "NUTRITION DIVISION" },
+  { name: "WEST AFRICA ACTIVE", role: "OFFICIAL HOST PORTAL" },
+  { name: "PRESTIGE WELLNESS INC.", role: "PHYSIOLOGY DIVISION" }
+];
+
+const DEFAULT_PRODUCTS = [
+  { id: '1', name: 'WFF Pro Stringer', price: 150.00, img: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=800&auto=format&fit=crop', category: 'Tanks', description: 'Classic stringer tank top.' },
+  { id: '6', name: 'Championship Hoodie', price: 350.00, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop', category: 'Outerwear', description: 'Heavyweight hoodie.' },
+  { id: '4', name: 'Elite Lifting Belt', price: 450.00, img: 'https://images.unsplash.com/photo-1584865288642-42078afe6942?q=80&w=800&auto=format&fit=crop', category: 'Gear', description: 'Genuine leather lifting belt.' },
+  { id: '3', name: 'WFF Ghana Cap', price: 120.00, img: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop', category: 'Accessories', description: 'Adjustable snapback cap.' }
+];
+
+const DEFAULT_NEWS_POSTS = [
+  {
+    id: "news-1",
+    date: "May 15, 2026",
+    title: "WFF CHAPTER SANCTIONED IN ACCRA",
+    summary: "The global licensing body has finalized the constitution of the Ghana federation, establishing a state office to manage West African natural tournaments."
   },
-  journeyPanels: [
-    {
-      title: 'FOUNDATION',
-      subtitle: 'COMMIT TO THE SANCTUARY OF IRON.',
-      type: 'image',
-      src: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=2070&auto=format&fit=crop'
-    },
-    {
-      title: 'INTENSITY',
-      subtitle: 'EVERY REP SHAPES YOUR DESTINY.',
-      type: 'video',
-      src: 'https://assets.mixkit.co/videos/preview/mixkit-man-training-with-heavy-ropes-in-the-gym-23450-large.mp4'
-    },
-    {
-      title: 'DISCIPLINE',
-      subtitle: 'SACRIFICE IN SILENCE, SHINE ON STAGE.',
-      type: 'image',
-      src: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop'
-    },
-    {
-      title: 'STAGE',
-      subtitle: 'THE ULTIMATE CONTINENTAL STAGE.',
-      type: 'video',
-      src: 'https://assets.mixkit.co/videos/preview/mixkit-silhouette-of-a-bodybuilder-flexing-his-muscles-41717-large.mp4'
-    },
-    {
-      title: 'ASCENSION',
-      subtitle: 'EARN REST, SEIZE GLORY.',
-      type: 'image',
-      src: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070&auto=format&fit=crop'
-    }
-  ],
-  championship: {
-    supertitle: "UPCOMING INAUGURAL EVENT",
-    title: "THE INAUGURAL SHOWDOWN",
-    description: "The premier battleground for West African natural aesthetics. Register to compete for official WFF International classifications, global pro-am credentials, and direct invitations to world-tier stages.",
-    categoriesTitle: "COMPETITION CLASSES",
-    categories: [
-      "Men's Bodybuilding (Open Weight)",
-      "Men's Physique (Height Classes)",
-      "Classic Physique (Symmetry Ratio)",
-      "Women's Bikini & Wellness Divisions"
-    ],
-    stakesTitle: "THE PRIZE",
-    stakesDescription: "Overall segment champions receive standard-accredited WFF Pro Status, opening doors to represent Ghana at world-class events in Europe, Asia, and the Americas.",
-    stakesBadge: "Certified Medals • Pro Cards • Global Standings",
-    venueTitle: "UPSA AUDITORIUM",
-    venueLocation: "Madina East, Accra, Ghana",
-    venueDetails: "Accra's state-of-the-art national-scale auditorium with premium production, professional athlete staging, and fully designed modern theater feedback.",
-    ctas: {
-      tickets: { text: "SECURE PASSES", href: "/championship" },
-      register: { text: "REGISTER TO COMPETE", href: "/register" }
-    }
+  {
+    id: "news-2",
+    date: "May 10, 2026",
+    title: "UPSA STAGE LIGHTING CONTRACT LOCKED",
+    summary: "To match WFF's premium presentation guidelines, a professional lighting and live feed team is selected to operate the main theater."
   },
-  ambassadorsSection: {
-    title: "FOUNDING EMBASSY",
-    subtitle: "Authorized Division Categories & Slots",
-    description: "We are establishing pristine competition segments. Competitors may request official slot registration for specific athletic divisions below:",
-    ambassadors: [
-      {
-        id: "amb-1",
-        title: "AESTHETICS",
-        desc: "Symmetry, Proportion & Conditioning",
-        image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800&auto=format&fit=crop",
-        badge: "Men's Physique Slot"
-      },
-      {
-        id: "amb-2",
-        title: "CLASSIC",
-        desc: "Mass, Structure & Stage Carriage",
-        image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop",
-        badge: "Classic Bodybuilding Slot"
-      },
-      {
-        id: "amb-3",
-        title: "WELLNESS",
-        desc: "Balance, Muscle Tone & Presentation",
-        image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800&auto=format&fit=crop",
-        badge: "Women's Wellness Slot"
-      }
-    ],
-    cta: { text: "Apply For Stage Access", href: "/register" }
-  },
-  wellness: {
-    supertitle: "SUSTAIN THE BODY",
-    title: "WELLNESS & PHYSIOLOGY",
-    body: "Peak athleticism requires supreme physical calibration. Our official guidance covers holistic training protocols, strict natural supplement directives, and structured athletic restoration programs.",
-    cta: { text: "Explore Wellness Programs", href: "/wellness" }
-  },
-  armory: {
-    supertitle: "OFFICIAL CHAPTER GEAR",
-    title: "THE ARMORY",
-    products: [
-      { id: '1', name: 'WFF Pro Stringer', price: 150.00, img: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=800&auto=format&fit=crop', category: 'Tanks', description: 'Classic stringer tank top.' },
-      { id: '6', name: 'Championship Hoodie', price: 350.00, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop', category: 'Outerwear', description: 'Heavyweight hoodie.' },
-      { id: '4', name: 'Elite Lifting Belt', price: 450.00, img: 'https://images.unsplash.com/photo-1584865288642-42078afe6942?q=80&w=800&auto=format&fit=crop', category: 'Gear', description: 'Genuine leather lifting belt.' },
-      { id: '3', name: 'WFF Ghana Cap', price: 120.00, img: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop', category: 'Accessories', description: 'Adjustable snapback cap.' }
-    ]
-  },
-  newsSection: {
-    title: "OFFICIAL CHRONICLES",
-    subtitle: "Authorized News & Notices",
-    posts: [
-      {
-        id: "news-1",
-        date: "May 15, 2026",
-        title: "WFF CHAPTER SANCTIONED IN ACCRA",
-        summary: "The global licensing body has finalized the constitution of the Ghana federation, establishing a state office to manage West African natural tournaments."
-      },
-      {
-        id: "news-2",
-        date: "May 10, 2026",
-        title: "UPSA STAGE LIGHTING CONTRACT LOCKED",
-        summary: "To match WFF's premium presentation guidelines, a professional lighting and live feed team is selected to operate the main theater."
-      },
-      {
-        id: "news-3",
-        date: "May 02, 2026",
-        title: "ANTI-DOPING COMPLIANCE WORKSHOP SET",
-        summary: "WFF Ghana reiterates its commitment to natural physique aesthetics with upcoming public rules workshops explaining natural parameters."
-      }
-    ]
-  },
-  partnerships: {
-    title: "AFFILIATION & SECTOR PARTNERS",
-    body: "Secure direct alignment with peak athletic lifestyles and highly disciplined consumer demographics in Accra, Kumasi, and West Africa.",
-    cta: { text: "Discover Sponsorship Tiers", href: "/partnerships" }
-  },
-  contactCta: {
-    title: "READY FOR GLORY?",
-    passesBtn: { text: "REGISTER TO COMPETE", href: "/contact" },
-    contactBtn: { text: "CONTACT OFFICIALS", href: "/contact" }
+  {
+    id: "news-3",
+    date: "May 02, 2026",
+    title: "ANTI-DOPING COMPLIANCE WORKSHOP SET",
+    summary: "WFF Ghana reiterates its commitment to natural physique aesthetics with upcoming public rules workshops explaining natural parameters."
   }
-};
+];
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   
   // Dynamic State mapping to Supabase
-  const [sponsors, setSponsors] = useState<any[]>(HOME_DATA_CONFIG.sponsors);
-  const [news, setNews] = useState<any[]>(HOME_DATA_CONFIG.newsSection.posts);
-  const [products, setProducts] = useState<any[]>(HOME_DATA_CONFIG.armory.products);
+  const [sponsors, setSponsors] = useState<any[]>(DEFAULT_SPONSORS);
+  const [news, setNews] = useState<any[]>(DEFAULT_NEWS_POSTS);
+  const [products, setProducts] = useState<any[]>(DEFAULT_PRODUCTS);
   const [eventData, setEventData] = useState<WffEvent | null>(null);
-  
+  const [content, setContent] = useState<HomeContent>(HOME_CONTENT_DEFAULTS);
+
   useEffect(() => {
     // Fetch Dynamic CMS Data
     const fetchHomeData = async () => {
       try {
-        const [sponsorsRes, newsRes, productsRes, eventsRes] = await Promise.all([
+        const [sponsorsRes, newsRes, productsRes, eventsRes, homeContentRes] = await Promise.all([
           supabase.from('sponsors').select('*').order('display_order', { ascending: true }),
           supabase.from('news_articles').select('*').order('publish_date', { ascending: false }).limit(3),
           supabase.from('ecommerce_products').select('*').limit(4),
-          fetchActiveEvent()
+          fetchActiveEvent(),
+          fetchHomeContent(),
         ]);
 
         if (sponsorsRes.data?.length) setSponsors(sponsorsRes.data.map(s => ({ name: s.name, role: s.tier })));
         if (newsRes.data?.length) setNews(newsRes.data.map(n => ({ id: n.id, date: n.publish_date, title: n.title, summary: n.summary })));
         if (productsRes.data?.length) setProducts(productsRes.data.map(p => ({ id: p.id, name: p.name, price: Number(p.price), img: p.image_url, category: p.category, description: p.description })));
         if (eventsRes) setEventData(eventsRes);
+        setContent(homeContentRes);
 
       } catch (error) {
         console.error("Error fetching homepage config:", error);
@@ -262,9 +151,9 @@ export default function Home() {
             {/* President Card Design */}
             <div className="lg:col-span-5 reveal-target relative">
               <div className="relative aspect-[4/5] bg-[#111] border border-white/10 overflow-hidden group rounded-2xl shadow-2xl">
-                <Image 
-                  src={HOME_DATA_CONFIG.presidentSection.president.image} 
-                  alt={HOME_DATA_CONFIG.presidentSection.president.name}
+                <Image
+                  src={content.president.president.image}
+                  alt={content.president.president.name}
                   fill
                   className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-103"
                   onError={(e) => {
@@ -274,10 +163,10 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent"></div>
                 <div className="absolute bottom-8 left-8 pr-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
                   <h3 className="font-bebas text-4xl mb-1 text-white leading-none tracking-wide">
-                    {HOME_DATA_CONFIG.presidentSection.president.name}
+                    {content.president.president.name}
                   </h3>
                   <p className="font-sans text-wff-gold font-bold uppercase tracking-widest text-xs">
-                    {HOME_DATA_CONFIG.presidentSection.president.role}
+                    {content.president.president.role}
                   </p>
                 </div>
               </div>
@@ -287,20 +176,20 @@ export default function Home() {
             {/* Federation Text Content */}
             <div className="lg:col-span-7 reveal-target lg:pl-8">
               <h2 className="font-bebas text-5xl md:text-7xl text-wff-gold mb-6 tracking-wide select-none">
-                {HOME_DATA_CONFIG.presidentSection.title}
+                {content.president.title}
               </h2>
               <div className="space-y-6 font-sans text-base text-white/70 leading-relaxed mb-8">
                 <p className="text-lg text-white italic border-l-2 border-wff-red pl-5 py-1">
-                  &ldquo;{HOME_DATA_CONFIG.presidentSection.quote}&rdquo;
+                  &ldquo;{content.president.quote}&rdquo;
                 </p>
-                <p>{HOME_DATA_CONFIG.presidentSection.body1}</p>
-                <p>{HOME_DATA_CONFIG.presidentSection.body2}</p>
+                <p>{content.president.body1}</p>
+                <p>{content.president.body2}</p>
               </div>
-              <Link 
-                href={HOME_DATA_CONFIG.presidentSection.cta.href}
+              <Link
+                href="/federation"
                 className="inline-flex border border-wff-gold text-wff-gold hover:bg-wff-gold hover:text-black font-sans text-xs font-black uppercase tracking-widest px-8 py-4 rounded-xl transition-all duration-300"
               >
-                {HOME_DATA_CONFIG.presidentSection.cta.text}
+                {content.president.cta.text}
               </Link>
             </div>
 
@@ -315,7 +204,7 @@ export default function Home() {
             <h2 className="font-bebas text-5xl md:text-7xl text-white">THE JOURNEY</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
-            {HOME_DATA_CONFIG.journeyPanels.map((panel, idx) => {
+            {content.journey.items.map((panel, idx) => {
               // Custom span logic for bento grid feeling
               let colSpan = "col-span-1 md:col-span-1 lg:col-span-2";
               if (idx === 2) colSpan = "col-span-1 md:col-span-2 lg:col-span-2";
@@ -367,13 +256,13 @@ export default function Home() {
         <div className="container mx-auto px-6 relative z-10 max-w-7xl">
           <div className="max-w-4xl mx-auto text-center mb-16 reveal-target">
             <p className="font-sans text-wff-gold font-bold uppercase tracking-[0.4em] text-xs mb-4">
-              {HOME_DATA_CONFIG.championship.supertitle}
+              {content.championship.supertitle}
             </p>
             <h2 className="font-bebas text-6xl md:text-8xl text-white mb-6 leading-none select-none">
-              {eventData ? eventData.title : HOME_DATA_CONFIG.championship.title}
+              {eventData ? eventData.title : content.championship.title}
             </h2>
             <p className="font-sans text-base text-white/70 max-w-2xl mx-auto leading-relaxed">
-              {eventData ? eventData.description : HOME_DATA_CONFIG.championship.description}
+              {eventData ? eventData.description : content.championship.description}
             </p>
           </div>
 
@@ -383,10 +272,10 @@ export default function Home() {
             <div className="bg-[#070707]/95 border border-white/10 p-8 reveal-target rounded-2xl flex flex-col justify-between">
               <div>
                 <h3 className="font-bebas text-2xl text-wff-gold mb-6 tracking-wider border-b border-white/5 pb-2">
-                  {HOME_DATA_CONFIG.championship.categoriesTitle}
+                  {content.championship.categoriesTitle}
                 </h3>
                 <ul className="space-y-4 font-sans text-white/75 text-sm font-semibold">
-                  {HOME_DATA_CONFIG.championship.categories.map((cat, i) => (
+                  {content.championship.categories.map((cat, i) => (
                     <li key={i} className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-wff-red"></span>
                       {cat}
@@ -402,7 +291,7 @@ export default function Home() {
             {/* Medal Focus Card (Honest Representation) */}
             <div className="bg-[#070707]/95 border border-white/10 p-8 reveal-target rounded-2xl flex flex-col items-center text-center">
               <h3 className="font-bebas text-2xl text-wff-gold mb-4 tracking-wider">
-                {HOME_DATA_CONFIG.championship.stakesTitle}
+                {content.championship.stakesTitle}
               </h3>
               
               <div className="relative w-40 h-40 my-3 hover:scale-[1.03] transition-transform duration-500">
@@ -416,10 +305,10 @@ export default function Home() {
               </div>
 
               <p className="font-sans text-white/70 text-xs leading-relaxed max-w-xs mb-4">
-                {HOME_DATA_CONFIG.championship.stakesDescription}
+                {content.championship.stakesDescription}
               </p>
               <p className="font-sans text-wff-red font-bold uppercase tracking-widest text-[9px] border border-wff-red/20 px-3 py-1 bg-wff-red/5 rounded-full">
-                {HOME_DATA_CONFIG.championship.stakesBadge}
+                {content.championship.stakesBadge}
               </p>
             </div>
 
@@ -430,10 +319,10 @@ export default function Home() {
                   VENUE PORTAL
                 </h3>
                 <p className="font-sans text-white font-extrabold text-sm mb-1 uppercase">
-                  {eventData ? eventData.venue_name : HOME_DATA_CONFIG.championship.venueTitle}
+                  {eventData ? eventData.venue_name : content.championship.venueTitle}
                 </p>
                 <p className="font-sans text-wff-red text-xs font-semibold mb-2">
-                  {eventData ? eventData.venue_location : HOME_DATA_CONFIG.championship.venueLocation}
+                  {eventData ? eventData.venue_location : content.championship.venueLocation}
                 </p>
                 {eventData && (
                   <p className="font-sans text-white/50 text-xs font-semibold mb-6 uppercase tracking-wider">
@@ -441,7 +330,7 @@ export default function Home() {
                   </p>
                 )}
                 <p className="font-sans text-white/70 text-xs leading-relaxed">
-                  {HOME_DATA_CONFIG.championship.venueDetails}
+                  {content.championship.venueDetails}
                 </p>
               </div>
               <p className="font-sans text-[10px] text-white/40 mt-6 tracking-wide">
@@ -452,17 +341,17 @@ export default function Home() {
           </div>
 
           <div className="text-center reveal-target flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link 
-              href={HOME_DATA_CONFIG.championship.ctas.tickets.href} 
+            <Link
+              href="/championship"
               className="inline-block bg-wff-red text-white py-4 px-10 rounded-xl font-bebas text-xl tracking-widest hover:bg-white hover:text-black transition-colors w-full sm:w-auto font-bold uppercase"
             >
-              {HOME_DATA_CONFIG.championship.ctas.tickets.text}
+              {content.championship.ctas.tickets.text}
             </Link>
-            <Link 
-              href={HOME_DATA_CONFIG.championship.ctas.register.href} 
+            <Link
+              href="/register"
               className="inline-block border border-wff-gold text-wff-gold py-4 px-10 rounded-xl font-bebas text-xl tracking-widest hover:bg-wff-gold hover:text-black transition-colors w-full sm:w-auto font-bold uppercase"
             >
-              {HOME_DATA_CONFIG.championship.ctas.register.text}
+              {content.championship.ctas.register.text}
             </Link>
           </div>
         </div>
@@ -477,18 +366,18 @@ export default function Home() {
         <div className="container mx-auto px-6 relative z-10 max-w-7xl">
           <div className="text-center mb-16 reveal-target">
             <h2 className="font-bebas text-5xl md:text-7xl text-white">
-              {HOME_DATA_CONFIG.ambassadorsSection.title}
+              {content.ambassadors.title}
             </h2>
             <p className="font-sans text-white/55 uppercase tracking-widest text-xs mt-3">
-              {HOME_DATA_CONFIG.ambassadorsSection.subtitle}
+              {content.ambassadors.subtitle}
             </p>
             <p className="font-sans text-white/40 text-xs max-w-md mx-auto mt-2">
-              {HOME_DATA_CONFIG.ambassadorsSection.description}
+              {content.ambassadors.description}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {HOME_DATA_CONFIG.ambassadorsSection.ambassadors.map((division, idx) => (
+            {content.ambassadors.items.map((division, idx) => (
               <div 
                 key={division.id} 
                 className="reveal-target aspect-[4/5] bg-[#111] border border-white/15 relative group overflow-hidden rounded-2xl shadow-xl"
@@ -518,11 +407,11 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-12 reveal-target">
-            <Link 
-              href={HOME_DATA_CONFIG.ambassadorsSection.cta.href} 
+            <Link
+              href="/register"
               className="inline-block border border-white/10 hover:border-white hover:bg-white hover:text-black text-white font-sans text-xs font-black uppercase tracking-widest px-8 py-4 rounded-xl transition-all duration-300"
             >
-              {HOME_DATA_CONFIG.ambassadorsSection.cta.text}
+              {content.ambassadors.cta.text}
             </Link>
           </div>
         </div>
@@ -533,19 +422,19 @@ export default function Home() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
         <div className="container mx-auto px-6 text-center relative z-10 max-w-4xl reveal-target">
           <p className="font-sans text-teal-400 font-bold uppercase tracking-[0.4em] text-xs mb-4">
-            {HOME_DATA_CONFIG.wellness.supertitle}
+            {content.wellness.supertitle}
           </p>
           <h2 className="font-bebas text-5xl md:text-7xl text-white mb-6 tracking-wide select-none">
-            {HOME_DATA_CONFIG.wellness.title}
+            {content.wellness.title}
           </h2>
           <p className="font-sans text-sm text-white/60 max-w-xl mx-auto mb-10 leading-relaxed">
-            {HOME_DATA_CONFIG.wellness.body}
+            {content.wellness.body}
           </p>
-          <Link 
-            href={HOME_DATA_CONFIG.wellness.cta.href}
+          <Link
+            href="/wellness"
             className="inline-block border border-teal-500 text-teal-400 font-sans text-xs font-black uppercase tracking-widest px-8 py-4 rounded-xl hover:bg-teal-500 hover:text-black transition-all duration-300"
           >
-            {HOME_DATA_CONFIG.wellness.cta.text}
+            {content.wellness.cta.text}
           </Link>
         </div>
       </section>
@@ -556,10 +445,10 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 reveal-target">
             <div>
               <p className="font-sans text-wff-red font-bold uppercase tracking-[0.4em] text-xs mb-3">
-                {HOME_DATA_CONFIG.armory.supertitle}
+                {content.armory.supertitle}
               </p>
               <h2 className="font-bebas text-5xl md:text-7xl text-white select-none">
-                {HOME_DATA_CONFIG.armory.title}
+                {content.armory.title}
               </h2>
             </div>
             <Link 
@@ -666,7 +555,7 @@ export default function Home() {
       <section className="py-24 bg-wff-dark border-b border-white/5">
         <div className="container mx-auto px-6 max-w-7xl">
           <h2 className="font-bebas text-5xl md:text-7xl text-white mb-12 text-center reveal-target select-none">
-            {HOME_DATA_CONFIG.newsSection.title}
+            {content.news.title}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {news.map((post) => (
@@ -698,16 +587,16 @@ export default function Home() {
       <section className="py-24 bg-black border-b border-white/5">
         <div className="container mx-auto px-6 text-center max-w-4xl reveal-target">
           <h2 className="font-bebas text-5xl md:text-7xl text-white mb-6 select-none">
-            {HOME_DATA_CONFIG.partnerships.title}
+            {content.partnerships.title}
           </h2>
           <p className="font-sans text-sm text-white/60 max-w-xl mx-auto mb-10 leading-relaxed">
-            {HOME_DATA_CONFIG.partnerships.body}
+            {content.partnerships.body}
           </p>
-          <Link 
-            href={HOME_DATA_CONFIG.partnerships.cta.href} 
+          <Link
+            href="/partnerships"
             className="inline-block border border-white/10 hover:border-white text-white font-sans text-xs font-black uppercase tracking-widest px-8 py-4 rounded-xl transition-all duration-300"
           >
-            {HOME_DATA_CONFIG.partnerships.cta.text}
+            {content.partnerships.cta.text}
           </Link>
         </div>
       </section>
@@ -720,17 +609,17 @@ export default function Home() {
             READY FOR <br/><span className="text-wff-red">THE STAGE?</span>
           </h2>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
-            <Link 
-              href={HOME_DATA_CONFIG.contactCta.passesBtn.href} 
+            <Link
+              href="/contact"
               className="bg-wff-red text-white font-bebas text-2xl py-4.5 px-10 rounded-xl hover:bg-white hover:text-black transition-colors w-full tracking-widest font-bold uppercase"
             >
-              {HOME_DATA_CONFIG.contactCta.passesBtn.text}
+              {content.contactCta.passesBtn.text}
             </Link>
-            <Link 
-              href={HOME_DATA_CONFIG.contactCta.contactBtn.href} 
+            <Link
+              href="/contact"
               className="border border-white/10 hover:border-white hover:bg-white hover:text-black text-white font-bebas text-2xl py-4.5 px-10 rounded-xl transition-colors w-full tracking-widest font-bold uppercase"
             >
-              {HOME_DATA_CONFIG.contactCta.contactBtn.text}
+              {content.contactCta.contactBtn.text}
             </Link>
           </div>
         </div>

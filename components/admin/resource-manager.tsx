@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import { uploadPublicMedia } from "@/lib/uploadPublicMedia";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -162,25 +163,14 @@ export default function ResourceManager({
     setSaving(true);
     setError(null);
 
-    const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "");
-    const path = `${table}/${Date.now()}_${safeName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("public-media")
-      .upload(path, file, { upsert: false });
-
-    if (uploadError) {
-      setError(uploadError.message);
+    try {
+      const publicUrl = await uploadPublicMedia(table, file);
+      setFormData((prev) => ({ ...prev, [field]: publicUrl }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
       setSaving(false);
-      return;
     }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("public-media").getPublicUrl(path);
-
-    setFormData((prev) => ({ ...prev, [field]: publicUrl }));
-    setSaving(false);
   };
 
   const inputClass = "bg-black border-white/10";
