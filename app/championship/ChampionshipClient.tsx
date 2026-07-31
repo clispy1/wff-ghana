@@ -163,15 +163,16 @@ export default function ChampionshipClient() {
         {/* Header */}
         <div ref={headerRef} className="max-w-4xl mx-auto text-center mb-16">
           <p className="font-sans text-wff-gold font-bold uppercase tracking-[0.3em] mb-4">
-            2026 Continental Summit
+            {championshipEvent?.start_date
+              ? `${new Date(championshipEvent.start_date).getFullYear()} Continental Summit`
+              : "Continental Summit"}
           </p>
           <h1 className="font-bebas text-6xl md:text-8xl mb-6">
             THE ULTIMATE <span className="text-wff-red">SHOWDOWN</span>
           </h1>
           <p className="font-sans text-lg text-white/70 leading-relaxed md:px-12">
-            {championshipEvent
-              ? championshipEvent.description
-              : "On September 26, 2026, the preeminent physiques from across Africa will converge in Accra, Ghana. Experience state-of-the-art stage layout, fair judging, and unmatched energy."}
+            {championshipEvent?.description ||
+              "The preeminent physiques from across Africa will converge in Ghana. Experience state-of-the-art stage layout, fair judging, and unmatched energy."}
           </p>
         </div>
 
@@ -189,12 +190,12 @@ export default function ChampionshipClient() {
                 formatEventRange(
                   championshipEvent?.start_date,
                   championshipEvent?.end_date,
-                ) || "Main Stage",
+                ) || "To Be Announced",
             },
             {
               icon: <Ticket className="text-white" size={24} />,
-              title: "Pre-Sale Live",
-              subtitle: "Exquisite Seating Plans",
+              title: TICKETS.length > 0 ? "Pre-Sale Live" : "Tickets Coming Soon",
+              subtitle: TICKETS.length > 0 ? "Exquisite Seating Plans" : "Check back soon",
             },
             {
               icon: <Award className="text-wff-gold" size={24} />,

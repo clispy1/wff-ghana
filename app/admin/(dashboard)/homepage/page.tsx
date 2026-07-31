@@ -556,6 +556,26 @@ export default function AdminHomepagePage() {
         />
       </SectionCard>
 
+      {/* Gallery header */}
+      <SectionCard
+        title="CHAPTER MEDIA (GALLERY) HEADER"
+        hint="Just the section heading — photos themselves are managed under Gallery."
+        saving={savingKey === "gallery"}
+        saved={savedKey === "gallery"}
+        onSave={() => save("gallery")}
+      >
+        <Field
+          label="Supertitle"
+          value={content.gallery.supertitle}
+          onChange={(e) => update("gallery", { ...content.gallery, supertitle: e.target.value })}
+        />
+        <Field
+          label="Title"
+          value={content.gallery.title}
+          onChange={(e) => update("gallery", { ...content.gallery, title: e.target.value })}
+        />
+      </SectionCard>
+
       {/* News header */}
       <SectionCard
         title="NEWS SECTION HEADER"

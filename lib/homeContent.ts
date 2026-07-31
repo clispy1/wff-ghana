@@ -25,6 +25,7 @@ export interface AmbassadorItem {
   badge: string;
 }
 
+
 export interface HomeContent {
   president: {
     title: string;
@@ -58,6 +59,7 @@ export interface HomeContent {
   };
   wellness: { supertitle: string; title: string; body: string; cta: { text: string } };
   armory: { supertitle: string; title: string };
+  gallery: { supertitle: string; title: string };
   news: { title: string };
   partnerships: { title: string; body: string; cta: { text: string } };
   contactCta: { title: string; passesBtn: { text: string }; contactBtn: { text: string } };
@@ -183,6 +185,10 @@ export const HOME_CONTENT_DEFAULTS: HomeContent = {
     supertitle: 'OFFICIAL CHAPTER GEAR',
     title: 'THE ARMORY',
   },
+  gallery: {
+    supertitle: 'AUTHORIZED LOGS',
+    title: 'CHAPTER MEDIA',
+  },
   news: {
     title: 'OFFICIAL CHRONICLES',
   },
@@ -206,6 +212,7 @@ export const HOME_CONTENT_KEYS: Record<keyof HomeContent, string> = {
   ambassadors: 'home_ambassadors',
   wellness: 'home_wellness',
   armory: 'home_armory',
+  gallery: 'home_gallery',
   news: 'home_news',
   partnerships: 'home_partnerships',
   contactCta: 'home_contact_cta',

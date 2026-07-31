@@ -10,6 +10,7 @@ import WorldChampionships from '@/components/WorldChampionships';
 import { supabase } from '@/lib/supabase';
 import { fetchActiveEvent, formatEventRange, type WffEvent } from '@/lib/activeEvent';
 import { HOME_CONTENT_DEFAULTS, fetchHomeContent, type HomeContent } from '@/lib/homeContent';
+import { fetchGalleryMedia, type GalleryPhoto } from '@/lib/galleryMedia';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -18,63 +19,30 @@ gsap.registerPlugin(ScrollTrigger);
 // fetch resolves. Everything else on this page is sourced from
 // lib/homeContent.ts / the site_content table, editable at
 // Admin -> Homepage Content.
-const DEFAULT_SPONSORS = [
-  { name: "ACCRA ATHLETIC CLUB", role: "FOUNDING GYM" },
-  { name: "PRIME PHYSIQUE GH", role: "ATHLETIC SUPPORT" },
-  { name: "IRON FORCE EQUIPMENT", role: "HARDWARE PARTNER" },
-  { name: "GOLD STANDARD SPORTS", role: "NUTRITION DIVISION" },
-  { name: "WEST AFRICA ACTIVE", role: "OFFICIAL HOST PORTAL" },
-  { name: "PRESTIGE WELLNESS INC.", role: "PHYSIOLOGY DIVISION" }
-];
 
-const DEFAULT_PRODUCTS = [
-  { id: '1', name: 'WFF Pro Stringer', price: 150.00, img: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=800&auto=format&fit=crop', category: 'Tanks', description: 'Classic stringer tank top.' },
-  { id: '6', name: 'Championship Hoodie', price: 350.00, img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop', category: 'Outerwear', description: 'Heavyweight hoodie.' },
-  { id: '4', name: 'Elite Lifting Belt', price: 450.00, img: 'https://images.unsplash.com/photo-1584865288642-42078afe6942?q=80&w=800&auto=format&fit=crop', category: 'Gear', description: 'Genuine leather lifting belt.' },
-  { id: '3', name: 'WFF Ghana Cap', price: 120.00, img: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=800&auto=format&fit=crop', category: 'Accessories', description: 'Adjustable snapback cap.' }
-];
-
-const DEFAULT_NEWS_POSTS = [
-  {
-    id: "news-1",
-    date: "May 15, 2026",
-    title: "WFF CHAPTER SANCTIONED IN ACCRA",
-    summary: "The global licensing body has finalized the constitution of the Ghana federation, establishing a state office to manage West African natural tournaments."
-  },
-  {
-    id: "news-2",
-    date: "May 10, 2026",
-    title: "UPSA STAGE LIGHTING CONTRACT LOCKED",
-    summary: "To match WFF's premium presentation guidelines, a professional lighting and live feed team is selected to operate the main theater."
-  },
-  {
-    id: "news-3",
-    date: "May 02, 2026",
-    title: "ANTI-DOPING COMPLIANCE WORKSHOP SET",
-    summary: "WFF Ghana reiterates its commitment to natural physique aesthetics with upcoming public rules workshops explaining natural parameters."
-  }
-];
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   
   // Dynamic State mapping to Supabase
-  const [sponsors, setSponsors] = useState<any[]>(DEFAULT_SPONSORS);
-  const [news, setNews] = useState<any[]>(DEFAULT_NEWS_POSTS);
-  const [products, setProducts] = useState<any[]>(DEFAULT_PRODUCTS);
+  const [sponsors, setSponsors] = useState<any[]>([]);
+  const [news, setNews] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [eventData, setEventData] = useState<WffEvent | null>(null);
   const [content, setContent] = useState<HomeContent>(HOME_CONTENT_DEFAULTS);
+  const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([]);
 
   useEffect(() => {
     // Fetch Dynamic CMS Data
     const fetchHomeData = async () => {
       try {
-        const [sponsorsRes, newsRes, productsRes, eventsRes, homeContentRes] = await Promise.all([
+        const [sponsorsRes, newsRes, productsRes, eventsRes, homeContentRes, galleryRes] = await Promise.all([
           supabase.from('sponsors').select('*').order('display_order', { ascending: true }),
           supabase.from('news_articles').select('*').order('publish_date', { ascending: false }).limit(3),
           supabase.from('ecommerce_products').select('*').limit(4),
           fetchActiveEvent(),
           fetchHomeContent(),
+          fetchGalleryMedia(4),
         ]);
 
         if (sponsorsRes.data?.length) setSponsors(sponsorsRes.data.map(s => ({ name: s.name, role: s.tier })));
@@ -82,6 +50,7 @@ export default function Home() {
         if (productsRes.data?.length) setProducts(productsRes.data.map(p => ({ id: p.id, name: p.name, price: Number(p.price), img: p.image_url, category: p.category, description: p.description })));
         if (eventsRes) setEventData(eventsRes);
         setContent(homeContentRes);
+        setGalleryPhotos(galleryRes);
 
       } catch (error) {
         console.error("Error fetching homepage config:", error);
@@ -130,17 +99,19 @@ export default function Home() {
       <Hero />
 
       {/* 2. Authentic Partners / Sponsors Strip (Moving Marquee) */}
-      <section className="py-6 border-y border-white/5 bg-[#050505] overflow-hidden relative z-10">
-        <div className="flex space-x-12 animate-[marquee_25s_linear_infinite] whitespace-nowrap opacity-60 hover:opacity-100 transition-opacity duration-500">
-          {[...sponsors, ...sponsors, ...sponsors].map((sponsor, i) => (
-            <div key={i} className="inline-flex items-center space-x-3 text-white font-sans text-xs select-none">
-              <span className="font-bebas text-lg tracking-widest text-wff-gold">{sponsor.name}</span>
-              <span className="text-[10px] text-white/30 font-bold uppercase font-mono">[{sponsor.role}]</span>
-              <span className="text-wff-red font-bold text-xs">•</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      {sponsors.length > 0 && (
+        <section className="py-6 border-y border-white/5 bg-[#050505] overflow-hidden relative z-10">
+          <div className="flex space-x-12 animate-[marquee_25s_linear_infinite] whitespace-nowrap opacity-60 hover:opacity-100 transition-opacity duration-500">
+            {[...sponsors, ...sponsors, ...sponsors].map((sponsor, i) => (
+              <div key={i} className="inline-flex items-center space-x-3 text-white font-sans text-xs select-none">
+                <span className="font-bebas text-lg tracking-widest text-wff-gold">{sponsor.name}</span>
+                <span className="text-[10px] text-white/30 font-bold uppercase font-mono">[{sponsor.role}]</span>
+                <span className="text-wff-red font-bold text-xs">•</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* 3. Federation About Section */}
       <section className="py-24 relative bg-[#070707] border-b border-white/5">
@@ -460,40 +431,46 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <Link 
-                href={`/shop/${product.id}`} 
-                key={product.id} 
-                className="reveal-target group cursor-pointer block"
-              >
-                <div className="relative aspect-[4/5] bg-[#111] border border-white/10 overflow-hidden mb-5 rounded-2xl">
-                  <div className="absolute inset-0 bg-wff-red/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
-                  <Image 
-                    src={product.img} 
-                    alt={product.name}
-                    fill
-                    className="object-cover grayscale group-hover:grayscale-0 transition-transform duration-700 group-hover:scale-103"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute bottom-0 left-0 w-full p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-20 bg-black/90 backdrop-blur-xs">
-                    <span className="block w-full text-center font-bebas text-lg text-wff-gold tracking-widest">
-                      VIEW IN SHOP
-                    </span>
+            {products.length === 0 ? (
+              <p className="text-white/40 text-sm col-span-full text-center py-8">
+                Merchandise will be listed here soon.
+              </p>
+            ) : (
+              products.map((product) => (
+                <Link
+                  href={`/shop/${product.id}`}
+                  key={product.id}
+                  className="reveal-target group cursor-pointer block"
+                >
+                  <div className="relative aspect-[4/5] bg-[#111] border border-white/10 overflow-hidden mb-5 rounded-2xl">
+                    <div className="absolute inset-0 bg-wff-red/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+                    <Image
+                      src={product.img}
+                      alt={product.name}
+                      fill
+                      className="object-cover grayscale group-hover:grayscale-0 transition-transform duration-700 group-hover:scale-103"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute bottom-0 left-0 w-full p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-20 bg-black/90 backdrop-blur-xs">
+                      <span className="block w-full text-center font-bebas text-lg text-wff-gold tracking-widest">
+                        VIEW IN SHOP
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <h3 className="font-bebas text-2xl text-white mb-0.5 group-hover:text-wff-red transition-colors tracking-wide truncate">
-                  {product.name}
-                </h3>
-                <p className="font-sans text-xs text-white/50">
-                  {typeof product.price === 'number' ? `₵ ${product.price.toFixed(2)}` : `₵ ${product.price}`}
-                </p>
-              </Link>
-            ))}
+                  <h3 className="font-bebas text-2xl text-white mb-0.5 group-hover:text-wff-red transition-colors tracking-wide truncate">
+                    {product.name}
+                  </h3>
+                  <p className="font-sans text-xs text-white/50">
+                    {typeof product.price === 'number' ? `₵ ${product.price.toFixed(2)}` : `₵ ${product.price}`}
+                  </p>
+                </Link>
+              ))
+            )}
           </div>
-          
+
           <div className="mt-8 text-center md:hidden reveal-target">
-            <Link 
-              href="/shop" 
+            <Link
+              href="/shop"
               className="inline-block border border-white/15 text-white font-sans text-xs font-black uppercase tracking-widest px-8 py-4 rounded-xl transition-all duration-300 w-full"
             >
               View Full Gallery
@@ -507,37 +484,38 @@ export default function Home() {
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="flex justify-between items-end mb-12 reveal-target">
             <div>
-              <p className="font-sans text-wff-gold font-bold uppercase tracking-[0.4em] text-xs mb-3">AUTHORIZED LOGS</p>
-              <h2 className="font-bebas text-5xl md:text-7xl text-white select-none">CHAPTER MEDIA</h2>
+              <p className="font-sans text-wff-gold font-bold uppercase tracking-[0.4em] text-xs mb-3">{content.gallery.supertitle}</p>
+              <h2 className="font-bebas text-5xl md:text-7xl text-white select-none">{content.gallery.title}</h2>
             </div>
-            <Link 
-              href="/media" 
+            <Link
+              href="/media"
               className="hidden md:inline-flex font-sans text-xs font-black uppercase tracking-widest text-white/50 hover:text-white transition-colors"
             >
-              View Media Board →
+              View Media & Gallery →
             </Link>
           </div>
-          
+
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800&auto=format&fit=crop",
-              "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop",
-              "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800&auto=format&fit=crop",
-              "https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=800&auto=format&fit=crop"
-            ].map((src, i) => (
-              <div 
-                key={i} 
-                className="reveal-target aspect-square bg-[#111] border border-white/10 hover:border-wff-red transition-all duration-300 cursor-pointer overflow-hidden rounded-2xl relative group"
-              >
-                <Image 
-                  src={src} 
-                  alt="Gallery Snip" 
-                  role="presentation"
-                  fill 
-                  className="object-cover grayscale group-hover:grayscale-0 opacity-55 group-hover:opacity-85 transition-opacity duration-300"
-                />
-              </div>
-            ))}
+            {galleryPhotos.length === 0 ? (
+              <p className="text-white/40 text-sm col-span-full text-center py-8">
+                Photos will be posted here soon.
+              </p>
+            ) : (
+              galleryPhotos.map((photo) => (
+                <div
+                  key={photo.id}
+                  className="reveal-target aspect-square bg-[#111] border border-white/10 hover:border-wff-red transition-all duration-300 cursor-pointer overflow-hidden rounded-2xl relative group"
+                >
+                  <Image
+                    src={photo.image_url}
+                    alt={photo.caption || "Gallery Snip"}
+                    role="presentation"
+                    fill
+                    className="object-cover grayscale group-hover:grayscale-0 opacity-55 group-hover:opacity-85 transition-opacity duration-300"
+                  />
+                </div>
+              ))
+            )}
           </div>
           
           <div className="mt-8 text-center md:hidden reveal-target">
@@ -545,7 +523,7 @@ export default function Home() {
               href="/media" 
               className="inline-block border border-white/15 text-white font-sans text-xs font-black uppercase tracking-widest px-8 py-4 rounded-xl transition-all duration-300 w-full"
             >
-              View Media Board →
+              View Media & Gallery →
             </Link>
           </div>
         </div>
@@ -558,27 +536,33 @@ export default function Home() {
             {content.news.title}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {news.map((post) => (
-              <div 
-                key={post.id} 
-                className="reveal-target bg-[#070707] border border-white/10 p-8 hover:-translate-y-1.5 transition-transform duration-500 rounded-2xl flex flex-col justify-between"
-              >
-                <div>
-                  <p className="font-sans text-wff-red text-xs font-bold uppercase tracking-widest mb-4">
-                    {post.date}
-                  </p>
-                  <h3 className="font-bebas text-2xl text-white mb-4 tracking-wide leading-tight">
-                    {post.title}
-                  </h3>
-                  <p className="font-sans text-xs text-white/55 leading-relaxed mb-6">
-                    {post.summary}
-                  </p>
+            {news.length === 0 ? (
+              <p className="text-white/40 text-sm col-span-full text-center py-8">
+                News articles will be posted here soon.
+              </p>
+            ) : (
+              news.map((post) => (
+                <div
+                  key={post.id}
+                  className="reveal-target bg-[#070707] border border-white/10 p-8 hover:-translate-y-1.5 transition-transform duration-500 rounded-2xl flex flex-col justify-between"
+                >
+                  <div>
+                    <p className="font-sans text-wff-red text-xs font-bold uppercase tracking-widest mb-4">
+                      {post.date}
+                    </p>
+                    <h3 className="font-bebas text-2xl text-white mb-4 tracking-wide leading-tight">
+                      {post.title}
+                    </h3>
+                    <p className="font-sans text-xs text-white/55 leading-relaxed mb-6">
+                      {post.summary}
+                    </p>
+                  </div>
+                  <span className="font-sans text-xs font-black uppercase tracking-widest text-wff-gold block cursor-pointer hover:text-white transition-colors mt-4">
+                    RESOURCES →
+                  </span>
                 </div>
-                <span className="font-sans text-xs font-black uppercase tracking-widest text-wff-gold block cursor-pointer hover:text-white transition-colors mt-4">
-                  RESOURCES →
-                </span>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>

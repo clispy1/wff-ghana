@@ -17,6 +17,7 @@ import {
   LayoutTemplate,
   CalendarClock,
   Hotel,
+  Images,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -47,6 +48,7 @@ const items = [
   { title: "Orders", url: "/admin/orders", icon: Receipt },
   { title: "Armory Shop", url: "/admin/shop", icon: ShoppingBag },
   { title: "News & Media", url: "/admin/news", icon: Newspaper },
+  { title: "Gallery", url: "/admin/gallery", icon: Images },
   { title: "Sponsors", url: "/admin/sponsors", icon: Handshake },
   { title: "Federation Staff", url: "/admin/staff", icon: UserSquare },
   { title: "Inbox", url: "/admin/messages", icon: Mail },
