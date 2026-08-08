@@ -40,8 +40,8 @@ export interface FeatureHighlight {
 export const HERO_CONTENT = {
   ticker: {
     title: "WORLD FITNESS FEDERATION GHANA OFFICIAL LAUNCH",
-    venue: "UPSA AUDITORIUM, ACCRA",
-    badge: "INAUGURAL PRO-AM CUP",
+    venue: "COLLEGE OF PHYSICIANS & SURGEONS, ACCRA",
+    badge: "AFRICAN CHAMPIONSHIP",
   },
   tagline: "BUILDING THE FUTURE OF NATURAL AESTHETICS",
   title: {
@@ -60,15 +60,15 @@ export const HERO_CONTENT = {
     },
     {
       id: "date",
-      label: "UPCOMING CUP",
-      value: "Sept 26, 2026",
+      label: "UPCOMING EVENT",
+      value: "Oct 2nd - 4th, 2026",
       icon: Calendar,
       iconColor: "text-wff-red",
     },
     {
       id: "status",
       label: "ACCREDITATION",
-      value: "WFF Authorized",
+      value: "WFF International Authorized",
       icon: Award,
       iconColor: "text-wff-green",
     },

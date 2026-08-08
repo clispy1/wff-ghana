@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import {
   fetchKnownAssignees,
@@ -37,6 +37,27 @@ import {
   X,
   ClipboardPaste,
 } from "lucide-react";
+import {
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useDroppable,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragOverEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface PlanEventOption {
   id: string;
@@ -54,6 +75,211 @@ const EMPTY_TASK_FORM = {
   due_date: "",
 };
 
+function TaskCardContent({
+  task,
+  phaseMeta,
+  onToggleDone,
+  onEdit,
+  onDelete,
+  onReorder,
+}: {
+  task: MasterPlanTask;
+  phaseMeta: (id: string | null) => MasterPlanPhase | undefined;
+  onToggleDone: (task: MasterPlanTask) => void;
+  onEdit: (task: MasterPlanTask) => void;
+  onDelete: (task: MasterPlanTask) => void;
+  onReorder: (task: MasterPlanTask, dir: -1 | 1) => void;
+}) {
+  const prio = priorityMeta(task.priority);
+  const phase = phaseMeta(task.phase_id);
+  return (
+    <>
+      <div className="flex items-start gap-2">
+        <button
+          onClick={() => onToggleDone(task)}
+          className={`mt-0.5 shrink-0 transition-colors ${
+            task.completed_at ? "text-green-400" : "text-white/20 hover:text-green-400"
+          }`}
+          title={task.completed_at ? "Reopen task" : "Mark done"}
+        >
+          {task.completed_at ? (
+            <RotateCcw className="h-4 w-4" />
+          ) : (
+            <CheckCircle2 className="h-4 w-4" />
+          )}
+        </button>
+        <div className="flex-1 min-w-0">
+          <div
+            className={`text-sm font-bold leading-snug ${
+              task.completed_at ? "text-white/40 line-through" : "text-white"
+            }`}
+          >
+            {task.title}
+          </div>
+          {task.description && (
+            <div className="text-[11px] text-white/40 font-sans mt-1 line-clamp-2">
+              {task.description}
+            </div>
+          )}
+          <div className="flex flex-wrap items-center gap-1.5 mt-2">
+            {phase && (
+              <span
+                className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest text-white/70"
+                style={{ backgroundColor: `${phase.color}22` }}
+              >
+                {phase.name}
+              </span>
+            )}
+            <span
+              className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border ${prio.color}`}
+            >
+              {prio.label}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-white/5">
+        <div className="flex items-center gap-3 text-[10px] text-white/40 font-sans">
+          {task.assignee && (
+            <span className="flex items-center gap-1">
+              <Flag className="h-3 w-3" />
+              {task.assignee}
+            </span>
+          )}
+          {task.due_date && (
+            <span className="flex items-center gap-1 font-mono">
+              <CalendarDays className="h-3 w-3" />
+              {formatEventDateShort(task.due_date)}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={() => onReorder(task, -1)}
+            className="text-white/30 hover:text-white p-0.5"
+            title="Move up"
+          >
+            <ChevronUp className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => onReorder(task, 1)}
+            className="text-white/30 hover:text-white p-0.5"
+            title="Move down"
+          >
+            <ChevronDown className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => onEdit(task)}
+            className="text-white/30 hover:text-wff-gold p-0.5"
+            title="Edit"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => onDelete(task)}
+            className="text-white/30 hover:text-wff-red p-0.5"
+            title="Delete"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function KanbanTaskCard(props: {
+  task: MasterPlanTask;
+  phaseMeta: (id: string | null) => MasterPlanPhase | undefined;
+  onToggleDone: (task: MasterPlanTask) => void;
+  onEdit: (task: MasterPlanTask) => void;
+  onDelete: (task: MasterPlanTask) => void;
+  onReorder: (task: MasterPlanTask, dir: -1 | 1) => void;
+}) {
+  const { task, ...handlers } = props;
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: task.id,
+  });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      {...attributes}
+      {...listeners}
+      className={`group rounded-lg border p-3 cursor-grab active:cursor-grabbing touch-none select-none transition-all ${
+        isDragging ? "opacity-40" : ""
+      } ${
+        task.completed_at
+          ? "border-green-500/20 bg-green-500/5"
+          : "border-white/10 bg-black/40 hover:border-white/25"
+      }`}
+    >
+      <TaskCardContent task={task} {...handlers} />
+    </div>
+  );
+}
+
+function KanbanColumn(props: {
+  column: MasterPlanColumn;
+  tasks: MasterPlanTask[];
+  highlighted: boolean;
+  phaseMeta: (id: string | null) => MasterPlanPhase | undefined;
+  onAddTask: () => void;
+  onToggleDone: (task: MasterPlanTask) => void;
+  onEdit: (task: MasterPlanTask) => void;
+  onDelete: (task: MasterPlanTask) => void;
+  onReorder: (task: MasterPlanTask, dir: -1 | 1) => void;
+}) {
+  const { column, tasks, highlighted, phaseMeta, onAddTask, ...handlers } = props;
+  const { setNodeRef } = useDroppable({ id: column.id });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`w-72 shrink-0 rounded-xl border transition-colors ${
+        highlighted ? "border-wff-gold bg-wff-gold/5" : "border-white/10 bg-[#111]"
+      } flex flex-col max-h-[70vh]`}
+    >
+      <div
+        className="px-4 py-3 rounded-t-xl flex items-center gap-2 border-b border-white/5"
+        style={{ backgroundColor: `${column.color}14` }}
+      >
+        <span
+          className="w-2.5 h-2.5 rounded-full shrink-0"
+          style={{ backgroundColor: column.color }}
+        />
+        <span className="font-bebas text-lg text-white tracking-widest flex-1">
+          {column.name.toUpperCase()}
+        </span>
+        <span className="text-xs font-mono text-white/40">{tasks.length}</span>
+        <button
+          onClick={onAddTask}
+          className="text-white/30 hover:text-wff-gold transition-colors"
+          title="Add task to this column"
+        >
+          <Plus className="h-4 w-4" />
+        </button>
+      </div>
+
+      <div className="p-2.5 space-y-2.5 overflow-y-auto flex-1 min-h-[120px]">
+        <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
+          {tasks.map((task) => (
+            <KanbanTaskCard key={task.id} task={task} phaseMeta={phaseMeta} {...handlers} />
+          ))}
+        </SortableContext>
+        {tasks.length === 0 && (
+          <button
+            onClick={onAddTask}
+            className="w-full py-6 rounded-lg border border-dashed border-white/10 text-white/25 text-xs font-sans hover:text-white/50 hover:border-white/25 transition-colors"
+          >
+            + Add a task
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function AdminChecklistsPage() {
   const [eventId, setEventId] = useState("");
   const [columns, setColumns] = useState<MasterPlanColumn[]>([]);
@@ -68,8 +294,12 @@ export default function AdminChecklistsPage() {
   const [phaseFilter, setPhaseFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
 
-  const [dragTaskId, setDragTaskId] = useState<string | null>(null);
-  const [dragOverCol, setDragOverCol] = useState<string | null>(null);
+  const [activeTask, setActiveTask] = useState<MasterPlanTask | null>(null);
+  const [overColumnId, setOverColumnId] = useState<string | null>(null);
+  const tasksRef = useRef<MasterPlanTask[]>(tasks);
+  useEffect(() => {
+    tasksRef.current = tasks;
+  }, [tasks]);
 
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
   const [editTaskId, setEditTaskId] = useState<string | null>(null);
@@ -124,7 +354,7 @@ export default function AdminChecklistsPage() {
   }, [tasks, phaseFilter, priorityFilter, search]);
 
   const tasksInColumn = (columnId: string) =>
-    filteredTasks
+    (activeTask ? tasks : filteredTasks)
       .filter((t) => t.column_id === columnId)
       .sort((a, b) => a.sort_order - b.sort_order);
 
@@ -144,7 +374,7 @@ export default function AdminChecklistsPage() {
     toColumnId: string | null,
     completedAt: string | null,
   ) => {
-    const siblings = tasks.filter(
+    const siblings = tasksRef.current.filter(
       (t) => t.column_id === toColumnId && t.id !== taskId,
     );
     const sortOrder = siblings.length
@@ -178,9 +408,9 @@ export default function AdminChecklistsPage() {
   };
 
   const reorderTask = (taskId: string, dir: -1 | 1) => {
-    const task = tasks.find((t) => t.id === taskId);
+    const task = tasksRef.current.find((t) => t.id === taskId);
     if (!task) return;
-    const siblings = tasks
+    const siblings = tasksRef.current
       .filter((t) => t.column_id === task.column_id)
       .sort((a, b) => a.sort_order - b.sort_order);
     const idx = siblings.findIndex((t) => t.id === taskId);
@@ -199,6 +429,138 @@ export default function AdminChecklistsPage() {
     );
     persist(taskId, { sort_order: b });
     persist(other.id, { sort_order: a });
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const setTasksBoth = (next: MasterPlanTask[]) => {
+    tasksRef.current = next;
+    setTasks(next);
+  };
+
+  const findColumnOf = (id: string): string | null => {
+    const t = tasksRef.current.find((x) => x.id === id);
+    if (t) return t.column_id;
+    return columns.some((c) => c.id === id) ? id : null;
+  };
+
+  const renumberColumn = (ordered: MasterPlanTask[]) =>
+    ordered.map((t, i) => (t.sort_order === i ? t : { ...t, sort_order: i }));
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const task = tasksRef.current.find((t) => t.id === String(event.active.id));
+    if (task) setActiveTask(task);
+  };
+
+  const handleDragCancel = () => {
+    setActiveTask(null);
+    setOverColumnId(null);
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+    const activeId = String(active.id);
+    const overId = String(over.id);
+    if (activeId === overId) return;
+
+    const activeColumnId = findColumnOf(activeId);
+    const overColumnId = findColumnOf(overId);
+    if (!activeColumnId || !overColumnId) return;
+    setOverColumnId(overColumnId);
+
+    if (activeColumnId === overColumnId) return;
+
+    const board = tasksRef.current;
+    const moved = board.find((t) => t.id === activeId);
+    if (!moved) return;
+
+    const overSiblings = board
+      .filter((t) => t.column_id === overColumnId)
+      .sort((a, b) => a.sort_order - b.sort_order);
+    const overIndex = overSiblings.findIndex((t) => t.id === overId);
+    const insertAt = overIndex >= 0 ? overIndex : overSiblings.length;
+
+    const doneColumnId = columns.find((c) => c.is_done_column)?.id;
+    const updated = {
+      ...moved,
+      column_id: overColumnId,
+      completed_at:
+        overColumnId === doneColumnId
+          ? moved.completed_at ?? new Date().toISOString()
+          : null,
+    };
+    const nextOver = renumberColumn([
+      ...overSiblings.slice(0, insertAt),
+      updated,
+      ...overSiblings.slice(insertAt),
+    ]);
+
+    const rest = board.filter((t) => t.id !== activeId);
+    const byId = new Map(nextOver.map((t) => [t.id, t]));
+    renumberColumn(
+      rest.filter((t) => t.column_id === activeColumnId).sort((a, b) => a.sort_order - b.sort_order),
+    ).forEach((t) => byId.set(t.id, t));
+    setTasksBoth(rest.map((t) => byId.get(t.id) ?? t));
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveTask(null);
+    setOverColumnId(null);
+    if (!over) return;
+    const activeId = String(active.id);
+    const overId = String(over.id);
+    if (activeId === overId) return;
+
+    const activeColumnId = findColumnOf(activeId);
+    const overColumnId = findColumnOf(overId);
+    if (!activeColumnId || !overColumnId) return;
+
+    let board = tasksRef.current;
+    if (activeColumnId === overColumnId) {
+      const siblings = board
+        .filter((t) => t.column_id === activeColumnId)
+        .sort((a, b) => a.sort_order - b.sort_order);
+      const activeIndex = siblings.findIndex((t) => t.id === activeId);
+      const overIndex = siblings.findIndex((t) => t.id === overId);
+      if (activeIndex >= 0 && overIndex >= 0 && activeIndex !== overIndex) {
+        const reordered = renumberColumn(arrayMove(siblings, activeIndex, overIndex));
+        const byId = new Map(reordered.map((t) => [t.id, t]));
+        board = board.map((t) => byId.get(t.id) ?? t);
+        setTasksBoth(board);
+      }
+    }
+
+    const patches = new Map<string, Record<string, string | number | null>>();
+    for (const colId of [activeColumnId, overColumnId]) {
+      board
+        .filter((t) => t.column_id === colId)
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .forEach((t, i) => {
+          if (t.sort_order !== i) patches.set(t.id, { sort_order: i });
+        });
+    }
+    const moved = board.find((t) => t.id === activeId);
+    if (moved && activeColumnId !== overColumnId) {
+      patches.set(moved.id, {
+        ...(patches.get(moved.id) ?? {}),
+        column_id: moved.column_id,
+        completed_at: moved.completed_at,
+      });
+    }
+
+    await Promise.all(
+      [...patches].map(([id, payload]) =>
+        supabase
+          .from("master_plan_tasks")
+          .update({ ...payload, updated_at: new Date().toISOString() })
+          .eq("id", id),
+      ),
+    );
   };
 
   const openNewTask = (columnId?: string) => {
@@ -412,186 +774,48 @@ export default function AdminChecklistsPage() {
           <span className="font-sans text-xs uppercase tracking-widest">Loading board…</span>
         </div>
       ) : (
-        <div className="flex gap-4 overflow-x-auto pb-4 -mx-1 px-1">
-          {columns.map((column) => {
-            const colTasks = tasksInColumn(column.id);
-            return (
-              <div
-                key={column.id}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOverCol(column.id);
-                }}
-                onDragLeave={(e) => {
-                  if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-                    setDragOverCol((prev) => (prev === column.id ? null : prev));
-                  }
-                }}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  if (dragTaskId) moveTask(dragTaskId, column.id, column.is_done_column ? new Date().toISOString() : null);
-                  setDragTaskId(null);
-                  setDragOverCol(null);
-                }}
-                className={`w-72 shrink-0 rounded-xl border transition-all ${
-                  dragOverCol === column.id
-                    ? "border-wff-gold bg-wff-gold/5"
-                    : "border-white/10 bg-[#111]"
-                } flex flex-col max-h-[70vh]`}
-              >
-                <div
-                  className="px-4 py-3 rounded-t-xl flex items-center gap-2 border-b border-white/5"
-                  style={{ backgroundColor: `${column.color}14` }}
-                >
-                  <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: column.color }}
-                  />
-                  <span className="font-bebas text-lg text-white tracking-widest flex-1">
-                    {column.name.toUpperCase()}
-                  </span>
-                  <span className="text-xs font-mono text-white/40">{colTasks.length}</span>
-                  <button
-                    onClick={() => openNewTask(column.id)}
-                    className="text-white/30 hover:text-wff-gold transition-colors"
-                    title="Add task to this column"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
-                </div>
-
-                <div className="p-2.5 space-y-2.5 overflow-y-auto flex-1 min-h-[120px]">
-                  {colTasks.map((task) => {
-                    const prio = priorityMeta(task.priority);
-                    return (
-                      <div
-                        key={task.id}
-                        draggable
-                        onDragStart={(e) => {
-                          e.dataTransfer.setData("text/plain", task.id);
-                          setDragTaskId(task.id);
-                        }}
-                        onDragEnd={() => {
-                          setDragTaskId(null);
-                          setDragOverCol(null);
-                        }}
-                        className={`group rounded-lg border p-3 cursor-grab active:cursor-grabbing transition-all ${
-                          task.completed_at
-                            ? "border-green-500/20 bg-green-500/5"
-                            : "border-white/10 bg-black/40 hover:border-white/25"
-                        } ${dragTaskId === task.id ? "opacity-40" : ""}`}
-                      >
-                        <div className="flex items-start gap-2">
-                          <button
-                            onClick={() => toggleDone(task)}
-                            className={`mt-0.5 shrink-0 transition-colors ${
-                              task.completed_at
-                                ? "text-green-400"
-                                : "text-white/20 hover:text-green-400"
-                            }`}
-                            title={task.completed_at ? "Reopen task" : "Mark done"}
-                          >
-                            {task.completed_at ? (
-                              <RotateCcw className="h-4 w-4" />
-                            ) : (
-                              <CheckCircle2 className="h-4 w-4" />
-                            )}
-                          </button>
-                          <div className="flex-1 min-w-0">
-                            <div
-                              className={`text-sm font-bold leading-snug ${
-                                task.completed_at
-                                  ? "text-white/40 line-through"
-                                  : "text-white"
-                              }`}
-                            >
-                              {task.title}
-                            </div>
-                            {task.description && (
-                              <div className="text-[11px] text-white/40 font-sans mt-1 line-clamp-2">
-                                {task.description}
-                              </div>
-                            )}
-                            <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                              {phaseMeta(task.phase_id) && (
-                                <span
-                                  className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest text-white/70"
-                                  style={{ backgroundColor: `${phaseMeta(task.phase_id)!.color}22` }}
-                                >
-                                  {phaseMeta(task.phase_id)!.name}
-                                </span>
-                              )}
-                              <span
-                                className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border ${prio.color}`}
-                              >
-                                {prio.label}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-white/5">
-                          <div className="flex items-center gap-3 text-[10px] text-white/40 font-sans">
-                            {task.assignee && (
-                              <span className="flex items-center gap-1">
-                                <Flag className="h-3 w-3" />
-                                {task.assignee}
-                              </span>
-                            )}
-                            {task.due_date && (
-                              <span className="flex items-center gap-1 font-mono">
-                                <CalendarDays className="h-3 w-3" />
-                                {formatEventDateShort(task.due_date)}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={() => reorderTask(task.id, -1)}
-                              className="text-white/30 hover:text-white p-0.5"
-                              title="Move up"
-                            >
-                              <ChevronUp className="h-3.5 w-3.5" />
-                            </button>
-                            <button
-                              onClick={() => reorderTask(task.id, 1)}
-                              className="text-white/30 hover:text-white p-0.5"
-                              title="Move down"
-                            >
-                              <ChevronDown className="h-3.5 w-3.5" />
-                            </button>
-                            <button
-                              onClick={() => openEditTask(task)}
-                              className="text-white/30 hover:text-wff-gold p-0.5"
-                              title="Edit"
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteTask(task)}
-                              className="text-white/30 hover:text-wff-red p-0.5"
-                              title="Delete"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {colTasks.length === 0 && (
-                    <button
-                      onClick={() => openNewTask(column.id)}
-                      className="w-full py-6 rounded-lg border border-dashed border-white/10 text-white/25 text-xs font-sans hover:text-white/50 hover:border-white/25 transition-colors"
-                    >
-                      + Add a task
-                    </button>
-                  )}
-                </div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
+          <div className="flex gap-4 overflow-x-auto pb-4 -mx-1 px-1">
+            {columns.map((column) => {
+              const colTasks = tasksInColumn(column.id);
+              return (
+                <KanbanColumn
+                  key={column.id}
+                  column={column}
+                  tasks={colTasks}
+                  highlighted={overColumnId === column.id}
+                  phaseMeta={phaseMeta}
+                  onAddTask={() => openNewTask(column.id)}
+                  onToggleDone={toggleDone}
+                  onEdit={openEditTask}
+                  onDelete={handleDeleteTask}
+                  onReorder={reorderTask}
+                />
+              );
+            })}
+          </div>
+          <DragOverlay dropAnimation={null}>
+            {activeTask && (
+              <div className="w-[266px] rounded-lg border border-wff-gold/40 bg-black/70 p-3 shadow-2xl rotate-2">
+                <TaskCardContent
+                  task={activeTask}
+                  phaseMeta={phaseMeta}
+                  onToggleDone={() => {}}
+                  onEdit={() => {}}
+                  onDelete={() => {}}
+                  onReorder={() => {}}
+                />
               </div>
-            );
-          })}
-        </div>
+            )}
+          </DragOverlay>
+        </DndContext>
       )}
 
       {/* Task create/edit dialog */}

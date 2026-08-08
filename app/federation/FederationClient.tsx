@@ -83,30 +83,30 @@ const EXECUTIVE_BOARD = [
     fallbackImg: 'https://picsum.photos/seed/president-victor/600/800',
     quote: 'Our athletes have the genetics, the work ethic, and the heart. It is time the world sees what Ghana brings to the main stage.'
   },
-  {
-    name: 'Kofi Kwakye',
-    role: 'Vice President & Chief Operating Officer',
-    bio: 'Oversees the regional chapters, national qualifying parameters, and ensures all state-stage regulations align with WFF International structures.',
-    image: 'https://picsum.photos/seed/kofi-kwakye/600/800',
-    fallbackImg: '',
-    quote: 'We operate on values of total integrity, fair local judging panels, and deep support networks for our amateur rosters.'
-  },
-  {
-    name: 'Kwame Mensah',
-    role: 'Technical Director & National Head Coach',
-    bio: 'A certified master coach holding multiple continental titles. Directs official fitness seminars and designs peak active-conditioning schedules.',
-    image: 'https://picsum.photos/seed/head-coach-kwame/600/800',
-    fallbackImg: '',
-    quote: 'Sustainable nutrition programs combined with structured, intense mechanical load is how we build unstoppable champions.'
-  },
-  {
-    name: 'Dr. Naa Dedei Koblah',
-    role: 'Director of Sports Nutrition & Integrity',
-    bio: 'Oversees athlete health guidelines, recovery clinics, anti-doping seminars, and wellness division programs.',
-    image: 'https://picsum.photos/seed/dr-naa/600/800',
-    fallbackImg: '',
-    quote: 'True strength is built from a foundation of absolute wellness. Physical conditioning must always harmonize with mental health.'
-  }
+  // {
+  //   name: 'Kofi Kwakye',
+  //   role: 'Vice President & Chief Operating Officer',
+  //   bio: 'Oversees the regional chapters, national qualifying parameters, and ensures all state-stage regulations align with WFF International structures.',
+  //   image: 'https://picsum.photos/seed/kofi-kwakye/600/800',
+  //   fallbackImg: '',
+  //   quote: 'We operate on values of total integrity, fair local judging panels, and deep support networks for our amateur rosters.'
+  // },
+  // {
+  //   name: 'Kwame Mensah',
+  //   role: 'Technical Director & National Head Coach',
+  //   bio: 'A certified master coach holding multiple continental titles. Directs official fitness seminars and designs peak active-conditioning schedules.',
+  //   image: 'https://picsum.photos/seed/head-coach-kwame/600/800',
+  //   fallbackImg: '',
+  //   quote: 'Sustainable nutrition programs combined with structured, intense mechanical load is how we build unstoppable champions.'
+  // },
+  // {
+  //   name: 'Dr. Naa Dedei Koblah',
+  //   role: 'Director of Sports Nutrition & Integrity',
+  //   bio: 'Oversees athlete health guidelines, recovery clinics, anti-doping seminars, and wellness division programs.',
+  //   image: 'https://picsum.photos/seed/dr-naa/600/800',
+  //   fallbackImg: '',
+  //   quote: 'True strength is built from a foundation of absolute wellness. Physical conditioning must always harmonize with mental health.'
+  // }
 ];
 
 export default function FederationClient() {
