@@ -19,6 +19,7 @@
 - [x] Sponsors, Federation Staff (public-facing data)
 - [x] **Event Master Plan** (phases, kanban checklists, task assignments, private design library)
 - [x] **Bulk task import** — paste JSON (string list or rich objects) or CSV/TSV from Sheets into the checklists page; live preview, name resolution, duplicate + error reporting (8 Aug 2026)
+- [x] **Vendors** — vendor directory; admin CRUD at `/admin/vendors` + public approved list at `/championship/vendors` (8 Aug 2026). Run `supabase_vendors.sql`.
 
 ## Next: approved build list (user-selected)
 
@@ -32,7 +33,6 @@ Build order TBD. The user picked all of these but said **"don't build yet."**
 - [ ] **VIP & Guest RSVP List** — VIPs, officials, media; confirmations, plus-ones, seating.
 - [ ] **Sponsorship Tracker** — deal amounts, paid status, deliverables (logo, banners).
 - [ ] **Promo Calendar** — 56-day plan: countdown posts, athlete spotlights, ticket pushes.
-- [ ] **Vendors** — vendor directory + managing them from the admin dashboard (added by request; pages/spec TBD).
 
 ## Event Master Plan modifications
 
@@ -41,6 +41,8 @@ Build order TBD. The user picked all of these but said **"don't build yet."**
 
 ## Notes / context
 
-- `app/wellness/page.tsx` was intentionally deleted by the owner (removed from nav too).
+- `/federation` is the general WFF Ghana about page (board, map/stats, rulebook, competition classes). Event content lives under `/championship`: partnerships moved to `/championship/partnerships`, vendors at `/championship/vendors`.
+- `app/wellness/page.tsx` was intentionally deleted (wellness section removed from federation too); all links to `/federation#wellness` removed.
+- `app/partnerships/page.tsx` now redirects to `/championship/partnerships`.
 - `app/federation/FederationClient.tsx` — executive board members temporarily commented out by owner; keep as-is.
 - The `output: 'standalone'` in `next.config.ts` fails the final trace-copy step on this Windows/pnpm machine (EPERM symlink); the app itself compiles and all 36 pages generate. Pre-existing environment issue.

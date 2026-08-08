@@ -25,9 +25,7 @@ const navItems: NavItem[] = [
     title: 'Federation',
     isDropdown: true,
     items: [
-      { name: 'Board & Mission', href: '/federation', desc: 'World Fitness Federation Ghana chapter and executive board.' },
-      { name: 'Holistic Wellness', href: '/federation#wellness', desc: 'Commitment to sustainable health, recovery, and nutrition.' },
-      { name: 'Corporate Sponsorship', href: '/federation#partnerships', desc: 'Corporate sponsorship packages and requester deck.' }
+      { name: 'Board & Mission', href: '/federation', desc: 'World Fitness Federation Ghana chapter and executive board.' }
     ]
   },
   {
@@ -39,7 +37,8 @@ const navItems: NavItem[] = [
       { name: 'Hourly Timetable', href: '/championship#schedule', desc: 'Official schedule, weighing slots & division sessions.' },
       { name: 'Host Hotels & Visas', href: '/championship#logistics', desc: 'Airport transfers, health rules & host hotels.' },
       { name: 'Ghana Roster', href: '/championship#roster', desc: 'The national squad profiles and elite achievements.' },
-      { name: 'Athlete Portal', href: '/register', desc: 'Athletes registration & music tracks uploader.' }
+      { name: 'Athlete Portal', href: '/register', desc: 'Athletes registration & music tracks uploader.' },
+      { name: 'Partnerships', href: '/championship/partnerships', desc: '2026 championship sponsorship packages and requester deck.' }
     ]
   },
   {

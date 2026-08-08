@@ -4,24 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
-import { 
-  Heart, 
-  Activity, 
-  Brain, 
-  Users, 
-  BarChart3, 
-  Globe2, 
-  Trophy, 
-  Mail, 
-  Play, 
-  Award, 
-  FileText, 
-  Download, 
-  Briefcase, 
-  ChevronRight, 
-  Scale, 
-  Check 
-} from 'lucide-react';
+import { Globe2, Award, Download, Scale } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -557,17 +540,17 @@ export default function FederationClient() {
         </div>
 
         {/* Holistic Wellness Division Section */}
-        <div id="wellness" className="mt-32 pt-16 border-t border-white/10">
-          <div className="text-center mb-16 max-w-3xl mx-auto">
+        {/* <div id="wellness" className="mt-32 pt-16 border-t border-white/10"> */}
+          {/* <div className="text-center mb-16 max-w-3xl mx-auto">
             <p className="font-sans text-[#00a86b] font-bold uppercase tracking-[0.3em] mb-4 text-xs">Holistic Health & Recovery</p>
             <h2 className="font-bebas text-5xl md:text-7xl mb-6">WELLNESS <span className="text-[#00A86B]">DIVISION</span></h2>
             <p className="font-sans text-white/75 text-base md:text-lg leading-relaxed">
               True athletic strength requires ultimate internal balance. WFF Ghana is committed to elevating the overall health of the nation through active recovery, physiological wellness, and athletic poise.
             </p>
-          </div>
+          </div> */}
 
           {/* Masterclass Video Card */}
-          <div className="relative aspect-video max-w-5xl mx-auto bg-[#001414] border border-[#00A86B]/20 mb-16 group cursor-pointer overflow-hidden rounded-2xl">
+          {/* <div className="relative aspect-video max-w-5xl mx-auto bg-[#001414] border border-[#00A86B]/20 mb-16 group cursor-pointer overflow-hidden rounded-2xl">
             <Image 
               src="https://picsum.photos/seed/training-video/1200/600" 
               alt="Active Recovery Masterclass Video"
@@ -585,10 +568,10 @@ export default function FederationClient() {
               <h3 className="font-bebas text-2xl md:text-4xl text-white">MASTERCLASS: ACTIVE RECOVERY & PREPARATION</h3>
               <p className="font-sans text-xs md:text-sm text-[#00A86B] font-bold">Featuring WFF Head Coach Kwame Mensah</p>
             </div>
-          </div>
+          </div> */}
 
           {/* Wellness Pillars Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
                 icon: <Activity size={28} />,
@@ -624,200 +607,12 @@ export default function FederationClient() {
                 </p>
               </div>
             ))}
-          </div>
-        </div>
+          </div> */}
+        {/* </div> */}
 
-        {/* Corporate Partnerships Section */}
-        <div id="partnerships" className="mt-32 pt-16 border-t border-white/10">
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <p className="font-sans text-wff-gold font-bold uppercase tracking-[0.3em] mb-4 text-xs">Corporate Partnerships</p>
-            <h2 className="font-bebas text-5xl md:text-7xl mb-6">ALIGN WITH <span className="text-wff-red">EXCELLENCE</span></h2>
-            <p className="font-sans text-lg text-white/70 leading-relaxed">
-              The 2026 All Africa Championship is a massive cultural phenomenon. Partnering with WFF Ghana positions your brand at the absolute forefront of health, discipline, and continental unity.
-            </p>
-          </div>
-
-          {/* Partnership Reach Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
-            {[
-              { icon: <Globe2 size={32} />, value: '40+', label: 'Participating Nations' },
-              { icon: <Users size={32} />, value: '10,000+', label: 'Expected Attendees' },
-              { icon: <BarChart3 size={32} />, value: '5M+', label: 'Digital Reach' },
-              { icon: <Trophy size={32} />, value: '500+', label: 'Elite Athletes' },
-            ].map((stat, idx) => (
-              <div key={idx} className="bg-[#111] border border-white/5 p-6 text-center flex flex-col items-center justify-center rounded-2xl transition-all hover:bg-black/80">
-                <div className="text-wff-red mb-3">{stat.icon}</div>
-                <div className="font-bebas text-4xl text-white mb-1 leading-none">{stat.value}</div>
-                <div className="font-sans text-[10px] uppercase tracking-widest text-white/40 font-bold">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Tiers & Form split */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
-            
-            {/* Packages */}
-            <div className="lg:col-span-2 space-y-6">
-              <h3 className="font-bebas text-3xl mb-4 text-white">SPONSORSHIP PACKAGES</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {[
-                  {
-                    name: 'Title Sponsor',
-                    price: 'Custom Tier',
-                    color: 'border-wff-gold text-wff-gold',
-                    bg: 'bg-wff-gold/5',
-                    benefits: [
-                      'Naming rights to the 2026 Championship',
-                      'Prime logo placement on all main stages and media channels',
-                      'VIP Boardroom and direct stage access during the event',
-                      'Dedicated continuous digital marketing campaigns globally'
-                    ]
-                  },
-                  {
-                    name: 'Gold Partner',
-                    price: '₵ 250,000',
-                    color: 'border-white text-white',
-                    bg: 'bg-white/5',
-                    benefits: [
-                      'Secondary logo placement on main dynamic stage banners',
-                      '10 VIP Premium Tickets for corporate executives',
-                      'Frequent social media campaign mentions (10x)',
-                      'Premium spacious exhibition booth space'
-                    ]
-                  },
-                  {
-                    name: 'Silver Partner',
-                    price: '₵ 100,000',
-                    color: 'border-white/50 text-white/80',
-                    bg: 'bg-white/2',
-                    benefits: [
-                      'Logo printed on central physical sponsor wall',
-                      '5 VIP Tickets for executive team members',
-                      'Social media thank you mentions (5x)',
-                      'Shared exhibition hall space'
-                    ]
-                  }
-                ].map((tier, idx) => (
-                  <div key={idx} className={`border ${tier.color} ${tier.bg} p-8 rounded-2xl flex flex-col relative overflow-hidden group hover:scale-[1.02] transition-transform`}>
-                    <h4 className="font-bebas text-2xl mb-1">{tier.name}</h4>
-                    <div className="font-sans font-bold text-lg mb-6">{tier.price}</div>
-                    <ul className="space-y-3 flex-grow mb-6">
-                      {tier.benefits.map((benefit, bIdx) => (
-                        <li key={bIdx} className="font-sans text-xs text-white/75 flex items-start">
-                          <span className="text-wff-gold mr-2 mt-0.5">▹</span>
-                          {benefit}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Dynamic Contact/Request Form (Pre-existing fully working) */}
-            <div className="bg-[#111] border border-white/10 p-8 rounded-2xl">
-              <h3 className="font-bebas text-3xl mb-2 text-wff-gold">REQUEST A DECK</h3>
-              <p className="font-sans text-xs text-white/50 mb-6 font-bold uppercase tracking-wider">Align your brand with sports excellence. Fill the request below:</p>
-              
-              <PartnershipForm />
-            </div>
-
-          </div>
-
-        </div>
 
       </div>
     </main>
   );
 }
 
-// Inner helper component for handling form inputs cleanly (Pre-existing fully working functionality)
-function PartnershipForm() {
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-    }, 1200);
-  };
-
-  if (submitted) {
-    return (
-      <div className="text-center py-10 space-y-4">
-        <div className="w-16 h-16 rounded-full bg-wff-gold/10 text-wff-gold flex items-center justify-center mx-auto mb-4 border border-wff-gold/20 shadow-[0_0_15px_rgba(252,209,22,0.15)]">
-          <Trophy size={32} />
-        </div>
-        <h4 className="font-bebas text-2xl text-white">DECK REQUESTED</h4>
-        <p className="font-sans text-xs text-white/60 leading-relaxed">
-          Thank you. Our partnership relations executive will reach out to your team by email within 24 hours.
-        </p>
-        <button 
-          onClick={() => setSubmitted(false)}
-          className="font-bebas text-sm text-wff-gold hover:underline uppercase tracking-wider block mx-auto pt-4"
-        >
-          Submit Another Request
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4 font-sans text-xs">
-      <div>
-        <label className="block text-white/50 uppercase tracking-widest font-bold mb-1.5">Representative Name</label>
-        <input 
-          type="text" 
-          required
-          placeholder="e.g. Ama Mensah"
-          className="w-full bg-black border border-white/10 p-3 text-white focus:border-wff-gold outline-none transition-colors rounded-lg" 
-        />
-      </div>
-      <div>
-        <label className="block text-white/50 uppercase tracking-widest font-bold mb-1.5">Company Name</label>
-        <input 
-          type="text" 
-          required
-          placeholder="e.g. Zenith Brands"
-          className="w-full bg-black border border-white/10 p-3 text-white focus:border-wff-gold outline-none transition-colors rounded-lg" 
-        />
-      </div>
-      <div>
-        <label className="block text-white/50 uppercase tracking-widest font-bold mb-1.5">Business Email</label>
-        <input 
-          type="email" 
-          required
-          placeholder="e.g. partner@zenith.com"
-          className="w-full bg-black border border-white/10 p-3 text-white focus:border-wff-gold outline-none transition-colors rounded-lg" 
-        />
-      </div>
-      <div>
-        <label className="block text-white/50 uppercase tracking-widest font-bold mb-1.5">Tier Interest</label>
-        <div className="relative">
-          <select 
-            required
-            className="w-full bg-black border border-white/10 p-3 text-white focus:border-wff-gold outline-none transition-colors rounded-lg appearance-none cursor-pointer"
-          >
-            <option>Title Sponsor Package</option>
-            <option>Gold Partner Package</option>
-            <option>Silver Partner Package</option>
-            <option>Custom Activation</option>
-          </select>
-          <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-white/40">
-            ▼
-          </div>
-        </div>
-      </div>
-      <button 
-        type="submit" 
-        disabled={loading}
-        className="w-full bg-wff-gold text-black font-bebas text-lg py-3 rounded-lg hover:bg-white hover:text-black transition-colors duration-200 uppercase tracking-wider shadow-lg font-bold"
-      >
-        {loading ? 'Processing...' : 'SEND REQUEST'}
-      </button>
-    </form>
-  );
-}
