@@ -19,6 +19,7 @@ import {
   CalendarClock,
   Hotel,
   Images,
+  Store,
   ChevronRight,
   type LucideIcon,
 } from "lucide-react";
@@ -84,6 +85,7 @@ const navGroups: NavGroup[] = [
     items: [
       { title: "Armory Shop", url: "/admin/shop", icon: ShoppingBag },
       { title: "Orders", url: "/admin/orders", icon: Receipt },
+      { title: "Event Vendors", url: "/admin/vendors", icon: Store },
     ],
   },
   {

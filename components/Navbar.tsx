@@ -10,10 +10,10 @@ const navLinks = [
   { name: 'Federation', href: '/federation' },
   { name: 'Championship', href: '/championship' },
   { name: 'Athletes', href: '/championship/athletes' },
-  { name: 'Wellness', href: '/federation#wellness' },
+  { name: 'Vendors', href: '/championship/vendors' },
   { name: 'Shop', href: '/shop' },
   { name: 'Media', href: '/media' },
-  { name: 'Partnerships', href: '/federation#partnerships' },
+  { name: 'Partnerships', href: '/championship/partnerships' },
   { name: 'Contact', href: '/contact' },
 ];
 
