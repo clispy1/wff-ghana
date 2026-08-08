@@ -88,7 +88,7 @@ function TaskCardContent({
   onToggleDone: (task: MasterPlanTask) => void;
   onEdit: (task: MasterPlanTask) => void;
   onDelete: (task: MasterPlanTask) => void;
-  onReorder: (task: MasterPlanTask, dir: -1 | 1) => void;
+  onReorder: (taskId: string, dir: -1 | 1) => void;
 }) {
   const prio = priorityMeta(task.priority);
   const phase = phaseMeta(task.phase_id);
@@ -156,14 +156,14 @@ function TaskCardContent({
         </div>
         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
-            onClick={() => onReorder(task, -1)}
+            onClick={() => onReorder(task.id, -1)}
             className="text-white/30 hover:text-white p-0.5"
             title="Move up"
           >
             <ChevronUp className="h-3.5 w-3.5" />
           </button>
           <button
-            onClick={() => onReorder(task, 1)}
+            onClick={() => onReorder(task.id, 1)}
             className="text-white/30 hover:text-white p-0.5"
             title="Move down"
           >
@@ -195,7 +195,7 @@ function KanbanTaskCard(props: {
   onToggleDone: (task: MasterPlanTask) => void;
   onEdit: (task: MasterPlanTask) => void;
   onDelete: (task: MasterPlanTask) => void;
-  onReorder: (task: MasterPlanTask, dir: -1 | 1) => void;
+  onReorder: (taskId: string, dir: -1 | 1) => void;
 }) {
   const { task, ...handlers } = props;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -229,7 +229,7 @@ function KanbanColumn(props: {
   onToggleDone: (task: MasterPlanTask) => void;
   onEdit: (task: MasterPlanTask) => void;
   onDelete: (task: MasterPlanTask) => void;
-  onReorder: (task: MasterPlanTask, dir: -1 | 1) => void;
+  onReorder: (taskId: string, dir: -1 | 1) => void;
 }) {
   const { column, tasks, highlighted, phaseMeta, onAddTask, ...handlers } = props;
   const { setNodeRef } = useDroppable({ id: column.id });
