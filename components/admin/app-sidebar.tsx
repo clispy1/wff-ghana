@@ -102,6 +102,16 @@ const navGroups: NavGroup[] = [
       { title: "System Settings", url: "/admin/settings", icon: Settings },
     ],
   },
+  {
+    title: "Event Master Plan",
+    icon: Calendar,
+    items: [
+      { title: "Master Plan", url: "/admin/master-plan", icon: Calendar },
+      { title: "Checklists", url: "/admin/master-plan/checklists", icon: ClipboardList },
+      { title: "Task Assignments", url: "/admin/master-plan/tasks", icon: ClipboardList },
+      { title: "Flyers & Design", url: "/admin/master-plan/designs", icon: Images },
+    ],
+  },
 ];
 
 function groupContaining(pathname: string): string | undefined {
