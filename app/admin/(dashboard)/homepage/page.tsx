@@ -11,6 +11,13 @@ import {
   type AmbassadorItem,
 } from "@/lib/homeContent";
 import { uploadPublicMedia } from "@/lib/uploadPublicMedia";
+import {
+  HOME_SECTION_DEFAULTS,
+  HOME_SECTION_META,
+  fetchHomeSectionVisibility,
+  saveHomeSectionVisibility,
+  type HomeSectionVisibility,
+} from "@/lib/homeSections";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,12 +39,20 @@ export default function AdminHomepagePage() {
   const [error, setError] = useState<string | null>(null);
   const [savingKey, setSavingKey] = useState<keyof HomeContent | null>(null);
   const [savedKey, setSavedKey] = useState<keyof HomeContent | null>(null);
+  const [sections, setSections] = useState<HomeSectionVisibility>(HOME_SECTION_DEFAULTS);
+  const [savingSections, setSavingSections] = useState(false);
+  const [savedSections, setSavedSections] = useState(false);
 
   const load = async () => {
     setLoading(true);
     setError(null);
     try {
-      setContent(await fetchHomeContent());
+      const [contentData, sectionsData] = await Promise.all([
+        fetchHomeContent(),
+        fetchHomeSectionVisibility(),
+      ]);
+      setContent(contentData);
+      setSections(sectionsData);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load homepage content.");
     } finally {
@@ -64,6 +79,24 @@ export default function AdminHomepagePage() {
       setError(err instanceof Error ? err.message : "Save failed.");
     } finally {
       setSavingKey(null);
+    }
+  };
+
+  const toggleSection = (key: keyof HomeSectionVisibility) => {
+    setSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const saveSections = async () => {
+    setSavingSections(true);
+    setError(null);
+    try {
+      await saveHomeSectionVisibility(sections);
+      setSavedSections(true);
+      setTimeout(() => setSavedSections(false), 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed.");
+    } finally {
+      setSavingSections(false);
     }
   };
 
@@ -98,6 +131,46 @@ export default function AdminHomepagePage() {
           {error}
         </div>
       )}
+
+      {/* Section visibility — which blocks render on the public homepage */}
+      <SectionCard
+        title="SECTION VISIBILITY"
+        hint="Toggle which homepage sections render on the public site. The hero is always shown."
+        saving={savingSections}
+        saved={savedSections}
+        onSave={saveSections}
+      >
+        <div className="space-y-3">
+          {(Object.keys(HOME_SECTION_META) as (keyof HomeSectionVisibility)[]).map((key) => (
+            <div
+              key={key}
+              className="flex items-center justify-between gap-4 border border-white/10 rounded-lg px-4 py-3 bg-black/30"
+            >
+              <div className="min-w-0">
+                <p className="text-white text-sm font-sans font-semibold">
+                  {HOME_SECTION_META[key].label}
+                </p>
+                <p className="text-white/40 text-xs font-sans">{HOME_SECTION_META[key].hint}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => toggleSection(key)}
+                aria-pressed={sections[key]}
+                aria-label={`${sections[key] ? "Disable" : "Enable"} ${HOME_SECTION_META[key].label}`}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors cursor-pointer ${
+                  sections[key] ? "bg-wff-red" : "bg-white/15"
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    sections[key] ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
 
       {/* Federation / President */}
       <SectionCard
@@ -613,6 +686,43 @@ export default function AdminHomepagePage() {
           value={content.partnerships.cta.text}
           onChange={(e) =>
             update("partnerships", { ...content.partnerships, cta: { text: e.target.value } })
+          }
+        />
+      </SectionCard>
+
+      {/* Become a Vendor */}
+      <SectionCard
+        title="BECOME A VENDOR"
+        hint="The homepage pitch for event suppliers, with benefits and the apply button (links to /championship/vendors/apply)."
+        saving={savingKey === "becomeVendor"}
+        saved={savedKey === "becomeVendor"}
+        onSave={() => save("becomeVendor")}
+      >
+        <Field
+          label="Supertitle"
+          value={content.becomeVendor.supertitle}
+          onChange={(e) => update("becomeVendor", { ...content.becomeVendor, supertitle: e.target.value })}
+        />
+        <Field
+          label="Title"
+          value={content.becomeVendor.title}
+          onChange={(e) => update("becomeVendor", { ...content.becomeVendor, title: e.target.value })}
+        />
+        <TextAreaField
+          label="Body"
+          value={content.becomeVendor.body}
+          onChange={(v) => update("becomeVendor", { ...content.becomeVendor, body: v })}
+        />
+        <StringListEditor
+          label="Benefits"
+          items={content.becomeVendor.benefits}
+          onChange={(items) => update("becomeVendor", { ...content.becomeVendor, benefits: items })}
+        />
+        <Field
+          label="Button Text"
+          value={content.becomeVendor.cta.text}
+          onChange={(e) =>
+            update("becomeVendor", { ...content.becomeVendor, cta: { text: e.target.value } })
           }
         />
       </SectionCard>

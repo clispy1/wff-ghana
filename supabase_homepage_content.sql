@@ -118,6 +118,19 @@ INSERT INTO public.site_content (key, value) VALUES
   "cta": { "text": "Discover Sponsorship Tiers" }
 }'),
 
+('home_become_vendor', '{
+  "supertitle": "OFFICIAL EVENT SUPPLIERS",
+  "title": "BECOME A VENDOR",
+  "body": "WFF Ghana is assembling the official supplier base for the 2026 All Africa Bodybuilding Championship in Accra. Secure a vendor slot to put your business in front of athletes, spectators, and partners from across West Africa.",
+  "benefits": [
+    "Prime booth placement at the championship venue",
+    "Direct exposure to athletes, fans and media",
+    "Flexible package tiers with one festival fee",
+    "Official listing in the event vendor directory"
+  ],
+  "cta": { "text": "APPLY TO BECOME A VENDOR" }
+}'),
+
 ('home_contact_cta', '{
   "title": "READY FOR GLORY?",
   "passesBtn": { "text": "REGISTER TO COMPETE" },

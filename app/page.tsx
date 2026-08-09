@@ -4,6 +4,7 @@ import { createServerSupabase } from '@/lib/supabase/server';
 import { fetchActiveEvent } from '@/lib/activeEvent';
 import { fetchPublicHomeContent } from '@/lib/homeContent';
 import { fetchGalleryMedia } from '@/lib/galleryMedia';
+import { fetchHomeSectionVisibility } from '@/lib/homeSections';
 
 export const metadata: Metadata = {
   title: 'WFF Ghana | 2026 All Africa Championship',
@@ -26,6 +27,7 @@ export default async function HomePage() {
     content,
     galleryPhotos,
     vendorsRes,
+    enabledSections,
   ] = await Promise.all([
     supabase
       .from('sponsors')
@@ -49,6 +51,7 @@ export default async function HomePage() {
       .select('id, name, category, display_order')
       .eq('status', 'approved')
       .order('display_order', { ascending: true }),
+    fetchHomeSectionVisibility(supabase),
   ]);
 
   const props: HomeClientProps = {
@@ -79,6 +82,7 @@ export default async function HomePage() {
         name: v.name,
         category: v.category,
       })) ?? [],
+    enabledSections,
   };
 
   return <HomeClient {...props} />;

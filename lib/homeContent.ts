@@ -62,6 +62,13 @@ export interface HomeContent {
   gallery: { supertitle: string; title: string };
   news: { title: string };
   partnerships: { title: string; body: string; cta: { text: string } };
+  becomeVendor: {
+    supertitle: string;
+    title: string;
+    body: string;
+    benefits: string[];
+    cta: { text: string };
+  };
   contactCta: { title: string; passesBtn: { text: string }; contactBtn: { text: string } };
 }
 
@@ -197,6 +204,18 @@ export const HOME_CONTENT_DEFAULTS: HomeContent = {
     body: 'Secure direct alignment with peak athletic lifestyles and highly disciplined consumer demographics in Accra, Kumasi, and West Africa.',
     cta: { text: 'Discover Sponsorship Tiers' },
   },
+  becomeVendor: {
+    supertitle: 'OFFICIAL EVENT SUPPLIERS',
+    title: 'BECOME A VENDOR',
+    body: 'WFF Ghana is assembling the official supplier base for the 2026 All Africa Bodybuilding Championship in Accra. Secure a vendor slot to put your business in front of athletes, spectators, and partners from across West Africa.',
+    benefits: [
+      'Prime booth placement at the championship venue',
+      'Direct exposure to athletes, fans and media',
+      'Flexible package tiers with one festival fee',
+      'Official listing in the event vendor directory',
+    ],
+    cta: { text: 'APPLY TO BECOME A VENDOR' },
+  },
   contactCta: {
     title: 'READY FOR GLORY?',
     passesBtn: { text: 'REGISTER TO COMPETE' },
@@ -215,6 +234,7 @@ export const HOME_CONTENT_KEYS: Record<keyof HomeContent, string> = {
   gallery: 'home_gallery',
   news: 'home_news',
   partnerships: 'home_partnerships',
+  becomeVendor: 'home_become_vendor',
   contactCta: 'home_contact_cta',
 };
 
