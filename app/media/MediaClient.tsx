@@ -1,24 +1,18 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
-import { fetchGalleryMedia, type GalleryPhoto } from '@/lib/galleryMedia';
+import type { GalleryPhoto } from '@/lib/galleryMedia';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function MediaClient() {
+export default function MediaClient({ photos }: { photos: GalleryPhoto[] }) {
   const headerRef = useRef<HTMLDivElement>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-
-  const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
-
-  useEffect(() => {
-    fetchGalleryMedia().then(setPhotos);
-  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {

@@ -1,42 +1,29 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/lib/CartContext';
-import { supabase } from '@/lib/supabase';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Default fallback layout, will be overridden by DB state.
-const initialProducts: any[] = [];
+export interface ShopProduct {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  category: string;
+  description: string;
+  tag: string | null;
+}
 
-export default function ShopClient() {
+export default function ShopClient({ products }: { products: ShopProduct[] }) {
   const headerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const { addToCart, setIsCartOpen } = useCart();
-  const [products, setProducts] = useState<any[]>(initialProducts);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const { data, error } = await supabase.from('ecommerce_products').select('*');
-      if (data && !error) {
-        setProducts(data.map(p => ({
-          id: p.id,
-          name: p.name,
-          price: Number(p.price),
-          image: p.image_url,
-          category: p.category,
-          description: p.description,
-          tag: p.tag
-        })));
-      }
-    };
-    fetchProducts();
-  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -81,9 +68,15 @@ export default function ShopClient() {
 
         {/* Product Grid */}
         <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
-          {products.map((product) => (
+          {products.length === 0 ? (
+            <p className="text-white/40 text-sm col-span-full text-center py-16">
+              Merchandise will be listed here soon.
+            </p>
+          ) : (
+          products.map((product) => (
             <Link href={`/shop/${product.id}`} key={product.id} className="product-card group cursor-pointer block">
               <div className="relative aspect-square bg-[#111] border border-white/10 mb-6 overflow-hidden rounded-xl">
+                {product.image ? (
                 <Image 
                   src={product.image} 
                   alt={product.name}
@@ -91,6 +84,9 @@ export default function ShopClient() {
                   className="object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500 scale-100 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
+                ) : (
+                  <div className="absolute inset-0 bg-[#161616]" />
+                )}
                 
                 {/* Tag */}
                 {product.tag && (
@@ -105,7 +101,7 @@ export default function ShopClient() {
                     onClick={(e) => { 
                       e.preventDefault();
                       e.stopPropagation(); 
-                      addToCart(product, 1, 'L'); // Default size L for now
+                      addToCart(product, 1);
                     }}
                     className="bg-white text-wff-dark font-bebas text-2xl px-8 py-3 hover:bg-wff-gold transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300"
                   >
@@ -119,7 +115,8 @@ export default function ShopClient() {
                 <span className="font-sans font-bold text-wff-gold text-lg">₵ {product.price.toFixed(2)}</span>
               </div>
             </Link>
-          ))}
+          ))
+          )}
         </div>
       </div>
     </main>

@@ -22,8 +22,10 @@ export interface WffEvent {
  *
  * The rule: active events only, soonest start date wins.
  */
-export async function fetchActiveEvent(): Promise<WffEvent | null> {
-  const { data, error } = await supabase
+export async function fetchActiveEvent(
+  db: { from: typeof supabase.from } = supabase,
+): Promise<WffEvent | null> {
+  const { data, error } = await db
     .from('events')
     .select('*')
     .eq('is_active', true)

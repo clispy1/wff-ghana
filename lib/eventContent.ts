@@ -171,6 +171,9 @@ export const EVENT_CONTENT_KEYS: Record<keyof EventPageContent, string> = {
  * Loads all three keys and layers them over EVENT_CONTENT_DEFAULTS.
  * A missing row (migration not run, or deleted) falls back to its
  * default rather than leaving a section blank.
+ *
+ * Used by the admin editor. The public site must use
+ * fetchPublicEventPageContent instead so no defaults leak.
  */
 export async function fetchEventPageContent(): Promise<EventPageContent> {
   const keys = Object.values(EVENT_CONTENT_KEYS);
@@ -192,6 +195,30 @@ export async function fetchEventPageContent(): Promise<EventPageContent> {
   });
 
   return result;
+}
+
+/**
+ * Server-side loader for the public /championship page. Returns ONLY the
+ * sections an admin has actually saved — missing sections render
+ * skeletons rather than the default event copy.
+ */
+export async function fetchPublicEventPageContent(
+  db: { from: typeof supabase.from } = supabase,
+): Promise<Partial<EventPageContent>> {
+  const keys = Object.values(EVENT_CONTENT_KEYS);
+  const { data, error } = await db.from('site_content').select('key, value').in('key', keys);
+
+  if (error || !data) return {};
+
+  const byKey = new Map(data.map((row) => [row.key, row.value]));
+  const result: Record<string, unknown> = {};
+
+  (Object.keys(EVENT_CONTENT_KEYS) as (keyof EventPageContent)[]).forEach((section) => {
+    const value = byKey.get(EVENT_CONTENT_KEYS[section]);
+    if (value) result[section] = value;
+  });
+
+  return result as Partial<EventPageContent>;
 }
 
 /** Upserts one section. Used by the admin editor — one save per card. */

@@ -6,11 +6,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  fetchActiveEvent,
   formatEventDateShort,
   type WffEvent,
-} from "@/lib/activeEvent";
-import {
+} from "@/lib/activeEvent";import {
   Trophy,
   MapPin,
   Calendar,
@@ -23,10 +21,6 @@ import {
 } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
-
-// Used until the active event loads, and if no event is marked live in
-// the admin dashboard.
-const FALLBACK_EVENT_DATE = "2026-09-26";
 
 // Correct Competition Divisions & Benefits for WFF Official Rulebook
 export interface FeatureHighlight {
@@ -115,7 +109,7 @@ export const HERO_CONTENT = {
     "★ DECLARED UNDER THE WORLD FITNESS FEDERATION INTERNATIONAL CHARTER",
 };
 
-export default function Hero() {
+export default function Hero({ event }: { event?: WffEvent | null }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const leftColRef = useRef<HTMLDivElement>(null);
   const rightColRef = useRef<HTMLDivElement>(null);
@@ -126,7 +120,6 @@ export default function Hero() {
   const bannerRef = useRef<HTMLDivElement>(null);
 
   const [activeHighlight, setActiveHighlight] = useState<string>("pro-status");
-  const [event, setEvent] = useState<WffEvent | null>(null);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -134,21 +127,24 @@ export default function Hero() {
     seconds: 0,
   });
 
-  useEffect(() => {
-    fetchActiveEvent().then(setEvent);
-  }, []);
-
-  // Host chapter and date come from the active event when there is one;
-  // the hardcoded config is the fallback.
+  // Host chapter and date come from the active event (fetched server-side
+  // and passed in). No event means honest "to be announced" labels — the
+  // admin's active event in the dashboard is the only source of truth.
   const heroDetails = HERO_CONTENT.details.map((detail) => {
     if (detail.id === "host" && event?.venue_location) {
       return { ...detail, value: event.venue_location };
+    }
+    if (detail.id === "host" && !event?.venue_location) {
+      return { ...detail, value: "To Be Announced" };
     }
     if (detail.id === "date" && event?.start_date) {
       return {
         ...detail,
         value: formatEventDateShort(event.start_date) || detail.value,
       };
+    }
+    if (detail.id === "date" && !event?.start_date) {
+      return { ...detail, value: "To Be Announced" };
     }
     return detail;
   });
@@ -216,11 +212,12 @@ export default function Hero() {
   }, []);
 
   // Countdown runs against the active event's start date, so changing
-  // the date in the admin dashboard moves the clock.
+  // the date in the admin dashboard moves the clock. No active event
+  // means no target — the ticker reads zeroed rather than a hardcoded date.
   useEffect(() => {
-    const targetDate = new Date(
-      `${event?.start_date || FALLBACK_EVENT_DATE}T00:00:00`,
-    ).getTime();
+    const targetDate = event?.start_date
+      ? new Date(`${event.start_date}T00:00:00`).getTime()
+      : NaN;
 
     if (Number.isNaN(targetDate)) return;
 
@@ -290,7 +287,7 @@ export default function Hero() {
             <span>
               {event?.venue_name
                 ? [event.venue_name, event.venue_location].filter(Boolean).join(", ")
-                : HERO_CONTENT.ticker.venue}
+                : "Venue To Be Announced"}
             </span>
             <span>•</span>
             <span className="text-wff-gold font-bold">

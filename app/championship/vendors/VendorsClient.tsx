@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Store, Phone, Mail, Globe2, User } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
-interface Vendor {
+export interface Vendor {
   id: string;
   name: string;
   category: string;
@@ -80,29 +78,7 @@ function VendorCard({ vendor }: { vendor: Vendor }) {
   );
 }
 
-export default function VendorsClient() {
-  const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchVendors = async () => {
-      try {
-        const { data } = await supabase
-          .from("vendors")
-          .select("*")
-          .eq("status", "approved")
-          .order("category", { ascending: true })
-          .order("display_order", { ascending: true });
-        setVendors((data as Vendor[]) || []);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchVendors();
-  }, []);
-
+export default function VendorsClient({ vendors }: { vendors: Vendor[] }) {
   const vendorsByCategory = (key: string) =>
     vendors.filter((v) => v.category === key);
   const hasVendors = vendors.length > 0;
@@ -122,11 +98,7 @@ export default function VendorsClient() {
         </p>
       </div>
 
-      {loading ? (
-        <p className="text-center text-white/40 font-sans text-xs uppercase tracking-widest py-24">
-          Loading vendors…
-        </p>
-      ) : !hasVendors ? (
+      {!hasVendors ? (
         <p className="text-center text-white/40 font-sans text-sm py-24 max-w-md mx-auto">
           The vendor lineup is coming soon. Check back closer to the event.
         </p>

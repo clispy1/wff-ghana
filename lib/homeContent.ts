@@ -223,6 +223,10 @@ export const HOME_CONTENT_KEYS: Record<keyof HomeContent, string> = {
  * A section missing from the database (migration not run yet, or the
  * row was deleted) silently falls back to its default rather than
  * blanking that part of the page.
+ *
+ * Used by the admin editor, where a missing section should still show
+ * the default copy to edit from. The public site must NOT use this —
+ * it must use fetchPublicHomeContent so no marketing defaults leak.
  */
 export async function fetchHomeContent(): Promise<HomeContent> {
   const keys = Object.values(HOME_CONTENT_KEYS);
@@ -244,6 +248,30 @@ export async function fetchHomeContent(): Promise<HomeContent> {
   });
 
   return result;
+}
+
+/**
+ * Server-side loader for the public homepage. Returns ONLY the sections
+ * an admin has actually saved — no marketing defaults. A missing section
+ * renders a skeleton on the page until the admin populates it.
+ */
+export async function fetchPublicHomeContent(
+  db: { from: typeof supabase.from } = supabase,
+): Promise<Partial<HomeContent>> {
+  const keys = Object.values(HOME_CONTENT_KEYS);
+  const { data, error } = await db.from('site_content').select('key, value').in('key', keys);
+
+  if (error || !data) return {};
+
+  const byKey = new Map(data.map((row) => [row.key, row.value]));
+  const result: Record<string, unknown> = {};
+
+  (Object.keys(HOME_CONTENT_KEYS) as (keyof HomeContent)[]).forEach((section) => {
+    const value = byKey.get(HOME_CONTENT_KEYS[section]);
+    if (value) result[section] = value;
+  });
+
+  return result as Partial<HomeContent>;
 }
 
 /** Upserts one section. Used by the admin editor — one save per card. */

@@ -5,48 +5,24 @@ import Image from 'next/image';
 import { X } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { supabase } from '@/lib/supabase';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const initialAthletes: any[] = [];
-export default function AthletesClient() {
-  const [athletes, setAthletes] = useState<any[]>(initialAthletes);
-  const [selectedAthlete, setSelectedAthlete] = useState<any | null>(null);
+export interface Athlete {
+  id: string;
+  name: string;
+  category: string;
+  weightClass: string;
+  image: string | null;
+  bio: string | null;
+  achievements: string[];
+}
+
+export default function AthletesClient({ athletes }: { athletes: Athlete[] }) {
+  const [selectedAthlete, setSelectedAthlete] = useState<Athlete | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const rosterRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const fetchAthletes = async () => {
-      const { data, error } = await supabase
-        .from('memberships')
-        .select(`
-          id,
-          first_name,
-          last_name,
-          country,
-          bio,
-          profile_image_url,
-          athlete_achievements ( title )
-        `);
-
-      if (data && !error) {
-        const parsed = data.map((m: any) => ({
-          id: m.id,
-          name: `${m.first_name} ${m.last_name}`,
-          category: 'WFF Athlete', // Placeholder until categories are linked directly
-          weightClass: m.country,
-          image: m.profile_image_url,
-          bio: m.bio,
-          achievements: m.athlete_achievements?.map((a: any) => a.title) || []
-        }));
-        setAthletes(parsed);
-      }
-    };
-    
-    fetchAthletes();
-  }, []);
 
   // 3D Tilt Effect
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -147,16 +123,17 @@ export default function AthletesClient() {
               onMouseLeave={handleMouseLeave}
               onClick={() => setSelectedAthlete(athlete)}
             >
+              {athlete.image ? (
               <Image 
                 src={athlete.image} 
                 alt={athlete.name}
                 fill
                 className="object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500"
                 referrerPolicy="no-referrer"
-                onError={(e) => {
-                  e.currentTarget.src = `https://picsum.photos/seed/${athlete.name.replace(/\s+/g, '')}/600/800`;
-                }}
               />
+              ) : (
+                <div className="absolute inset-0 bg-[#161616]" />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/40 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500"></div>
               
               <div className="absolute bottom-0 left-0 w-full p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
@@ -192,16 +169,17 @@ export default function AthletesClient() {
             </button>
 
             <div className="w-full md:w-1/2 relative aspect-[3/4] md:aspect-auto md:h-auto">
+              {selectedAthlete.image ? (
               <Image 
                 src={selectedAthlete.image} 
                 alt={selectedAthlete.name}
                 fill
                 className="object-cover"
                 referrerPolicy="no-referrer"
-                onError={(e) => {
-                  e.currentTarget.src = `https://picsum.photos/seed/${selectedAthlete.name.replace(/\s+/g, '')}/600/800`;
-                }}
               />
+              ) : (
+                <div className="w-full h-full bg-[#161616]" />
+              )}
             </div>
 
             <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">

@@ -16,22 +16,39 @@ import {
   ClipboardCheck,
   Download,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 import TicketPurchaseModal, { type TicketTier } from "@/components/TicketPurchaseModal";
 import {
-  fetchActiveEvent,
   formatEventDate,
   formatEventRange,
   type WffEvent,
 } from "@/lib/activeEvent";
 import {
-  EVENT_CONTENT_DEFAULTS,
-  fetchEventPageContent,
   formatScheduleDayHeading,
   type EventPageContent,
 } from "@/lib/eventContent";
+import { Skeleton } from "@/components/ui/skeleton";
 
 gsap.registerPlugin(ScrollTrigger);
+
+export interface ChampionshipClientProps {
+  tickets: {
+    id: string;
+    name: string;
+    price: number;
+    isVip: boolean;
+    category: string;
+    description?: string | null;
+  }[];
+  hotels: {
+    type: string;
+    name: string;
+    location: string;
+    desc: string;
+    labelColor: string;
+  }[];
+  championshipEvent: WffEvent | null;
+  pageContent: Partial<EventPageContent>;
+}
 
 // Fixed per-card styling for the first three award cards — visual choices,
 // not content, so they stay in code. A 4th admin-added award reuses the last style.
@@ -53,74 +70,36 @@ const AWARD_ICON_STYLES = [
   },
 ];
 
-const initialTickets: any[] = [];
-const initialHotels: any[] = [];
-// Database states are initialized inside the component.
-
-export default function ChampionshipClient() {
+export default function ChampionshipClient({
+  tickets: TICKETS,
+  hotels: HOTELS,
+  championshipEvent,
+  pageContent,
+}: ChampionshipClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
 
   const [selectedTicket, setSelectedTicket] = useState<TicketTier | null>(null);
+  const [registrationOpen, setRegistrationOpen] = useState(true);
 
-  const [TICKETS, setTickets] = useState<any[]>(initialTickets);
-  const [HOTELS, setHotels] = useState<any[]>(initialHotels);
-  const [championshipEvent, setChampionshipEvent] = useState<WffEvent | null>(null);
-  const [pageContent, setPageContent] = useState<EventPageContent>(EVENT_CONTENT_DEFAULTS);
-
-  useEffect(() => {
-    const fetchChampionshipData = async () => {
-      try {
-        const [ticketsRes, hotelsRes, eventsRes, contentRes] =
-          await Promise.all([
-            supabase
-              .from("ticket_tiers")
-              .select("*")
-              .order("price", { ascending: true }),
-            supabase.from("accommodations").select("*"),
-            fetchActiveEvent(),
-            fetchEventPageContent(),
-          ]);
-
-        if (ticketsRes.data?.length)
-          setTickets(
-            ticketsRes.data.map((t) => ({
-              id: t.id,
-              name: t.name,
-              price: Number(t.price),
-              isVip: Boolean(t.type?.toLowerCase().includes("vip")),
-              category: "Tickets",
-              description: t.description,
-            })),
-          );
-        if (hotelsRes.data?.length)
-          setHotels(
-            hotelsRes.data.map((h) => ({
-              type: h.type,
-              name: h.name,
-              location: h.location,
-              desc: h.description,
-              labelColor: h.label_color,
-            })),
-          );
-        if (eventsRes) setChampionshipEvent(eventsRes);
-        setPageContent(contentRes);
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    fetchChampionshipData();
-  }, []);
+  const logistics = pageContent.logistics;
+  const schedule = pageContent.schedule;
+  const awards = pageContent.awards;
 
   const handleBuyTicket = (ticketId: string) => {
     const ticket = TICKETS.find((t) => t.id === ticketId);
     if (ticket) setSelectedTicket(ticket);
   };
 
-  const registrationDeadline = championshipEvent?.registration_deadline
-    ? new Date(championshipEvent.registration_deadline)
-    : null;
-  const registrationOpen = !registrationDeadline || registrationDeadline.getTime() > Date.now();
+  useEffect(() => {
+    const evaluate = () => {
+      const deadline = championshipEvent?.registration_deadline
+        ? new Date(championshipEvent.registration_deadline)
+        : null;
+      setRegistrationOpen(!deadline || deadline.getTime() > Date.now());
+    };
+    evaluate();
+  }, [championshipEvent?.registration_deadline]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -171,8 +150,7 @@ export default function ChampionshipClient() {
             THE ULTIMATE <span className="text-wff-red">SHOWDOWN</span>
           </h1>
           <p className="font-sans text-lg text-white/70 leading-relaxed md:px-12">
-            {championshipEvent?.description ||
-              "The preeminent physiques from across Africa will converge in Ghana. Experience state-of-the-art stage layout, fair judging, and unmatched energy."}
+            {championshipEvent?.description || "Event details to be announced."}
           </p>
         </div>
 
@@ -204,14 +182,14 @@ export default function ChampionshipClient() {
             },
             {
               icon: <Globe2 className="text-wff-red" size={24} />,
-              title: pageContent.logistics.hostNationName,
-              subtitle: pageContent.logistics.hostNationTagline,
+              title: logistics?.hostNationName || "WFF Ghana",
+              subtitle: logistics?.hostNationTagline || "World Fitness Federation",
             },
             {
               icon: <ClipboardCheck className="text-wff-gold" size={24} />,
               title: registrationOpen ? "Registration Open" : "Registration Closed",
-              subtitle: registrationDeadline
-                ? `Closes ${formatEventDate(championshipEvent!.registration_deadline)}`
+              subtitle: championshipEvent?.registration_deadline
+                ? `Closes ${formatEventDate(championshipEvent.registration_deadline)}`
                 : "Details to follow",
             },
           ].map((item, idx) => (
@@ -230,10 +208,10 @@ export default function ChampionshipClient() {
           ))}
         </div>
 
-        {pageContent.logistics.pdfUrl && (
+        {logistics?.pdfUrl && (
           <div className="flex justify-center mb-16">
             <a
-              href={pageContent.logistics.pdfUrl}
+              href={logistics.pdfUrl}
               download
               className="inline-flex items-center gap-2 border border-white/20 text-white font-bebas text-lg px-6 py-2.5 rounded hover:bg-white hover:text-black transition-colors"
             >
@@ -340,12 +318,20 @@ export default function ChampionshipClient() {
             TIMETABLE & RUNNING ORDER
           </h2>
 
+          {!schedule || !schedule.days?.length ? (
+            <div className="space-y-8">
+              <Skeleton className="h-6 w-64 bg-white/10" />
+              <Skeleton className="h-24 w-full bg-white/10" />
+              <Skeleton className="h-24 w-full bg-white/10" />
+              <Skeleton className="h-24 w-full bg-white/10" />
+            </div>
+          ) : (
           <div className="space-y-12 font-sans">
-            {pageContent.schedule.days.map((day, idx) => {
+            {schedule.days.map((day, idx) => {
               // Last day gets the gold dot (final/awards day); every
               // other day gets red — matches the original design intent
               // without needing a color field in the admin form.
-              const isLast = idx === pageContent.schedule.days.length - 1;
+              const isLast = idx === schedule.days.length - 1;
               const dotColor = isLast
                 ? "bg-wff-gold shadow-[0_0_10px_rgba(252,209,22,0.8)]"
                 : "bg-wff-red shadow-[0_0_10px_rgba(206,17,38,0.8)]";
@@ -388,9 +374,24 @@ export default function ChampionshipClient() {
               );
             })}
           </div>
+          )}
         </div>
 
         {/* Airport Transfers, Visa Guidance, Accommodations */}
+        {!logistics ? (
+          <div id="logistics" className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+            <div className="bg-[#111]/80 border border-white/10 p-8 rounded-2xl space-y-4">
+              <Skeleton className="h-5 w-40 bg-white/10" />
+              <Skeleton className="h-20 w-full bg-white/10" />
+              <Skeleton className="h-20 w-full bg-white/10" />
+            </div>
+            <div className="lg:col-span-2 bg-[#111]/80 border border-white/10 p-8 rounded-2xl space-y-4">
+              <Skeleton className="h-5 w-56 bg-white/10" />
+              <Skeleton className="h-16 w-full bg-white/10" />
+              <Skeleton className="h-28 w-full bg-white/10" />
+            </div>
+          </div>
+        ) : (
         <div
           id="logistics"
           className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16"
@@ -405,14 +406,14 @@ export default function ChampionshipClient() {
                 AIRPORTS & VISAS
               </h3>
               <p className="font-sans text-xs text-white/60 leading-relaxed space-y-4">
-                <span>{pageContent.logistics.airportIntro}</span>
+                <span>{logistics.airportIntro}</span>
                 <br />
                 <br />
-                <span>{pageContent.logistics.transportNote}</span>
+                <span>{logistics.transportNote}</span>
                 <br />
                 <br />
                 <span>
-                  {pageContent.logistics.visaNote} {pageContent.logistics.yellowFeverNote}
+                  {logistics.visaNote} {logistics.yellowFeverNote}
                 </span>
               </p>
             </div>
@@ -433,9 +434,9 @@ export default function ChampionshipClient() {
               </h3>
             </div>
             <p className="font-sans text-xs text-white/50 mb-6 leading-relaxed">
-              {pageContent.logistics.hotelIntro} Use discount code{" "}
+              {logistics.hotelIntro} Use discount code{" "}
               <span className="text-wff-gold font-bold">
-                {pageContent.logistics.hotelDiscountCode}
+                {logistics.hotelDiscountCode}
               </span>{" "}
               when securing rooms.
             </p>
@@ -467,6 +468,7 @@ export default function ChampionshipClient() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Awards & Prizes */}
         <div
@@ -476,8 +478,27 @@ export default function ChampionshipClient() {
           <h2 className="font-bebas text-4xl md:text-5xl text-wff-gold mb-8 pb-4 border-b border-white/10">
             AWARDS &amp; PRIZES
           </h2>
+          {!awards || !awards.items?.length ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="space-y-3">
+                <Skeleton className="h-12 w-12 rounded-full bg-white/10" />
+                <Skeleton className="h-5 w-40 bg-white/10" />
+                <Skeleton className="h-16 w-full bg-white/10" />
+              </div>
+              <div className="space-y-3">
+                <Skeleton className="h-12 w-12 rounded-full bg-white/10" />
+                <Skeleton className="h-5 w-40 bg-white/10" />
+                <Skeleton className="h-16 w-full bg-white/10" />
+              </div>
+              <div className="space-y-3">
+                <Skeleton className="h-12 w-12 rounded-full bg-white/10" />
+                <Skeleton className="h-5 w-40 bg-white/10" />
+                <Skeleton className="h-16 w-full bg-white/10" />
+              </div>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 font-sans">
-            {pageContent.awards.items.map((award, i) => {
+            {awards.items.map((award, i) => {
               const style = AWARD_ICON_STYLES[Math.min(i, AWARD_ICON_STYLES.length - 1)];
               return (
                 <div key={i} className="flex flex-col">
@@ -505,6 +526,7 @@ export default function ChampionshipClient() {
               );
             })}
           </div>
+          )}
         </div>
 
         {/* Team Ghana Roster CTA */}

@@ -12,8 +12,11 @@ export interface GalleryPhoto {
  * gallery — same table, so both pages can never show different sets.
  * Pass `limit` for the teaser; omit it for the full gallery.
  */
-export async function fetchGalleryMedia(limit?: number): Promise<GalleryPhoto[]> {
-  let query = supabase
+export async function fetchGalleryMedia(
+  limit?: number,
+  db: { from: typeof supabase.from } = supabase,
+): Promise<GalleryPhoto[]> {
+  let query = db
     .from('gallery_media')
     .select('id, image_url, caption, display_order')
     .order('display_order', { ascending: true });
