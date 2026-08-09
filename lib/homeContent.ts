@@ -67,6 +67,7 @@ export interface HomeContent {
     title: string;
     body: string;
     benefits: string[];
+    image: string;
     cta: { text: string };
   };
   contactCta: { title: string; passesBtn: { text: string }; contactBtn: { text: string } };
@@ -214,6 +215,7 @@ export const HOME_CONTENT_DEFAULTS: HomeContent = {
       'Flexible package tiers with one festival fee',
       'Official listing in the event vendor directory',
     ],
+    image: '',
     cta: { text: 'APPLY TO BECOME A VENDOR' },
   },
   contactCta: {

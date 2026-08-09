@@ -95,11 +95,11 @@ export default function WorldChampionships() {
             <h2 className="font-bebas text-6xl md:text-8xl lg:text-9xl tracking-tight mb-4 text-stroke">
               WORLD CHAMPIONSHIPS
             </h2>
-            <h3 className="font-bebas text-4xl md:text-6xl text-white">ACCRA, GHANA • SEP 2026</h3>
+            <h3 className="font-bebas text-4xl md:text-6xl text-white">ACCRA, GHANA • OCT 2026</h3>
           </div>
 
           <div className="relative w-64 h-64 md:w-96 md:h-96 shrink-0 drop-shadow-2xl hover:scale-105 transition-transform duration-700 mt-8 md:mt-0">
-             <Image src="/world-medal.jpg" alt="World Championship Medal" fill className="object-contain" />
+             <Image src="/anon-builder.png" alt="World Championship Medal" fill className="object-contain" />
           </div>
 
         </div>

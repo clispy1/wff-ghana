@@ -128,6 +128,7 @@ INSERT INTO public.site_content (key, value) VALUES
     "Flexible package tiers with one festival fee",
     "Official listing in the event vendor directory"
   ],
+  "image": "",
   "cta": { "text": "APPLY TO BECOME A VENDOR" }
 }'),
 

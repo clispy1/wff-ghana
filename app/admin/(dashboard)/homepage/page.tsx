@@ -718,6 +718,12 @@ export default function AdminHomepagePage() {
           items={content.becomeVendor.benefits}
           onChange={(items) => update("becomeVendor", { ...content.becomeVendor, benefits: items })}
         />
+        <ImagePicker
+          label="Section Image"
+          folder="homepage/become-vendor"
+          value={content.becomeVendor.image}
+          onChange={(url) => update("becomeVendor", { ...content.becomeVendor, image: url })}
+        />
         <Field
           label="Button Text"
           value={content.becomeVendor.cta.text}
