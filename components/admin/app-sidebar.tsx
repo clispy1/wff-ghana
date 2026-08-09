@@ -86,6 +86,7 @@ const navGroups: NavGroup[] = [
       { title: "Armory Shop", url: "/admin/shop", icon: ShoppingBag },
       { title: "Orders", url: "/admin/orders", icon: Receipt },
       { title: "Event Vendors", url: "/admin/vendors", icon: Store },
+      { title: "Vendor Packages", url: "/admin/vendor-packages", icon: Store },
     ],
   },
   {

@@ -86,6 +86,13 @@ export async function settlePayment(
         })
         .eq('id', payment.related_id);
       break;
+
+    case 'vendor':
+      await admin
+        .from('vendors')
+        .update({ payment_status: 'paid', paystack_ref: reference, paid_at: paidAt })
+        .eq('id', payment.related_id);
+      break;
   }
 
   return { status: 'success', purpose: payment.purpose, relatedId: payment.related_id };
@@ -102,6 +109,8 @@ async function markRelatedFailed(
     await admin.from('shop_orders').update({ payment_status: 'failed' }).eq('id', relatedId);
   } else if (purpose === 'ticket') {
     await admin.from('ticket_orders').update({ payment_status: 'failed' }).eq('id', relatedId);
+  } else if (purpose === 'vendor') {
+    await admin.from('vendors').update({ payment_status: 'failed' }).eq('id', relatedId);
   }
   // Registrations stay 'pending' on a failed attempt so the athlete can
   // retry without the record looking rejected.

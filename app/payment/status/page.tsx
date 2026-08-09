@@ -18,6 +18,10 @@ const COPY = {
       title: 'TICKETS SECURED',
       body: 'Payment received. Your tickets have been reserved and confirmation is on its way to your inbox.',
     },
+    vendor: {
+      title: 'APPLICATION & FEE RECEIVED',
+      body: 'Your vendor application is in. We will review it and get back to you by email — once approved you will appear in the event directory.',
+    },
     default: {
       title: 'PAYMENT CONFIRMED',
       body: 'Your payment has been received. A confirmation email is on its way.',
@@ -82,7 +86,7 @@ export default async function PaymentStatusPage({
           </Link>
           {status !== 'success' && (
             <Link
-              href={purpose === 'shop' ? '/shop/checkout' : purpose === 'ticket' ? '/championship#tickets' : '/register'}
+              href={purpose === 'shop' ? '/shop/checkout' : purpose === 'ticket' ? '/championship#tickets' : purpose === 'vendor' ? '/championship/vendors/apply' : '/register'}
               className="inline-block border border-white/20 text-white font-bebas text-2xl px-10 py-3 hover:bg-white hover:text-black transition-colors"
             >
               TRY AGAIN

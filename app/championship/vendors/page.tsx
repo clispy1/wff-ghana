@@ -13,7 +13,7 @@ export default async function VendorsPage() {
 
   const { data } = await supabase
     .from('vendors')
-    .select('id, name, category, contact_person, phone, email, website_url, display_order')
+    .select('id, name, category, contact_person, phone, email, website_url, package_name, display_order')
     .eq('status', 'approved')
     .order('category', { ascending: true })
     .order('display_order', { ascending: true });

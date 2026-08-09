@@ -1,6 +1,7 @@
 "use client";
 
-import { Store, Phone, Mail, Globe2, User } from "lucide-react";
+import { Store, Phone, Mail, Globe2, User, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export interface Vendor {
   id: string;
@@ -10,6 +11,7 @@ export interface Vendor {
   phone: string | null;
   email: string | null;
   website_url: string | null;
+  package_name: string | null;
   display_order: number;
 }
 
@@ -38,6 +40,11 @@ function VendorCard({ vendor }: { vendor: Vendor }) {
       </div>
 
       <div className="mt-4 pt-4 border-t border-white/5 space-y-2 font-sans text-xs text-white/60">
+        {vendor.package_name && (
+          <p className="inline-block px-2 py-0.5 rounded border border-wff-gold/30 bg-wff-gold/5 text-wff-gold uppercase tracking-widest text-[10px] font-bold">
+            {vendor.package_name}
+          </p>
+        )}
         {vendor.contact_person && (
           <p className="flex items-center gap-2">
             <User className="h-3.5 w-3.5 text-white/30 shrink-0" />
@@ -96,6 +103,13 @@ export default function VendorsClient({ vendors }: { vendors: Vendor[] }) {
           The food, merch and services fuelling the championship weekend in
           Accra. More vendors will be added as we get closer to October 2–4, 2026.
         </p>
+
+        <Link
+          href="/championship/vendors/apply"
+          className="inline-flex items-center gap-2 bg-wff-red text-white font-bebas text-xl px-8 py-3 mt-8 hover:bg-white hover:text-wff-red transition-colors"
+        >
+          BECOME A VENDOR <ArrowRight className="h-5 w-5" />
+        </Link>
       </div>
 
       {!hasVendors ? (

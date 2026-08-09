@@ -20,11 +20,10 @@
 - [x] **Event Master Plan** (phases, kanban checklists, task assignments, private design library)
 - [x] **Bulk task import** — paste JSON (string list or rich objects) or CSV/TSV from Sheets into the checklists page; live preview, name resolution, duplicate + error reporting (8 Aug 2026)
 - [x] **Vendors (phase 1)** — vendor directory; admin CRUD at `/admin/vendors` + public approved list at `/championship/vendors` (8 Aug 2026). `supabase_vendors.sql` run.
-- [x] **Homepage: server-rendered, no defaults** — homepage data fetched on the server (sponsors, news, products, active event, home content, gallery, approved vendors); client page rendered from props; `app/loading.tsx` skeleton + per-section skeletons replace the old default/fallback copy; all content controlled from the admin dashboard (scheduled next).
+- [x] **Homepage: server-rendered, no defaults** — homepage data fetched on the server (sponsors, news, products, active event, home content, gallery, approved vendors); client page rendered from props; `app/loading.tsx` skeleton + per-section skeletons replace the old default/fallback copy; all content controlled from the admin dashboard.
+- [x] **Vendors (phase 2): public self-registration + payment** — a vendor applies at `/championship/vendors/apply`, picks an admin-managed package (`/admin/vendor-packages`), pays online via Paystack (same ledger/webhook as shop orders), then the admin reviews it in `/admin/vendors` and flips status to approved to publish it to the public directory. Homepage + directory now link to the apply page. Run `supabase_vendor_apply.sql`.
 
 ## Next: approved build list (user-selected)
-
-- [ ] **Vendors (phase 2): public self-registration + payment** — a vendor can register on the website (account + vendor profile/application), pick a sponsorship/booth package, and pay online (Paystack, same as shop orders). Public homepage vendors section will link in. **Building soon.**
 
 Then the existing "approved build list" continues.
 

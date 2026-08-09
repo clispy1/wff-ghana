@@ -652,6 +652,12 @@ export default function HomeClient({
               >
                 View All Vendors
               </Link>
+              <Link
+                href="/championship/vendors/apply"
+                className="hidden md:inline-flex bg-wff-red text-white hover:bg-white hover:text-wff-red font-sans text-xs font-black uppercase tracking-widest px-8 py-4 rounded-xl transition-all duration-300 mb-2"
+              >
+                Become a Vendor
+              </Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

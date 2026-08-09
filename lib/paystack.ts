@@ -6,7 +6,7 @@ import crypto from 'crypto';
 
 const PAYSTACK_BASE = 'https://api.paystack.co';
 
-export type PaystackPurpose = 'registration' | 'shop' | 'ticket';
+export type PaystackPurpose = 'registration' | 'shop' | 'ticket' | 'vendor';
 
 export interface PaystackVerifyData {
   status: string; // 'success' | 'failed' | 'abandoned' | ...
