@@ -50,4 +50,12 @@ Build order TBD. The user picked all of these but said **"don't build yet."**
 - `app/wellness/page.tsx` was intentionally deleted (wellness section removed from federation too); all links to `/federation#wellness` removed.
 - `app/partnerships/page.tsx` now redirects to `/championship/partnerships`.
 - `app/federation/FederationClient.tsx` — executive board members temporarily commented out by owner; keep as-is.
-- The `output: 'standalone'` in `next.config.ts` fails the final trace-copy step on this Windows/pnpm machine (EPERM symlink); the app itself compiles and all 36 pages generate. Pre-existing environment issue.
+- **Next.js 16 upgrade (16 Aug 2026)** — upgraded from 15.5.19 to 16.3.1, React 19.2.8. Turbopack is now the default for both `next dev` and `next build`.
+  - `middleware.ts` is now **`proxy.ts`** and the exported function is `proxy` (the `middleware` convention is deprecated in 16). Behaviour is unchanged: same `admin_users` check, same matcher, nodejs runtime.
+  - The dead `webpack`/`DISABLE_HMR` block was removed from `next.config.ts` — `DISABLE_HMR` was never set anywhere, and any webpack config fails a Turbopack build. The removed `eslint` option and the stale `.eslintrc.json` went with it (`eslint.config.mjs` flat config was already in place).
+  - `next lint` no longer exists and `next build` no longer lints. Use `pnpm lint` (`eslint .`) directly.
+  - ESLint is pinned to **9.39.1**: `eslint-config-next` pulls `eslint-plugin-react@7.37.5`, which crashes on ESLint 10 (`context.getFilename is not a function`). Revisit once that plugin ships ESLint 10 support.
+  - `eslint-plugin-react-hooks` v7 flags 13 pre-existing errors (mostly `set-state-in-effect`, e.g. `hooks/use-mobile.ts`). Not build-blocking; cleanup is its own task.
+  - `images.minimumCacheTTL` is pinned to **30s** in `next.config.ts`. Next.js 16 raised the default to 4 hours; because admins replace images at the same Supabase URL, a long TTL would serve stale art during the event.
+  - The old `output: 'standalone'` EPERM symlink failure no longer occurs — `.next/standalone` now builds cleanly under Turbopack, and all 46 routes generate.
+- `AGENTS.md` (+ `CLAUDE.md` pointing at it) directs coding agents to the version-matched docs bundled at `node_modules/next/dist/docs/`. The `<!-- BEGIN:nextjs-agent-rules -->` block is managed by `next dev` — keep project notes outside it.

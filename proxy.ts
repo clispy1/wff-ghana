@@ -7,8 +7,11 @@ import { NextResponse, type NextRequest } from 'next/server';
  * The client-side redirect in app/admin/(dashboard)/layout.tsx only
  * hides the UI; this runs before the page is ever served, and it checks
  * membership in admin_users rather than merely "is logged in".
+ *
+ * Named `proxy` (was `middleware` before Next.js 16). Runs on the
+ * nodejs runtime, which is the only runtime `proxy` supports.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(

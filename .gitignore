@@ -6,3 +6,9 @@ coverage/
 .env*
 !.env.example
 tsconfig.tsbuildinfo
+
+# Agent skills installed locally via `npx skills add` (e.g. next-dev-loop).
+# Tooling, not app code — install on demand rather than committing.
+.agents/
+.claude/skills/
+skills-lock.json
