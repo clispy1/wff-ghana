@@ -39,8 +39,10 @@ AS $$
     );
 $$;
 
+-- anon can never be an admin (auth.uid() is null when unauthenticated), so
+-- it never needs EXECUTE here — only authenticated's RLS policies call this.
 REVOKE ALL ON FUNCTION public.is_admin() FROM public;
-GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, anon;
+GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated;
 
 DROP POLICY IF EXISTS "Admins read admin list" ON public.admin_users;
 CREATE POLICY "Admins read admin list" ON public.admin_users
