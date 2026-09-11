@@ -53,9 +53,10 @@ CREATE TABLE IF NOT EXISTS public.registrations (
     paystack_ref TEXT,
     payment_screenshot_url TEXT,
     
-    emergency_name TEXT NOT NULL,
-    emergency_relation TEXT NOT NULL,
-    emergency_phone TEXT NOT NULL,
+    -- Optional (recommended, not required) on the registration form.
+    emergency_name TEXT,
+    emergency_relation TEXT,
+    emergency_phone TEXT,
     
     instagram TEXT,
     facebook TEXT,
