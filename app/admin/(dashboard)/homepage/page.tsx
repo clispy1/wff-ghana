@@ -21,7 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, RefreshCw } from "lucide-react";
+import { Plus, RefreshCw, ChevronsDown, ChevronsUp } from "lucide-react";
 import {
   SectionCard,
   Field,
@@ -33,6 +33,22 @@ import {
   inputClass,
 } from "@/components/admin/content-editor-kit";
 
+// Every collapsible card on this page, in the order they're rendered —
+// used to drive "expand all / collapse all" and each card's own toggle.
+const SECTION_IDS = [
+  "sectionVisibility", "president", "journey", "championship", "ambassadors",
+  "wellness", "armory", "gallery", "news", "partnerships", "becomeVendor", "contactCta",
+] as const;
+type SectionId = (typeof SECTION_IDS)[number];
+
+function GroupHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="font-sans text-[11px] uppercase tracking-[0.25em] text-white/30 font-bold pt-6 pb-1 first:pt-0">
+      {children}
+    </h3>
+  );
+}
+
 export default function AdminHomepagePage() {
   const [content, setContent] = useState<HomeContent>(HOME_CONTENT_DEFAULTS);
   const [loading, setLoading] = useState(true);
@@ -42,6 +58,23 @@ export default function AdminHomepagePage() {
   const [sections, setSections] = useState<HomeSectionVisibility>(HOME_SECTION_DEFAULTS);
   const [savingSections, setSavingSections] = useState(false);
   const [savedSections, setSavedSections] = useState(false);
+
+  // Collapsed by default — 12 fully-expanded editors on one page was the
+  // whole problem. "Section Visibility" starts open since it's the one
+  // most people touch first.
+  const [openSections, setOpenSections] = useState<Set<SectionId>>(
+    () => new Set<SectionId>(["sectionVisibility"]),
+  );
+  const isOpen = (id: SectionId) => openSections.has(id);
+  const setSectionOpen = (id: SectionId, open: boolean) =>
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      if (open) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  const expandAll = () => setOpenSections(new Set(SECTION_IDS));
+  const collapseAll = () => setOpenSections(new Set());
 
   const load = async () => {
     setLoading(true);
@@ -115,15 +148,33 @@ export default function AdminHomepagePage() {
             there. Sponsors, news and shop products are managed on their own pages.
           </p>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={load}
-          className="text-white/40 hover:text-white"
-          aria-label="Reload"
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={expandAll}
+            className="text-white/40 hover:text-white font-sans text-xs gap-1.5"
+          >
+            <ChevronsDown className="h-3.5 w-3.5" /> Expand all
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={collapseAll}
+            className="text-white/40 hover:text-white font-sans text-xs gap-1.5"
+          >
+            <ChevronsUp className="h-3.5 w-3.5" /> Collapse all
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={load}
+            className="text-white/40 hover:text-white"
+            aria-label="Reload"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {error && (
@@ -133,12 +184,16 @@ export default function AdminHomepagePage() {
       )}
 
       {/* Section visibility — which blocks render on the public homepage */}
+      <GroupHeading>Page Structure</GroupHeading>
       <SectionCard
         title="SECTION VISIBILITY"
         hint="Toggle which homepage sections render on the public site. The hero is always shown."
         saving={savingSections}
         saved={savedSections}
         onSave={saveSections}
+        collapsible
+        open={isOpen("sectionVisibility")}
+        onOpenChange={(v) => setSectionOpen("sectionVisibility", v)}
       >
         <div className="space-y-3">
           {(Object.keys(HOME_SECTION_META) as (keyof HomeSectionVisibility)[]).map((key) => (
@@ -173,12 +228,16 @@ export default function AdminHomepagePage() {
       </SectionCard>
 
       {/* Federation / President */}
+      <GroupHeading>Hero & Leadership</GroupHeading>
       <SectionCard
         title="FEDERATION SECTION"
         hint="The 'THE FEDERATION' block with the president photo, quote and body copy."
         saving={savingKey === "president"}
         saved={savedKey === "president"}
         onSave={() => save("president")}
+        collapsible
+        open={isOpen("president")}
+        onOpenChange={(v) => setSectionOpen("president", v)}
       >
         <Field
           label="Section Title"
@@ -245,12 +304,16 @@ export default function AdminHomepagePage() {
       </SectionCard>
 
       {/* Journey panels */}
+      <GroupHeading>Story</GroupHeading>
       <SectionCard
         title="THE JOURNEY"
         hint="The five-panel bento grid (Foundation, Intensity, Discipline, Stage, Ascension)."
         saving={savingKey === "journey"}
         saved={savedKey === "journey"}
         onSave={() => save("journey")}
+        collapsible
+        open={isOpen("journey")}
+        onOpenChange={(v) => setSectionOpen("journey", v)}
       >
         <div className="space-y-4">
           {content.journey.items.map((item, i) => (
@@ -353,12 +416,16 @@ export default function AdminHomepagePage() {
       </SectionCard>
 
       {/* Championship details */}
+      <GroupHeading>Championship</GroupHeading>
       <SectionCard
         title="CHAMPIONSHIP DETAILS"
         hint="Falls back copy for the championship block on the homepage — overridden automatically whenever an event is marked live under Events & Logistics."
         saving={savingKey === "championship"}
         saved={savedKey === "championship"}
         onSave={() => save("championship")}
+        collapsible
+        open={isOpen("championship")}
+        onOpenChange={(v) => setSectionOpen("championship", v)}
       >
         <Field
           label="Supertitle"
@@ -460,6 +527,9 @@ export default function AdminHomepagePage() {
         saving={savingKey === "ambassadors"}
         saved={savedKey === "ambassadors"}
         onSave={() => save("ambassadors")}
+        collapsible
+        open={isOpen("ambassadors")}
+        onOpenChange={(v) => setSectionOpen("ambassadors", v)}
       >
         <Field
           label="Section Title"
@@ -581,11 +651,15 @@ export default function AdminHomepagePage() {
       </SectionCard>
 
       {/* Wellness */}
+      <GroupHeading>Wellness & Shop</GroupHeading>
       <SectionCard
         title="WELLNESS & PHYSIOLOGY"
         saving={savingKey === "wellness"}
         saved={savedKey === "wellness"}
         onSave={() => save("wellness")}
+        collapsible
+        open={isOpen("wellness")}
+        onOpenChange={(v) => setSectionOpen("wellness", v)}
       >
         <Field
           label="Supertitle"
@@ -616,6 +690,9 @@ export default function AdminHomepagePage() {
         saving={savingKey === "armory"}
         saved={savedKey === "armory"}
         onSave={() => save("armory")}
+        collapsible
+        open={isOpen("armory")}
+        onOpenChange={(v) => setSectionOpen("armory", v)}
       >
         <Field
           label="Supertitle"
@@ -636,6 +713,9 @@ export default function AdminHomepagePage() {
         saving={savingKey === "gallery"}
         saved={savedKey === "gallery"}
         onSave={() => save("gallery")}
+        collapsible
+        open={isOpen("gallery")}
+        onOpenChange={(v) => setSectionOpen("gallery", v)}
       >
         <Field
           label="Supertitle"
@@ -656,6 +736,9 @@ export default function AdminHomepagePage() {
         saving={savingKey === "news"}
         saved={savedKey === "news"}
         onSave={() => save("news")}
+        collapsible
+        open={isOpen("news")}
+        onOpenChange={(v) => setSectionOpen("news", v)}
       >
         <Field
           label="Title"
@@ -665,11 +748,15 @@ export default function AdminHomepagePage() {
       </SectionCard>
 
       {/* Partnerships */}
+      <GroupHeading>Community & Partners</GroupHeading>
       <SectionCard
         title="AFFILIATION & PARTNERS"
         saving={savingKey === "partnerships"}
         saved={savedKey === "partnerships"}
         onSave={() => save("partnerships")}
+        collapsible
+        open={isOpen("partnerships")}
+        onOpenChange={(v) => setSectionOpen("partnerships", v)}
       >
         <Field
           label="Title"
@@ -697,6 +784,9 @@ export default function AdminHomepagePage() {
         saving={savingKey === "becomeVendor"}
         saved={savedKey === "becomeVendor"}
         onSave={() => save("becomeVendor")}
+        collapsible
+        open={isOpen("becomeVendor")}
+        onOpenChange={(v) => setSectionOpen("becomeVendor", v)}
       >
         <Field
           label="Supertitle"
@@ -739,6 +829,9 @@ export default function AdminHomepagePage() {
         saving={savingKey === "contactCta"}
         saved={savedKey === "contactCta"}
         onSave={() => save("contactCta")}
+        collapsible
+        open={isOpen("contactCta")}
+        onOpenChange={(v) => setSectionOpen("contactCta", v)}
       >
         <div className="grid grid-cols-2 gap-3">
           <Field

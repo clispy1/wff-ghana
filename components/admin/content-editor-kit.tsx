@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, ArrowUp, ArrowDown, Check } from "lucide-react";
+import { Plus, Trash2, ArrowUp, ArrowDown, Check, ChevronDown } from "lucide-react";
 
 /**
  * Shared building blocks for the "one JSONB row per section, save
@@ -25,6 +26,10 @@ export function SectionCard({
   saved,
   onSave,
   children,
+  collapsible = false,
+  open,
+  defaultOpen = true,
+  onOpenChange,
 }: {
   title: string;
   hint?: string;
@@ -32,23 +37,57 @@ export function SectionCard({
   saved: boolean;
   onSave: () => void;
   children: React.ReactNode;
+  /** Opt-in — existing callers (e.g. the schedule editor) are unaffected
+   * unless they pass this, so the card always renders expanded as before. */
+  collapsible?: boolean;
+  /** Controlled open state, for a page-level "expand/collapse all". Omit
+   * to let the card manage its own state, seeded from defaultOpen. */
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const isControlled = open !== undefined;
+  const isOpen = collapsible ? (isControlled ? open : internalOpen) : true;
+
+  const toggle = () => {
+    if (!collapsible) return;
+    onOpenChange?.(!isOpen);
+    if (!isControlled) setInternalOpen((v) => !v);
+  };
+
   return (
     <Card className="bg-[#111] border-white/10 text-white">
-      <CardHeader>
-        <CardTitle className="font-bebas text-2xl tracking-widest text-wff-gold flex items-center justify-between">
-          {title}
+      <CardHeader
+        className={collapsible ? "cursor-pointer select-none" : undefined}
+        onClick={collapsible ? toggle : undefined}
+      >
+        <CardTitle className="font-bebas text-2xl tracking-widest text-wff-gold flex items-center justify-between gap-3">
+          <span className="flex items-center gap-2 min-w-0">
+            {collapsible && (
+              <ChevronDown
+                className={`h-4 w-4 flex-shrink-0 text-white/40 transition-transform duration-200 ${isOpen ? "" : "-rotate-90"}`}
+              />
+            )}
+            <span className="truncate">{title}</span>
+            {collapsible && !isOpen && saved && (
+              <Check className="h-4 w-4 text-wff-green flex-shrink-0" />
+            )}
+          </span>
           <Button
-            onClick={onSave}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSave();
+            }}
             disabled={saving}
-            className="bg-wff-red hover:bg-white hover:text-black font-bebas text-sm tracking-widest h-8 px-4"
+            className="bg-wff-red hover:bg-white hover:text-black font-bebas text-sm tracking-widest h-8 px-4 flex-shrink-0"
           >
             {saving ? "SAVING…" : saved ? <Check className="h-4 w-4" /> : "SAVE"}
           </Button>
         </CardTitle>
-        {hint && <p className="text-white/40 text-xs font-sans font-normal pt-1">{hint}</p>}
+        {hint && isOpen && <p className="text-white/40 text-xs font-sans font-normal pt-1">{hint}</p>}
       </CardHeader>
-      <CardContent className="space-y-4 font-sans">{children}</CardContent>
+      {isOpen && <CardContent className="space-y-4 font-sans">{children}</CardContent>}
     </Card>
   );
 }
