@@ -7,21 +7,19 @@ import * as z from 'zod';
 import confetti from 'canvas-confetti';
 import { supabase } from '@/lib/supabase';
 import {
-  User, Trophy, Users, FileText, CreditCard,
+  User, Trophy, FileText, CreditCard,
   Upload, CheckCircle, ChevronRight, ChevronLeft,
-  Camera, Shield, AlertCircle, Instagram, Facebook,
-  Phone, MapPin, Plane, X, Check, Lock
+  Shield, AlertCircle, Lock, Check
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────
 // STEP DEFINITIONS
 // ─────────────────────────────────────────────
 const STEPS = [
-  { id: 1, label: 'Personal',     icon: User },
-  { id: 2, label: 'Competition',  icon: Trophy },
-  { id: 3, label: 'Team / Club',  icon: Users },
-  { id: 4, label: 'Documents',    icon: FileText },
-  { id: 5, label: 'Payment',      icon: CreditCard },
+  { id: 1, label: 'Personal',    icon: User },
+  { id: 2, label: 'Competition', icon: Trophy },
+  { id: 3, label: 'Documents',   icon: FileText },
+  { id: 4, label: 'Payment',     icon: CreditCard },
 ];
 
 // ─────────────────────────────────────────────
@@ -31,28 +29,23 @@ const schema = z.object({
   // Step 1 — Personal
   firstName:           z.string().min(2, 'First name is required'),
   lastName:            z.string().min(2, 'Last name is required'),
-  middleName:          z.string().optional(),
   gender:              z.string().min(1, 'Gender is required'),
   dob:                 z.string().min(1, 'Date of birth is required'),
   nationality:         z.string().min(2, 'Nationality is required'),
   countryRepresenting: z.string().min(2, 'Country representing is required'),
   passportNumber:      z.string().optional(),
-  nationalId:          z.string().optional(),
   email:               z.string().email('Invalid email address'),
   mobile:              z.string().min(10, 'Valid mobile number required'),
-  whatsapp:            z.string().optional(),
   address:             z.string().min(5, 'Residential address is required'),
   city:                z.string().min(2, 'City is required'),
   country:             z.string().min(2, 'Country is required'),
 
-  // Step 2 — Competition
+  // Step 2 — Competition (+ Team/Club, shown only for club/national athletes)
   athleteType:         z.string().min(1, 'Athlete type is required'),
   category:            z.string().min(1, 'Category is required'),
   division:            z.string().min(1, 'Division is required'),
   weightClass:         z.string().optional(),
   heightClass:         z.string().optional(),
-
-  // Step 3 — Team / Club
   teamName:            z.string().optional(),
   clubName:            z.string().optional(),
   teamCountry:         z.string().optional(),
@@ -61,29 +54,20 @@ const schema = z.object({
   managerContact:      z.string().optional(),
   federationAffiliation: z.string().optional(),
 
-  // Step 4 — Documents / Medical
+  // Step 3 — Documents / Medical
   medicalDeclaration:  z.boolean().refine(v => v === true, 'You must confirm your medical fitness'),
   fitnessDeclaration:  z.boolean().refine(v => v === true, 'You must confirm your fitness declaration'),
 
-  // Step 5 — Payment
+  // Step 4 — Payment & Final
   // How the athlete intends to settle the entry fee. Whether it is
   // actually paid is decided by Paystack, never by this form.
   feePaid:             z.string().min(1, 'Please choose how you want to pay'),
   paymentMethod:       z.string().optional(),
   transactionId:       z.string().optional(),
   paystackRef:         z.string().optional(),
-
-  // Additional
   emergencyName:       z.string().min(2, 'Emergency contact name required'),
   emergencyRelation:   z.string().min(2, 'Relationship required'),
   emergencyPhone:      z.string().min(10, 'Emergency phone required'),
-  instagram:           z.string().optional(),
-  facebook:            z.string().optional(),
-  tiktok:              z.string().optional(),
-  arrivalDate:         z.string().optional(),
-  departureDate:       z.string().optional(),
-  needsPickup:         z.string().optional(),
-  needsAccommodation:  z.string().optional(),
   mediaConsent:        z.boolean().optional(),
   termsAgreed:         z.boolean().refine(v => v === true, 'You must agree to the terms and conditions'),
 });
@@ -209,19 +193,16 @@ const RadioGroup = ({
 // ─────────────────────────────────────────────
 
 // ── STEP 1: PERSONAL INFORMATION ──
-function Step1({ register, errors, watch, setValue, files, onFileChange }: {
+function Step1({ register, errors, files, onFileChange }: {
   register: ReturnType<typeof useForm<FormData>>['register'];
   errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
-  watch: ReturnType<typeof useForm<FormData>>['watch'];
-  setValue: ReturnType<typeof useForm<FormData>>['setValue'];
   files: Record<string, File | null>;
   onFileChange: (key: string, file: File | null) => void;
 }) {
-
   return (
     <div className="space-y-0">
       <SectionHeading>Identity</SectionHeading>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
           <Label>First Name <RequiredMark /></Label>
           <input {...register('firstName')} className={inputClass} placeholder="Kwame" />
@@ -231,10 +212,6 @@ function Step1({ register, errors, watch, setValue, files, onFileChange }: {
           <Label>Last Name <RequiredMark /></Label>
           <input {...register('lastName')} className={inputClass} placeholder="Mensah" />
           <FieldError message={errors.lastName?.message} />
-        </div>
-        <div>
-          <Label>Middle Name</Label>
-          <input {...register('middleName')} className={inputClass} placeholder="Optional" />
         </div>
       </div>
 
@@ -264,37 +241,16 @@ function Step1({ register, errors, watch, setValue, files, onFileChange }: {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
         <div>
           <Label>Country Representing <RequiredMark /></Label>
           <input {...register('countryRepresenting')} className={inputClass} placeholder="Ghana" />
           <FieldError message={errors.countryRepresenting?.message} />
         </div>
         <div>
-          <Label>Passport Number <span className="text-white/30 ml-1 normal-case text-[9px]">International</span></Label>
+          <Label>Passport Number <span className="text-white/30 ml-1 normal-case text-[9px]">Optional</span></Label>
           <input {...register('passportNumber')} className={inputClass} placeholder="G12345678" />
         </div>
-        <div>
-          <Label>National ID</Label>
-          <input {...register('nationalId')} className={inputClass} placeholder="GHA-000000000-0" />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
-        <FileUpload
-          label="Passport Photo"
-          required
-          hint="JPEG / PNG · Max 2MB · White background preferred"
-          fileName={files.passportPhoto?.name || ''}
-          onChange={f => onFileChange('passportPhoto', f)}
-        />
-        <FileUpload
-          label="Athlete Photo"
-          required
-          hint="Full-face, competition or gym photo"
-          fileName={files.athletePhoto?.name || ''}
-          onChange={f => onFileChange('athletePhoto', f)}
-        />
       </div>
 
       <SectionHeading>Contact Details</SectionHeading>
@@ -311,22 +267,18 @@ function Step1({ register, errors, watch, setValue, files, onFileChange }: {
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-        <div>
-          <Label>WhatsApp Number</Label>
-          <input {...register('whatsapp')} className={inputClass} placeholder="+233 20 123 4567" />
-        </div>
         <div className="sm:col-span-2">
           <Label>Residential Address <RequiredMark /></Label>
           <input {...register('address')} className={inputClass} placeholder="House No., Street Name" />
           <FieldError message={errors.address?.message} />
         </div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <Label>City <RequiredMark /></Label>
           <input {...register('city')} className={inputClass} placeholder="Accra" />
           <FieldError message={errors.city?.message} />
         </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
         <div>
           <Label>Country <RequiredMark /></Label>
           <input {...register('country')} className={inputClass} placeholder="Ghana" />
@@ -337,7 +289,7 @@ function Step1({ register, errors, watch, setValue, files, onFileChange }: {
   );
 }
 
-// ── STEP 2: COMPETITION INFORMATION ──
+// ── STEP 2: COMPETITION + TEAM/CLUB (conditional) ──
 function Step2({ register, errors, watch, setValue }: {
   register: ReturnType<typeof useForm<FormData>>['register'];
   errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
@@ -362,10 +314,9 @@ function Step2({ register, errors, watch, setValue }: {
     ],
   };
 
-  const ALL_CATS = [...(CATEGORIES.men), ...(CATEGORIES.women)];
-
   const isBodybuilding = ['mens-bodybuilding', 'classic-physique'].includes(category);
   const isPhysique     = ['mens-physique', 'womens-bikini', 'womens-fitness', 'womens-figure'].includes(category);
+  const needsTeamInfo   = athleteType === 'club' || athleteType === 'national';
 
   return (
     <div>
@@ -463,63 +414,52 @@ function Step2({ register, errors, watch, setValue }: {
           </div>
         </>
       )}
+
+      {needsTeamInfo && (
+        <>
+          <SectionHeading>Team & Club</SectionHeading>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+              <Label>Team Name</Label>
+              <input {...register('teamName')} className={inputClass} placeholder="Team Strength Ghana" />
+            </div>
+            <div>
+              <Label>Club Name</Label>
+              <input {...register('clubName')} className={inputClass} placeholder="Iron Temple GH" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+              <Label>Team / Club Country</Label>
+              <input {...register('teamCountry')} className={inputClass} placeholder="Ghana" />
+            </div>
+            <div>
+              <Label>Federation Affiliation</Label>
+              <input {...register('federationAffiliation')} className={inputClass} placeholder="WFF Ghana" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <Label>Coach Name</Label>
+              <input {...register('coachName')} className={inputClass} placeholder="Coach John Doe" />
+            </div>
+            <div>
+              <Label>Team Manager Name</Label>
+              <input {...register('managerName')} className={inputClass} placeholder="Jane Smith" />
+            </div>
+            <div>
+              <Label>Manager Contact</Label>
+              <input {...register('managerContact')} className={inputClass} placeholder="+233 20 000 0000" />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
-// ── STEP 3: TEAM / CLUB INFORMATION ──
-function Step3({ register, errors }: {
-  register: ReturnType<typeof useForm<FormData>>['register'];
-  errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
-}) {
-  return (
-    <div>
-      <SectionHeading>Team & Club</SectionHeading>
-      <p className="text-sm text-white/40 mb-6">Only required if competing as a Club or National Team athlete. Leave blank if individual.</p>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        <div>
-          <Label>Team Name</Label>
-          <input {...register('teamName')} className={inputClass} placeholder="Team Strength Ghana" />
-        </div>
-        <div>
-          <Label>Club Name</Label>
-          <input {...register('clubName')} className={inputClass} placeholder="Iron Temple GH" />
-        </div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        <div>
-          <Label>Team / Club Country</Label>
-          <input {...register('teamCountry')} className={inputClass} placeholder="Ghana" />
-        </div>
-        <div>
-          <Label>Federation Affiliation</Label>
-          <input {...register('federationAffiliation')} className={inputClass} placeholder="WFF Ghana" />
-        </div>
-      </div>
-
-      <SectionHeading>Coaching Staff</SectionHeading>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div>
-          <Label>Coach Name</Label>
-          <input {...register('coachName')} className={inputClass} placeholder="Coach John Doe" />
-        </div>
-        <div>
-          <Label>Team Manager Name</Label>
-          <input {...register('managerName')} className={inputClass} placeholder="Jane Smith" />
-        </div>
-        <div>
-          <Label>Manager Contact</Label>
-          <input {...register('managerContact')} className={inputClass} placeholder="+233 20 000 0000" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── STEP 4: DOCUMENTS & VERIFICATION ──
-function Step4({ register, errors, watch, setValue, files, onFileChange }: {
-  register: ReturnType<typeof useForm<FormData>>['register'];
+// ── STEP 3: DOCUMENTS & VERIFICATION ──
+function Step3({ watch, setValue, errors, files, onFileChange }: {
   errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
   watch: ReturnType<typeof useForm<FormData>>['watch'];
   setValue: ReturnType<typeof useForm<FormData>>['setValue'];
@@ -529,30 +469,35 @@ function Step4({ register, errors, watch, setValue, files, onFileChange }: {
   const medicalDeclaration = watch('medicalDeclaration') || false;
   const fitnessDeclaration = watch('fitnessDeclaration') || false;
 
-  const handleFile = (key: string) => (f: File | null) => {
-    onFileChange(key, f);
-  };
-
   return (
     <div>
       <SectionHeading>Required Documents</SectionHeading>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
-        <FileUpload label="Passport Copy" required hint="First page with photo · PDF or JPEG"
-          fileName={files.passport?.name || ''} onChange={handleFile('passport')} accept="image/*,.pdf" />
-        <FileUpload label="National ID" hint="Government-issued national ID card"
-          fileName={files.nationalId?.name || ''} onChange={handleFile('nationalId')} accept="image/*,.pdf" />
-        <FileUpload label="Athlete Headshot" required hint="Professional headshot, plain background"
-          fileName={files.headshot?.name || ''} onChange={handleFile('headshot')} />
-        <FileUpload label="Full Body Competition Photo" required hint="Recent competition or stage photo"
-          fileName={files.fullBody?.name || ''} onChange={handleFile('fullBody')} />
+        <FileUpload
+          label="Passport / ID Copy"
+          required
+          accept="image/*,.pdf"
+          hint="Passport or national ID, photo page · PDF or JPEG"
+          fileName={files.passportDoc?.name || ''}
+          onChange={f => onFileChange('passportDoc', f)}
+        />
+        <FileUpload
+          label="Athlete Photo"
+          required
+          hint="Clear face photo, competition or gym"
+          fileName={files.athletePhoto?.name || ''}
+          onChange={f => onFileChange('athletePhoto', f)}
+        />
       </div>
 
-      <SectionHeading>Optional Documents</SectionHeading>
+      <SectionHeading>Optional</SectionHeading>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
-        <FileUpload label="Previous Competition Photos" hint="Up to 3 photos · ZIP or individual"
-          fileName={files.prevPhotos?.name || ''} onChange={handleFile('prevPhotos')} />
-        <FileUpload label="Championship Certificates" hint="PDF preferred · Previous wins & placements"
-          fileName={files.certs?.name || ''} onChange={handleFile('certs')} accept="image/*,.pdf" />
+        <FileUpload
+          label="Full Body Competition Photo"
+          hint="Recent competition or stage photo"
+          fileName={files.fullBody?.name || ''}
+          onChange={f => onFileChange('fullBody', f)}
+        />
       </div>
 
       <SectionHeading>Medical Declarations</SectionHeading>
@@ -578,8 +523,8 @@ function Step4({ register, errors, watch, setValue, files, onFileChange }: {
   );
 }
 
-// ── STEP 5: PAYMENT INFORMATION ──
-function Step5({ register, errors, watch, setValue, files, onFileChange }: {
+// ── STEP 4: PAYMENT & FINAL ──
+function Step4({ register, errors, watch, setValue, files, onFileChange }: {
   register: ReturnType<typeof useForm<FormData>>['register'];
   errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
   watch: ReturnType<typeof useForm<FormData>>['watch'];
@@ -587,7 +532,7 @@ function Step5({ register, errors, watch, setValue, files, onFileChange }: {
   files: Record<string, File | null>;
   onFileChange: (key: string, file: File | null) => void;
 }) {
-  const feePaid       = watch('feePaid') || '';
+  const feePaid = watch('feePaid') || '';
 
   return (
     <div>
@@ -673,58 +618,6 @@ function Step5({ register, errors, watch, setValue, files, onFileChange }: {
         </div>
       </div>
 
-      <SectionHeading>Social Media <span className="text-white/30 text-sm normal-case ml-2 font-sans font-normal">Used for competition promotion</span></SectionHeading>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-0">
-        <div>
-          <Label><Instagram size={11} className="inline mr-1.5 -mt-0.5" />Instagram</Label>
-          <input {...register('instagram')} className={inputClass} placeholder="@username" />
-        </div>
-        <div>
-          <Label><Facebook size={11} className="inline mr-1.5 -mt-0.5" />Facebook</Label>
-          <input {...register('facebook')} className={inputClass} placeholder="facebook.com/username" />
-        </div>
-        <div>
-          <Label>TikTok</Label>
-          <input {...register('tiktok')} className={inputClass} placeholder="@username" />
-        </div>
-      </div>
-
-      <SectionHeading>
-        <Plane size={14} className="inline mr-2 -mt-0.5" />
-        Logistics — All Africa Championship
-      </SectionHeading>
-      <p className="text-xs text-white/35 mb-4">For international athletes travelling to the event.</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        <div>
-          <Label>Arrival Date</Label>
-          <input {...register('arrivalDate')} type="date"
-            className={`${inputClass} [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-30`} />
-        </div>
-        <div>
-          <Label>Departure Date</Label>
-          <input {...register('departureDate')} type="date"
-            className={`${inputClass} [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-30`} />
-        </div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <div>
-          <Label>Airport Pickup Required?</Label>
-          <select {...register('needsPickup')} className={selectClass}>
-            <option value="">Select</option>
-            <option value="yes">Yes, I need pickup</option>
-            <option value="no">No, I&apos;ll arrange my own</option>
-          </select>
-        </div>
-        <div>
-          <Label>Accommodation Required?</Label>
-          <select {...register('needsAccommodation')} className={selectClass}>
-            <option value="">Select</option>
-            <option value="yes">Yes, please arrange</option>
-            <option value="no">No, I have accommodation</option>
-          </select>
-        </div>
-      </div>
-
       <SectionHeading>Consents & Agreements</SectionHeading>
       <div className="space-y-4 p-5 border border-white/8 bg-white/2">
         <CheckboxField
@@ -753,9 +646,8 @@ function Step5({ register, errors, watch, setValue, files, onFileChange }: {
 const STEP_FIELDS: Record<number, (keyof FormData)[]> = {
   1: ['firstName', 'lastName', 'gender', 'dob', 'nationality', 'countryRepresenting', 'email', 'mobile', 'address', 'city', 'country'],
   2: ['athleteType', 'category', 'division'],
-  3: [],
-  4: ['medicalDeclaration', 'fitnessDeclaration'],
-  5: ['feePaid', 'emergencyName', 'emergencyRelation', 'emergencyPhone', 'termsAgreed'],
+  3: ['medicalDeclaration', 'fitnessDeclaration'],
+  4: ['feePaid', 'emergencyName', 'emergencyRelation', 'emergencyPhone', 'termsAgreed'],
 };
 
 // ─────────────────────────────────────────────
@@ -788,7 +680,7 @@ export default function Registration() {
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
-    
+
     try {
       // The athlete-documents bucket is private — these are passport and
       // ID scans. We store the object path and the admin dashboard reads
@@ -804,28 +696,24 @@ export default function Registration() {
         return udata.path;
       };
 
-      const passportUrl = await uploadFile(files.passportPhoto || files.passport);
-      const athletePhotoUrl = await uploadFile(files.athletePhoto);
-      const nationalIdUrl = await uploadFile(files.nationalId);
-      const headshotUrl = await uploadFile(files.headshot) || athletePhotoUrl;
+      const passportUrl = await uploadFile(files.passportDoc);
+      const headshotUrl = await uploadFile(files.athletePhoto);
       const fullBodyUrl = await uploadFile(files.fullBody);
-      const prevPhotosUrl = await uploadFile(files.prevPhotos);
-      const certsUrl = await uploadFile(files.certs);
       const paymentScreenshotUrl = await uploadFile(files.paymentScreenshot);
 
       const { data: inserted, error } = await supabase.from('registrations').insert({
         first_name: data.firstName,
         last_name: data.lastName,
-        middle_name: data.middleName || null,
+        middle_name: null,
         gender: data.gender,
         dob: data.dob,
         nationality: data.nationality,
         country_representing: data.countryRepresenting,
         passport_number: data.passportNumber || null,
-        national_id: data.nationalId || null,
+        national_id: null,
         email: data.email,
         mobile: data.mobile,
-        whatsapp: data.whatsapp || null,
+        whatsapp: null,
         address: data.address,
         city: data.city,
         country: data.country,
@@ -844,11 +732,11 @@ export default function Registration() {
         medical_declaration: data.medicalDeclaration,
         fitness_declaration: data.fitnessDeclaration,
         passport_url: passportUrl,
-        national_id_url: nationalIdUrl,
+        national_id_url: null,
         headshot_url: headshotUrl,
         full_body_url: fullBodyUrl,
-        prev_photos_urls: prevPhotosUrl ? [prevPhotosUrl] : [],
-        certs_url: certsUrl,
+        prev_photos_urls: [],
+        certs_url: null,
         // Always 'pending' here. Only a verified Paystack transaction or
         // an admin can move this to 'paid' — RLS rejects anything else.
         fee_paid_status: 'pending',
@@ -859,13 +747,13 @@ export default function Registration() {
         emergency_name: data.emergencyName,
         emergency_relation: data.emergencyRelation,
         emergency_phone: data.emergencyPhone,
-        instagram: data.instagram || null,
-        facebook: data.facebook || null,
-        tiktok: data.tiktok || null,
-        arrival_date: data.arrivalDate || null,
-        departure_date: data.departureDate || null,
-        needs_pickup: data.needsPickup || null,
-        needs_accommodation: data.needsAccommodation || null,
+        instagram: null,
+        facebook: null,
+        tiktok: null,
+        arrival_date: null,
+        departure_date: null,
+        needs_pickup: null,
+        needs_accommodation: null,
         media_consent: data.mediaConsent || false,
         terms_agreed: data.termsAgreed,
       }).select('id').single();
@@ -1035,11 +923,10 @@ export default function Registration() {
             {/* ── FORM PANEL ── */}
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="bg-[#0a0a0a] border border-white/8 p-8 md:p-12 min-h-[500px]">
-                {currentStep === 1 && <Step1 register={register} errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} />}
+                {currentStep === 1 && <Step1 register={register} errors={errors} files={files} onFileChange={onFileChange} />}
                 {currentStep === 2 && <Step2 register={register} errors={errors} watch={watch} setValue={setValue} />}
-                {currentStep === 3 && <Step3 register={register} errors={errors} />}
+                {currentStep === 3 && <Step3 errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} />}
                 {currentStep === 4 && <Step4 register={register} errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} />}
-                {currentStep === 5 && <Step5 register={register} errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} />}
               </div>
 
               {/* ── NAVIGATION BUTTONS ── */}
