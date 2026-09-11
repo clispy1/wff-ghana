@@ -306,12 +306,15 @@ interface CheckboxFieldProps {
 }
 const CheckboxField = ({ id, checked, onChange, label, sublabel, error }: CheckboxFieldProps) => (
   <div>
-    <label htmlFor={id} className="flex items-start gap-3 cursor-pointer group">
+    <label
+      htmlFor={id}
+      onClick={(e) => { e.preventDefault(); onChange(!checked); }}
+      className="flex items-start gap-3 cursor-pointer group"
+    >
       <div
         className={`mt-0.5 w-5 h-5 flex-shrink-0 rounded-md border flex items-center justify-center transition-all duration-200 ${
           checked ? 'bg-wff-red border-wff-red' : 'border-white/20 group-hover:border-wff-red/50'
         }`}
-        onClick={() => onChange(!checked)}
       >
         {checked && <Check size={12} className="text-white" />}
       </div>
