@@ -159,6 +159,10 @@ CREATE TABLE IF NOT EXISTS public.categories (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT,
+    -- 'Bodybuilding & Figure' | 'Fitness Models' | 'Fashion Models' —
+    -- the registration form groups categories under these headings.
+    group_name TEXT,
+    display_order INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -168,6 +172,7 @@ CREATE TABLE IF NOT EXISTS public.divisions (
     name TEXT NOT NULL,
     weight_limit TEXT,
     height_limit TEXT,
+    display_order INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

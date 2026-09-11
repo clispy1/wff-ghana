@@ -6,10 +6,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import confetti from 'canvas-confetti';
 import { supabase } from '@/lib/supabase';
+import { COUNTRIES } from '@/lib/countries';
 import {
   User, Trophy, FileText, CreditCard,
   Upload, CheckCircle, ChevronRight, ChevronLeft, ChevronDown,
-  Shield, AlertCircle, Lock, Check, X, Plane
+  Shield, AlertCircle, Lock, Check, X, Plane, Sparkles, Medal
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────
@@ -40,12 +41,10 @@ const schema = z.object({
   city:                z.string().min(2, 'City is required'),
   country:             z.string().min(2, 'Country is required'),
 
-  // Step 2 — Competition (+ Team/Club, shown only for club/national athletes)
+  // Step 2 — Competition (+ Team/Club, shown only when the team toggle is on)
   athleteType:         z.string().min(1, 'Athlete type is required'),
   category:            z.string().min(1, 'Category is required'),
   division:            z.string().min(1, 'Division is required'),
-  weightClass:         z.string().optional(),
-  heightClass:         z.string().optional(),
   teamName:            z.string().optional(),
   clubName:            z.string().optional(),
   teamCountry:         z.string().optional(),
@@ -66,14 +65,17 @@ const schema = z.object({
   paymentMethod:       z.string().optional(),
   transactionId:       z.string().optional(),
   paystackRef:         z.string().optional(),
-  emergencyName:       z.string().min(2, 'Emergency contact name required'),
-  emergencyRelation:   z.string().min(2, 'Relationship required'),
-  emergencyPhone:      z.string().min(10, 'Emergency phone required'),
+  // Recommended, not required — some athletes register in a hurry and
+  // add this later; we'd rather have the entry than block on it.
+  emergencyName:       z.string().optional(),
+  emergencyRelation:   z.string().optional(),
+  emergencyPhone:      z.string().optional(),
   mediaConsent:        z.boolean().optional(),
   termsAgreed:         z.boolean().refine(v => v === true, 'You must agree to the terms and conditions'),
 });
 
 type FormData = z.infer<typeof schema>;
+type CategoryRow = { id: string; name: string; group_name: string | null; divisions: { id: string; name: string; display_order: number }[] };
 
 // ─────────────────────────────────────────────
 // REUSABLE FIELD COMPONENTS
@@ -85,7 +87,11 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 );
 
 const RequiredMark = () => <span className="text-wff-red ml-1">*</span>;
-const OptionalMark = () => <span className="text-white/25 ml-1.5 normal-case text-[9px] tracking-normal">Optional</span>;
+const OptionalMark = ({ recommended }: { recommended?: boolean } = {}) => (
+  <span className="text-white/25 ml-1.5 normal-case text-[9px] tracking-normal">
+    {recommended ? 'Optional · recommended' : 'Optional'}
+  </span>
+);
 
 const FieldError = ({ message }: { message?: string }) =>
   message ? (
@@ -95,10 +101,10 @@ const FieldError = ({ message }: { message?: string }) =>
   ) : null;
 
 const inputClass =
-  'w-full bg-white/5 border border-white/10 px-4 py-3 text-sm text-white placeholder-white/20 focus:border-wff-red/70 focus:outline-none focus:bg-white/8 focus:ring-2 focus:ring-wff-red/10 transition-all duration-200';
+  'w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/20 focus:border-wff-red/70 focus:outline-none focus:bg-white/8 focus:ring-2 focus:ring-wff-red/10 transition-all duration-200';
 
 const selectClass =
-  'w-full bg-[#0d0d0d] border border-white/10 px-4 py-3 pr-10 text-sm text-white focus:border-wff-red/70 focus:outline-none focus:ring-2 focus:ring-wff-red/10 transition-all duration-200 appearance-none cursor-pointer';
+  'w-full bg-[#0d0d0d] border border-white/10 rounded-lg px-4 py-3 pr-10 text-sm text-white focus:border-wff-red/70 focus:outline-none focus:ring-2 focus:ring-wff-red/10 transition-all duration-200 appearance-none cursor-pointer';
 
 const Select = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
   <div className="relative">
@@ -106,6 +112,97 @@ const Select = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
     <ChevronDown size={14} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/30" />
   </div>
 );
+
+// ── COMBOBOX: type-to-filter dropdown, used for country-type fields ──
+function ComboboxField({
+  label, required, value, onChange, onBlur, options, placeholder, error,
+}: {
+  label: string; required?: boolean; value: string; onChange: (v: string) => void;
+  onBlur?: () => void; options: string[]; placeholder?: string; error?: string;
+}) {
+  const [query, setQuery] = useState(value || '');
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { setQuery(value || ''); }, [value]);
+
+  useEffect(() => {
+    const onClickOutside = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setQuery(value || '');
+        onBlur?.();
+      }
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const list = q ? options.filter(o => o.toLowerCase().includes(q)) : options;
+    return list.slice(0, 8);
+  }, [query, options]);
+
+  const pick = (v: string) => {
+    onChange(v);
+    setQuery(v);
+    setOpen(false);
+  };
+
+  return (
+    <div ref={wrapRef} className="relative">
+      <Label>{label}{required && <RequiredMark />}</Label>
+      <input
+        value={query}
+        onChange={(e) => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        className={inputClass}
+        placeholder={placeholder}
+        autoComplete="off"
+      />
+      {open && filtered.length > 0 && (
+        <div className="absolute z-20 mt-1.5 w-full max-h-56 overflow-y-auto bg-[#0d0d0d] border border-white/10 rounded-lg shadow-2xl animate-in fade-in slide-in-from-top-1 duration-150">
+          {filtered.map(opt => (
+            <button
+              type="button"
+              key={opt}
+              onClick={() => pick(opt)}
+              className="w-full text-left px-4 py-2.5 text-sm text-white/70 hover:bg-wff-red/10 hover:text-white transition-colors"
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+      <FieldError message={error} />
+    </div>
+  );
+}
+
+// ── SWITCH: iOS-style toggle ──
+function Switch({ checked, onChange, label, sublabel }: {
+  checked: boolean; onChange: (v: boolean) => void; label: string; sublabel?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className="flex items-center gap-3.5 group"
+      role="switch"
+      aria-checked={checked}
+    >
+      <span className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors duration-200 ${checked ? 'bg-wff-red' : 'bg-white/15 group-hover:bg-white/25'}`}>
+        <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${checked ? 'translate-x-6' : 'translate-x-1'}`} />
+      </span>
+      <span className="text-left">
+        <span className="block text-sm text-white/80">{label}</span>
+        {sublabel && <span className="block text-xs text-white/35 mt-0.5">{sublabel}</span>}
+      </span>
+    </button>
+  );
+}
 
 // ── FILE UPLOAD: drag & drop, live preview, clear success state ──
 function formatBytes(bytes: number) {
@@ -150,12 +247,12 @@ const FileUpload = ({ label, required, accept = 'image/*', hint, file, onChange 
       {file ? (
         <div
           onClick={() => ref.current?.click()}
-          className="flex items-center gap-3 border border-wff-green/40 bg-wff-green/5 p-3.5 cursor-pointer hover:bg-wff-green/8 transition-colors animate-in fade-in zoom-in-95 duration-200"
+          className="flex items-center gap-3 border border-wff-green/40 bg-wff-green/5 rounded-lg p-3.5 cursor-pointer hover:bg-wff-green/8 transition-colors animate-in fade-in zoom-in-95 duration-200"
         >
           {preview ? (
-            <img src={preview} alt="" className="w-11 h-11 object-cover flex-shrink-0 border border-white/10" />
+            <img src={preview} alt="" className="w-11 h-11 object-cover rounded-md flex-shrink-0 border border-white/10" />
           ) : (
-            <div className="w-11 h-11 flex-shrink-0 bg-wff-green/10 border border-wff-green/30 flex items-center justify-center">
+            <div className="w-11 h-11 flex-shrink-0 bg-wff-green/10 border border-wff-green/30 rounded-md flex items-center justify-center">
               <FileText size={16} className="text-wff-green" />
             </div>
           )}
@@ -181,7 +278,7 @@ const FileUpload = ({ label, required, accept = 'image/*', hint, file, onChange 
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
-          className={`relative border border-dashed p-5 text-center cursor-pointer transition-all duration-200 group ${
+          className={`relative border border-dashed rounded-lg p-5 text-center cursor-pointer transition-all duration-200 group ${
             isDragging
               ? 'border-wff-red bg-wff-red/8 scale-[1.01]'
               : 'border-white/15 hover:border-wff-red/50 hover:bg-white/3'
@@ -211,7 +308,7 @@ const CheckboxField = ({ id, checked, onChange, label, sublabel, error }: Checkb
   <div>
     <label htmlFor={id} className="flex items-start gap-3 cursor-pointer group">
       <div
-        className={`mt-0.5 w-5 h-5 flex-shrink-0 border flex items-center justify-center transition-all duration-200 ${
+        className={`mt-0.5 w-5 h-5 flex-shrink-0 rounded-md border flex items-center justify-center transition-all duration-200 ${
           checked ? 'bg-wff-red border-wff-red' : 'border-white/20 group-hover:border-wff-red/50'
         }`}
         onClick={() => onChange(!checked)}
@@ -236,7 +333,7 @@ const SectionHeading = ({ children }: { children: React.ReactNode }) => (
 const RadioGroup = ({
   label, name, options, value, onChange, required, error
 }: {
-  label: string; name: string; options: { value: string; label: string; sublabel?: string }[];
+  label: string; name: string; options: { value: string; label: string }[];
   value: string; onChange: (v: string) => void; required?: boolean; error?: string;
 }) => (
   <div>
@@ -247,7 +344,7 @@ const RadioGroup = ({
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
-          className={`px-4 py-2.5 text-xs font-sans border transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] ${
+          className={`px-4 py-2.5 text-xs font-sans border rounded-lg transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] ${
             value === opt.value
               ? 'bg-wff-red border-wff-red text-white shadow-[0_0_0_3px_rgba(206,17,38,0.15)]'
               : 'border-white/15 text-white/50 hover:border-wff-red/40 hover:text-white'
@@ -266,9 +363,12 @@ const RadioGroup = ({
 // ─────────────────────────────────────────────
 
 // ── STEP 1: PERSONAL INFORMATION ──
-function Step1({ register, errors }: {
+function Step1({ register, errors, watch, setValue, trigger }: {
   register: ReturnType<typeof useForm<FormData>>['register'];
   errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
+  watch: ReturnType<typeof useForm<FormData>>['watch'];
+  setValue: ReturnType<typeof useForm<FormData>>['setValue'];
+  trigger: ReturnType<typeof useForm<FormData>>['trigger'];
 }) {
   return (
     <div className="space-y-0">
@@ -305,19 +405,27 @@ function Step1({ register, errors }: {
           />
           <FieldError message={errors.dob?.message} />
         </div>
-        <div>
-          <Label>Nationality <RequiredMark /></Label>
-          <input {...register('nationality')} className={inputClass} placeholder="Ghanaian" />
-          <FieldError message={errors.nationality?.message} />
-        </div>
+        <ComboboxField
+          label="Nationality" required
+          value={watch('nationality') || ''}
+          onChange={v => setValue('nationality', v, { shouldValidate: true })}
+          onBlur={() => trigger('nationality')}
+          options={COUNTRIES}
+          placeholder="Ghanaian"
+          error={errors.nationality?.message}
+        />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
-        <div>
-          <Label>Country Representing <RequiredMark /></Label>
-          <input {...register('countryRepresenting')} className={inputClass} placeholder="Ghana" />
-          <FieldError message={errors.countryRepresenting?.message} />
-        </div>
+        <ComboboxField
+          label="Country Representing" required
+          value={watch('countryRepresenting') || ''}
+          onChange={v => setValue('countryRepresenting', v, { shouldValidate: true })}
+          onBlur={() => trigger('countryRepresenting')}
+          options={COUNTRIES}
+          placeholder="Ghana"
+          error={errors.countryRepresenting?.message}
+        />
         <div>
           <Label>Passport Number <OptionalMark /></Label>
           <input {...register('passportNumber')} className={inputClass} placeholder="G12345678" />
@@ -350,143 +458,120 @@ function Step1({ register, errors }: {
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
-        <div>
-          <Label>Country <RequiredMark /></Label>
-          <input {...register('country')} className={inputClass} placeholder="Ghana" />
-          <FieldError message={errors.country?.message} />
-        </div>
+        <ComboboxField
+          label="Country" required
+          value={watch('country') || ''}
+          onChange={v => setValue('country', v, { shouldValidate: true })}
+          onBlur={() => trigger('country')}
+          options={COUNTRIES}
+          placeholder="Ghana"
+          error={errors.country?.message}
+        />
       </div>
     </div>
   );
 }
 
-// ── STEP 2: COMPETITION + TEAM/CLUB (conditional) ──
-function Step2({ register, errors, watch, setValue }: {
+// ── STEP 2: COMPETITION + TEAM/CLUB (toggle-revealed) ──
+function Step2({ register, errors, watch, setValue, trigger, categories, categoriesLoading }: {
   register: ReturnType<typeof useForm<FormData>>['register'];
   errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
   watch: ReturnType<typeof useForm<FormData>>['watch'];
   setValue: ReturnType<typeof useForm<FormData>>['setValue'];
+  trigger: ReturnType<typeof useForm<FormData>>['trigger'];
+  categories: CategoryRow[];
+  categoriesLoading: boolean;
 }) {
-  const athleteType = watch('athleteType') || '';
+  const athleteType = watch('athleteType') || 'individual';
   const category    = watch('category') || '';
   const division    = watch('division') || '';
-  const weightClass = watch('weightClass') || '';
+  const isTeamAthlete = athleteType === 'club' || athleteType === 'national';
 
-  const CATEGORIES: Record<string, { label: string; value: string }[]> = {
-    men: [
-      { value: 'mens-bodybuilding', label: "Men's Bodybuilding" },
-      { value: 'mens-physique',     label: "Men's Physique" },
-      { value: 'classic-physique',  label: 'Classic Physique' },
-    ],
-    women: [
-      { value: 'womens-bikini',   label: "Women's Bikini" },
-      { value: 'womens-fitness',  label: "Women's Fitness" },
-      { value: 'womens-figure',   label: "Women's Figure" },
-    ],
-  };
+  const groups = useMemo(() => {
+    const byGroup = new Map<string, CategoryRow[]>();
+    for (const c of categories) {
+      const g = c.group_name || 'Categories';
+      if (!byGroup.has(g)) byGroup.set(g, []);
+      byGroup.get(g)!.push(c);
+    }
+    return Array.from(byGroup.entries());
+  }, [categories]);
 
-  const isBodybuilding = ['mens-bodybuilding', 'classic-physique'].includes(category);
-  const isPhysique     = ['mens-physique', 'womens-bikini', 'womens-fitness', 'womens-figure'].includes(category);
-  const needsTeamInfo   = athleteType === 'club' || athleteType === 'national';
+  const selectedCategory = categories.find(c => c.name === category);
 
   return (
     <div>
       <SectionHeading>Athlete Type</SectionHeading>
-      <RadioGroup
-        label="I am competing as"
-        name="athleteType"
-        required
-        value={athleteType}
-        onChange={v => setValue('athleteType', v, { shouldValidate: true })}
-        error={errors.athleteType?.message}
-        options={[
-          { value: 'individual', label: 'Individual Athlete' },
-          { value: 'club',       label: 'Club Athlete' },
-          { value: 'national',   label: 'National Team Athlete' },
-        ]}
+      <Switch
+        checked={isTeamAthlete}
+        onChange={(on) => setValue('athleteType', on ? 'club' : 'individual', { shouldValidate: true })}
+        label="Registering with a team or club?"
+        sublabel="Leave this off if you're competing as an individual."
       />
-
-      <SectionHeading>Category</SectionHeading>
-      <div className="mb-5">
-        <Label>Men&apos;s Categories</Label>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {CATEGORIES.men.map(c => (
-            <button
-              key={c.value} type="button"
-              onClick={() => setValue('category', c.value, { shouldValidate: true })}
-              className={`px-4 py-2.5 text-xs font-sans border transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] ${
-                category === c.value
-                  ? 'bg-wff-red border-wff-red text-white shadow-[0_0_0_3px_rgba(206,17,38,0.15)]'
-                  : 'border-white/15 text-white/50 hover:border-wff-red/40 hover:text-white'
-              }`}
-            >{c.label}</button>
-          ))}
-        </div>
-        <Label>Women&apos;s Categories</Label>
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.women.map(c => (
-            <button
-              key={c.value} type="button"
-              onClick={() => setValue('category', c.value, { shouldValidate: true })}
-              className={`px-4 py-2.5 text-xs font-sans border transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] ${
-                category === c.value
-                  ? 'bg-wff-red border-wff-red text-white shadow-[0_0_0_3px_rgba(206,17,38,0.15)]'
-                  : 'border-white/15 text-white/50 hover:border-wff-red/40 hover:text-white'
-              }`}
-            >{c.label}</button>
-          ))}
-        </div>
-        <FieldError message={errors.category?.message} />
-      </div>
-
-      <SectionHeading>Division</SectionHeading>
-      <RadioGroup
-        label="Division"
-        name="division"
-        required
-        value={division}
-        onChange={v => setValue('division', v, { shouldValidate: true })}
-        error={errors.division?.message}
-        options={[
-          { value: 'junior',  label: 'Junior (Under 23)' },
-          { value: 'senior',  label: 'Senior' },
-          { value: 'masters', label: 'Masters (40+)' },
-        ]}
-      />
-
-      {isBodybuilding && (
-        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-          <SectionHeading>Weight Class</SectionHeading>
+      {isTeamAthlete && (
+        <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
           <RadioGroup
-            label="Select your weight class"
-            name="weightClass"
-            value={weightClass}
-            onChange={v => setValue('weightClass', v, { shouldValidate: true })}
+            label="Which one?"
+            name="athleteType"
+            value={athleteType}
+            onChange={v => setValue('athleteType', v, { shouldValidate: true })}
             options={[
-              { value: 'u70',  label: 'Up to 70kg' },
-              { value: '70-80', label: '70 – 80kg' },
-              { value: '80-90', label: '80 – 90kg' },
-              { value: '90+',  label: '90kg+' },
+              { value: 'club',     label: 'Club Athlete' },
+              { value: 'national', label: 'National Team Athlete' },
             ]}
           />
         </div>
       )}
 
-      {isPhysique && (
-        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-          <SectionHeading>Height Class</SectionHeading>
-          <div>
-            <Label>Height Class</Label>
-            <input
-              {...register('heightClass')}
-              className={inputClass}
-              placeholder="e.g. Under 175cm"
-            />
-          </div>
+      <SectionHeading>Category</SectionHeading>
+      {categoriesLoading ? (
+        <p className="text-sm text-white/30">Loading categories…</p>
+      ) : (
+        <div className="mb-5">
+          {groups.map(([groupName, cats]) => (
+            <div key={groupName} className="mb-4 last:mb-0">
+              <Label>{groupName}</Label>
+              <div className="flex flex-wrap gap-2">
+                {cats.map(c => (
+                  <button
+                    key={c.id} type="button"
+                    onClick={() => {
+                      setValue('category', c.name, { shouldValidate: true });
+                      setValue('division', '', { shouldValidate: false });
+                    }}
+                    className={`px-4 py-2.5 text-xs font-sans border rounded-lg transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] ${
+                      category === c.name
+                        ? 'bg-wff-red border-wff-red text-white shadow-[0_0_0_3px_rgba(206,17,38,0.15)]'
+                        : 'border-white/15 text-white/50 hover:border-wff-red/40 hover:text-white'
+                    }`}
+                  >{c.name}</button>
+                ))}
+              </div>
+            </div>
+          ))}
+          <FieldError message={errors.category?.message} />
         </div>
       )}
 
-      {needsTeamInfo && (
+      {selectedCategory && (
+        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+          <SectionHeading>Division</SectionHeading>
+          <RadioGroup
+            label={`Division within ${selectedCategory.name}`}
+            name="division"
+            required
+            value={division}
+            onChange={v => setValue('division', v, { shouldValidate: true })}
+            error={errors.division?.message}
+            options={selectedCategory.divisions
+              .slice()
+              .sort((a, b) => a.display_order - b.display_order)
+              .map(d => ({ value: d.name, label: d.name }))}
+          />
+        </div>
+      )}
+
+      {isTeamAthlete && (
         <div className="animate-in fade-in slide-in-from-top-2 duration-300">
           <SectionHeading>Team & Club</SectionHeading>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -500,10 +585,14 @@ function Step2({ register, errors, watch, setValue }: {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div>
-              <Label>Team / Club Country</Label>
-              <input {...register('teamCountry')} className={inputClass} placeholder="Ghana" />
-            </div>
+            <ComboboxField
+              label="Team / Club Country"
+              value={watch('teamCountry') || ''}
+              onChange={v => setValue('teamCountry', v)}
+              onBlur={() => trigger('teamCountry')}
+              options={COUNTRIES}
+              placeholder="Ghana"
+            />
             <div>
               <Label>Federation Affiliation</Label>
               <input {...register('federationAffiliation')} className={inputClass} placeholder="WFF Ghana" />
@@ -572,7 +661,7 @@ function Step3({ watch, setValue, errors, files, onFileChange }: {
       </div>
 
       <SectionHeading>Medical Declarations</SectionHeading>
-      <div className="space-y-4 p-5 border border-white/8 bg-white/2">
+      <div className="space-y-4 p-5 border border-white/8 rounded-xl bg-white/2">
         <CheckboxField
           id="medicalDeclaration"
           checked={medicalDeclaration}
@@ -595,13 +684,14 @@ function Step3({ watch, setValue, errors, files, onFileChange }: {
 }
 
 // ── STEP 4: PAYMENT & FINAL ──
-function Step4({ register, errors, watch, setValue, files, onFileChange }: {
+function Step4({ register, errors, watch, setValue, files, onFileChange, fee }: {
   register: ReturnType<typeof useForm<FormData>>['register'];
   errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
   watch: ReturnType<typeof useForm<FormData>>['watch'];
   setValue: ReturnType<typeof useForm<FormData>>['setValue'];
   files: Record<string, File | null>;
   onFileChange: (key: string, file: File | null) => void;
+  fee: { ghs: number; usd: number };
 }) {
   const feePaid = watch('feePaid') || '';
 
@@ -609,10 +699,12 @@ function Step4({ register, errors, watch, setValue, files, onFileChange }: {
     <div>
       <SectionHeading>Registration Fee</SectionHeading>
 
-      <div className="p-5 border border-wff-gold/20 bg-wff-gold/5 mb-6 flex items-start gap-3">
+      <div className="p-5 border border-wff-gold/20 bg-wff-gold/5 rounded-xl mb-6 flex items-start gap-3">
         <CreditCard size={20} className="text-wff-gold mt-0.5 flex-shrink-0" />
         <div>
-          <p className="text-sm font-bebas tracking-wider text-wff-gold text-lg leading-none">Registration Fee: ₵ 500.00 / $45 USD</p>
+          <p className="text-sm font-bebas tracking-wider text-wff-gold text-lg leading-none">
+            Registration Fee: ₵ {fee.ghs.toFixed(2)} / ${fee.usd} USD
+          </p>
           <p className="text-xs text-white/40 mt-1">Fee covers registration, competition bib, and entry into all judging rounds for your selected category.</p>
         </div>
       </div>
@@ -632,7 +724,7 @@ function Step4({ register, errors, watch, setValue, files, onFileChange }: {
       />
 
       {feePaid === 'paystack' && (
-        <div className="mt-6 flex gap-3 items-start bg-wff-gold/5 border border-wff-gold/20 p-5 animate-in fade-in slide-in-from-top-2 duration-300">
+        <div className="mt-6 flex gap-3 items-start bg-wff-gold/5 border border-wff-gold/20 rounded-xl p-5 animate-in fade-in slide-in-from-top-2 duration-300">
           <Lock size={18} className="text-wff-gold mt-0.5 flex-shrink-0" />
           <p className="text-xs text-white/60 leading-relaxed">
             When you submit this form you will be taken to <span className="text-white font-bold">Paystack</span> to
@@ -645,7 +737,7 @@ function Step4({ register, errors, watch, setValue, files, onFileChange }: {
 
       {feePaid === 'offline' && (
         <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="flex gap-3 items-start bg-white/[0.03] border border-white/10 p-5">
+          <div className="flex gap-3 items-start bg-white/[0.03] border border-white/10 rounded-xl p-5">
             <CreditCard size={18} className="text-white/40 mt-0.5 flex-shrink-0" />
             <p className="text-xs text-white/60 leading-relaxed">
               Transfer the entry fee to the federation account, then upload your receipt below.
@@ -672,7 +764,7 @@ function Step4({ register, errors, watch, setValue, files, onFileChange }: {
       )}
 
       {feePaid === 'onsite' && (
-        <div className="mt-6 flex gap-3 items-start bg-wff-green/5 border border-wff-green/20 p-5 animate-in fade-in slide-in-from-top-2 duration-300">
+        <div className="mt-6 flex gap-3 items-start bg-wff-green/5 border border-wff-green/20 rounded-xl p-5 animate-in fade-in slide-in-from-top-2 duration-300">
           <Plane size={18} className="text-wff-green mt-0.5 flex-shrink-0" />
           <p className="text-xs text-white/60 leading-relaxed">
             No payment needed right now. Complete registration today and settle the entry fee
@@ -683,26 +775,27 @@ function Step4({ register, errors, watch, setValue, files, onFileChange }: {
       )}
 
       <SectionHeading>Emergency Contact</SectionHeading>
+      <p className="text-sm text-white/40 -mt-3 mb-5">Not required, but it helps us reach someone for you if needed.</p>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-0">
         <div>
-          <Label>Full Name <RequiredMark /></Label>
+          <Label>Full Name <OptionalMark recommended /></Label>
           <input {...register('emergencyName')} className={inputClass} placeholder="Jane Mensah" />
           <FieldError message={errors.emergencyName?.message} />
         </div>
         <div>
-          <Label>Relationship <RequiredMark /></Label>
+          <Label>Relationship <OptionalMark recommended /></Label>
           <input {...register('emergencyRelation')} className={inputClass} placeholder="Spouse / Parent / Sibling" />
           <FieldError message={errors.emergencyRelation?.message} />
         </div>
         <div>
-          <Label>Phone Number <RequiredMark /></Label>
+          <Label>Phone Number <OptionalMark recommended /></Label>
           <input {...register('emergencyPhone')} className={inputClass} placeholder="+233 24 000 0000" />
           <FieldError message={errors.emergencyPhone?.message} />
         </div>
       </div>
 
       <SectionHeading>Consents & Agreements</SectionHeading>
-      <div className="space-y-4 p-5 border border-white/8 bg-white/2">
+      <div className="space-y-4 p-5 border border-white/8 rounded-xl bg-white/2">
         <CheckboxField
           id="mediaConsent"
           checked={watch('mediaConsent') || false}
@@ -730,7 +823,7 @@ const STEP_FIELDS: Record<number, (keyof FormData)[]> = {
   1: ['firstName', 'lastName', 'gender', 'dob', 'nationality', 'countryRepresenting', 'email', 'mobile', 'address', 'city', 'country'],
   2: ['athleteType', 'category', 'division'],
   3: ['medicalDeclaration', 'fitnessDeclaration'],
-  4: ['feePaid', 'emergencyName', 'emergencyRelation', 'emergencyPhone', 'termsAgreed'],
+  4: ['feePaid', 'termsAgreed'],
 };
 
 // ─────────────────────────────────────────────
@@ -741,7 +834,33 @@ export default function Registration() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState<Record<string, File | null>>({});
+  const [categories, setCategories] = useState<CategoryRow[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [fee, setFee] = useState({ ghs: 500, usd: 45 });
+  const [successName, setSuccessName] = useState('');
+  const [successMeta, setSuccessMeta] = useState<{ category: string; division: string; country: string }>({ category: '', division: '', country: '' });
   const topRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    supabase
+      .from('categories')
+      .select('id,name,group_name,divisions(id,name,display_order)')
+      .order('display_order')
+      .then(({ data }) => {
+        if (data) setCategories(data as unknown as CategoryRow[]);
+        setCategoriesLoading(false);
+      });
+
+    supabase
+      .from('site_content')
+      .select('value')
+      .eq('key', 'registration_fee')
+      .maybeSingle()
+      .then(({ data }) => {
+        const v = data?.value as { ghs?: number; usd?: number } | undefined;
+        if (v?.ghs && v?.usd) setFee({ ghs: v.ghs, usd: v.usd });
+      });
+  }, []);
 
   const onFileChange = (key: string, file: File | null) => setFiles(prev => ({ ...prev, [key]: file }));
 
@@ -749,14 +868,16 @@ export default function Registration() {
     useForm<FormData>({
       resolver: zodResolver(schema),
       mode: 'onBlur',
-      // These fields are only ever set via setValue (button/checkbox
-      // controls, never a registered input), so without an explicit
-      // default they start as `undefined`. Zod then raises a generic
-      // "invalid type" error instead of running our .min()/.refine()
-      // message, so the athlete sees "Invalid input" instead of real
-      // guidance the first time they hit Submit.
+      // These fields are only ever set via setValue (button/switch/
+      // checkbox/combobox controls, never a registered input), so
+      // without an explicit default they start as `undefined`. Zod
+      // then raises a generic "invalid type" error instead of running
+      // our .min()/.refine() message, so the athlete would see
+      // "Invalid input" instead of real guidance the first time they
+      // hit Submit.
       defaultValues: {
-        athleteType: '', category: '', division: '', weightClass: '', heightClass: '',
+        athleteType: 'individual', category: '', division: '',
+        nationality: '', countryRepresenting: '', country: '', teamCountry: '',
         medicalDeclaration: false, fitnessDeclaration: false,
         feePaid: '', mediaConsent: false, termsAgreed: false,
       },
@@ -798,6 +919,10 @@ export default function Registration() {
       const fullBodyUrl = await uploadFile(files.fullBody);
       const paymentScreenshotUrl = await uploadFile(files.paymentScreenshot);
 
+      const divisionRow = categories
+        .find(c => c.name === data.category)
+        ?.divisions.find(d => d.name === data.division);
+
       const { data: inserted, error } = await supabase.from('registrations').insert({
         first_name: data.firstName,
         last_name: data.lastName,
@@ -817,8 +942,9 @@ export default function Registration() {
         athlete_type: data.athleteType,
         category: data.category,
         division: data.division,
-        weight_class: data.weightClass || null,
-        height_class: data.heightClass || null,
+        division_id: divisionRow?.id || null,
+        weight_class: null,
+        height_class: null,
         team_name: data.teamName || null,
         club_name: data.clubName || null,
         team_country: data.teamCountry || null,
@@ -843,9 +969,9 @@ export default function Registration() {
         transaction_id: data.transactionId || null,
         paystack_ref: data.paystackRef || null,
         payment_screenshot_url: paymentScreenshotUrl,
-        emergency_name: data.emergencyName,
-        emergency_relation: data.emergencyRelation,
-        emergency_phone: data.emergencyPhone,
+        emergency_name: data.emergencyName || null,
+        emergency_relation: data.emergencyRelation || null,
+        emergency_phone: data.emergencyPhone || null,
         instagram: null,
         facebook: null,
         tiktok: null,
@@ -879,6 +1005,8 @@ export default function Registration() {
         return;
       }
 
+      setSuccessName(`${data.firstName} ${data.lastName}`.trim());
+      setSuccessMeta({ category: data.category, division: data.division, country: data.countryRepresenting });
       setIsSubmitting(false);
       setIsSuccess(true);
       const duration = 4000;
@@ -905,39 +1033,57 @@ export default function Registration() {
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-wff-gold/3 blur-[150px] rounded-full pointer-events-none" />
 
       <div className="container mx-auto px-6 relative z-10">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <p className="font-sans text-[10px] uppercase tracking-[0.3em] text-wff-red mb-4">2026 All Africa Championship</p>
-          <h2 className="font-bebas text-6xl md:text-8xl mb-4 leading-none">
-            ATHLETE <span className="text-wff-red">REGISTRATION</span>
-          </h2>
-          <p className="font-sans text-white/50 text-base max-w-xl mx-auto">
-            Four short steps. Most athletes finish in under five minutes.
-          </p>
-        </div>
-
         {isSuccess ? (
-          // ── SUCCESS STATE ──
-          <div className="max-w-2xl mx-auto border border-white/10 p-12 text-center bg-[#0a0a0a] animate-in fade-in zoom-in-95 duration-500">
-            <div className="w-20 h-20 rounded-full bg-wff-red/10 border border-wff-red/30 flex items-center justify-center mx-auto mb-8">
-              <CheckCircle size={40} className="text-wff-red" />
+          // ── SUCCESS STATE: personalized, ego-boosting ──
+          <div className="max-w-2xl mx-auto border border-wff-gold/30 rounded-2xl p-12 text-center bg-gradient-to-b from-[#120d02] to-[#0a0a0a] animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-wff-red via-wff-gold to-wff-green" />
+            <div className="w-20 h-20 rounded-full bg-wff-gold/10 border border-wff-gold/40 flex items-center justify-center mx-auto mb-8">
+              <Medal size={40} className="text-wff-gold" />
             </div>
-            <h3 className="font-bebas text-5xl mb-3">REGISTRATION RECEIVED</h3>
-            <p className="font-sans text-white/50 mb-2 text-sm">Welcome to the 2026 WFF All Africa Championship.</p>
+            <p className="font-sans text-[10px] uppercase tracking-[0.3em] text-wff-gold mb-3 flex items-center justify-center gap-2">
+              <Sparkles size={12} /> Welcome to the roster <Sparkles size={12} />
+            </p>
+            <h3 className="font-bebas text-3xl sm:text-4xl mb-2 text-white/60 tracking-wide">
+              YOU&apos;RE IN,
+            </h3>
+            <h2 className="font-bebas text-6xl sm:text-7xl mb-6 leading-none text-wff-gold break-words">
+              {successName || 'ATHLETE'}
+            </h2>
+            {(successMeta.category || successMeta.country) && (
+              <p className="font-sans text-white/50 text-sm mb-8">
+                {successMeta.category && <>Competing in <span className="text-white font-bold">{successMeta.category}</span></>}
+                {successMeta.division && <> · <span className="text-white/70">{successMeta.division}</span></>}
+                {successMeta.country && <> · Representing <span className="text-white font-bold">{successMeta.country}</span></>}
+              </p>
+            )}
             <p className="font-sans text-white/40 text-sm max-w-sm mx-auto mb-10">
-              Our team will review your submission and contact you within 48 hours with your registration status and next steps.
+              You just took the step most people only talk about. Our team will review your
+              submission and reach out within 48 hours with your status and next steps.
+              See you on stage.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={() => { setIsSuccess(false); reset(); setFiles({}); setCurrentStep(1); scrollToTop(); }}
-                className="bg-wff-red text-white font-bebas text-xl px-10 py-3 hover:bg-white hover:text-wff-red transition-colors"
+                className="bg-wff-red text-white font-bebas text-xl px-10 py-3 rounded-lg hover:bg-white hover:text-wff-red transition-colors"
               >
                 Register Another Athlete
               </button>
             </div>
           </div>
         ) : (
-          <div className="max-w-4xl mx-auto">
+          <>
+            {/* Header */}
+            <div className="text-center mb-16">
+              <p className="font-sans text-[10px] uppercase tracking-[0.3em] text-wff-red mb-4">2026 All Africa Championship</p>
+              <h2 className="font-bebas text-6xl md:text-8xl mb-4 leading-none">
+                ATHLETE <span className="text-wff-red">REGISTRATION</span>
+              </h2>
+              <p className="font-sans text-white/50 text-base max-w-xl mx-auto">
+                Four short steps. Most athletes finish in under five minutes.
+              </p>
+            </div>
+
+            <div className="max-w-4xl mx-auto">
             {/* ── STEP NAVIGATION ── */}
             <div className="mb-10">
               {/* Desktop stepper */}
@@ -955,7 +1101,7 @@ export default function Registration() {
                           active ? 'opacity-100' : done ? 'opacity-80 hover:opacity-100' : 'opacity-30 hover:opacity-50'
                         }`}
                       >
-                        <div className={`w-10 h-10 border flex items-center justify-center transition-all duration-200 ${
+                        <div className={`w-10 h-10 rounded-lg border flex items-center justify-center transition-all duration-200 ${
                           done    ? 'bg-wff-red border-wff-red' :
                           active  ? 'border-wff-red bg-wff-red/10 shadow-[0_0_0_4px_rgba(206,17,38,0.1)]' :
                                     'border-white/20 bg-white/3'
@@ -992,7 +1138,7 @@ export default function Registration() {
                     <div
                       key={step.id}
                       onClick={() => goToStep(step.id)}
-                      className={`w-8 h-8 border flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                      className={`w-8 h-8 rounded-lg border flex items-center justify-center cursor-pointer transition-all duration-200 ${
                         done    ? 'bg-wff-red border-wff-red' :
                         active  ? 'border-wff-red bg-wff-red/10' :
                                   'border-white/15 bg-white/3'
@@ -1021,12 +1167,12 @@ export default function Registration() {
 
             {/* ── FORM PANEL ── */}
             <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="bg-[#0a0a0a] border border-white/8 p-8 md:p-12 min-h-[500px] overflow-hidden">
+              <div className="bg-[#0a0a0a] border border-white/8 rounded-2xl p-8 md:p-12 min-h-[500px] overflow-hidden">
                 <div key={currentStep} className="animate-in fade-in slide-in-from-right-3 duration-300">
-                  {currentStep === 1 && <Step1 register={register} errors={errors} />}
-                  {currentStep === 2 && <Step2 register={register} errors={errors} watch={watch} setValue={setValue} />}
+                  {currentStep === 1 && <Step1 register={register} errors={errors} watch={watch} setValue={setValue} trigger={trigger} />}
+                  {currentStep === 2 && <Step2 register={register} errors={errors} watch={watch} setValue={setValue} trigger={trigger} categories={categories} categoriesLoading={categoriesLoading} />}
                   {currentStep === 3 && <Step3 errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} />}
-                  {currentStep === 4 && <Step4 register={register} errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} />}
+                  {currentStep === 4 && <Step4 register={register} errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} fee={fee} />}
                 </div>
               </div>
 
@@ -1058,7 +1204,7 @@ export default function Registration() {
                   <button
                     type="button"
                     onClick={() => goToStep(currentStep + 1)}
-                    className="flex items-center gap-2 font-bebas text-xl bg-wff-red text-white px-8 py-3 hover:bg-white hover:text-wff-red transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                    className="flex items-center gap-2 font-bebas text-xl bg-wff-red text-white px-8 py-3 rounded-lg hover:bg-white hover:text-wff-red transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                   >
                     Next <ChevronRight size={18} />
                   </button>
@@ -1066,7 +1212,7 @@ export default function Registration() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex items-center gap-2 font-bebas text-xl bg-wff-red text-white px-8 py-3 hover:bg-wff-gold hover:text-wff-dark transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
+                    className="flex items-center gap-2 font-bebas text-xl bg-wff-red text-white px-8 py-3 rounded-lg hover:bg-wff-gold hover:text-wff-dark transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
                   >
                     {isSubmitting ? (
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -1077,7 +1223,8 @@ export default function Registration() {
                 )}
               </div>
             </form>
-          </div>
+            </div>
+          </>
         )}
       </div>
     </section>

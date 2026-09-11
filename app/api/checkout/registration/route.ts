@@ -35,10 +35,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'This entry fee has already been paid.' }, { status: 409 });
     }
 
-    const fee = Number(process.env.NEXT_PUBLIC_REGISTRATION_FEE || 0);
+    // The fee is admin-editable from /admin/settings (site_content,
+    // key 'registration_fee') so it can change without a redeploy.
+    // NEXT_PUBLIC_REGISTRATION_FEE is a last-resort fallback for an
+    // environment where that row hasn't been seeded yet.
+    const { data: feeRow } = await admin
+      .from('site_content')
+      .select('value')
+      .eq('key', 'registration_fee')
+      .maybeSingle();
+    const fee = Number(
+      (feeRow?.value as { ghs?: number } | null)?.ghs || process.env.NEXT_PUBLIC_REGISTRATION_FEE || 0,
+    );
     if (!fee || fee <= 0) {
       return NextResponse.json(
-        { error: 'Registration fee is not configured. Set NEXT_PUBLIC_REGISTRATION_FEE.' },
+        { error: 'Registration fee is not configured. Set it from /admin/settings.' },
         { status: 500 },
       );
     }

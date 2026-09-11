@@ -5,17 +5,52 @@ import { supabase } from "@/lib/supabase";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Eye, CheckCircle, XCircle, BadgeCent, RefreshCw } from "lucide-react";
+import { Eye, CheckCircle, XCircle, BadgeCent, RefreshCw, FileWarning } from "lucide-react";
 
 const DOCUMENTS: { key: string; label: string }[] = [
-  { key: "passport_url", label: "Passport Scan" },
-  { key: "national_id_url", label: "National ID" },
-  { key: "headshot_url", label: "Headshot" },
+  { key: "headshot_url", label: "Athlete Photo" },
+  { key: "passport_url", label: "Passport / ID Copy" },
   { key: "full_body_url", label: "Full Body Photo" },
+  { key: "payment_screenshot_url", label: "Payment Receipt" },
+  { key: "national_id_url", label: "National ID" },
   { key: "certs_url", label: "Certificates" },
   { key: "audio_track_url", label: "Posing Track" },
-  { key: "payment_screenshot_url", label: "Payment Receipt" },
 ];
+
+/**
+ * Renders the signed URL as an image thumbnail (every document we
+ * actually collect today is a photo). Falls back to an "open file"
+ * link for anything that isn't renderable as an <img> — a PDF passport
+ * scan, or a document type from before the form was simplified.
+ */
+function DocumentPreview({ label, url }: { label: string; url: string }) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noreferrer"
+        className="flex flex-col items-center justify-center gap-1.5 aspect-square bg-black/40 border border-white/10 rounded-lg text-white/40 hover:text-wff-gold hover:border-wff-gold/30 transition-colors p-2 text-center"
+      >
+        <FileWarning className="h-5 w-5" />
+        <span className="text-[10px] leading-tight">Open file</span>
+      </a>
+    );
+  }
+
+  return (
+    <a href={url} target="_blank" rel="noreferrer" className="block group">
+      <img
+        src={url}
+        alt={label}
+        onError={() => setFailed(true)}
+        className="aspect-square w-full object-cover rounded-lg border border-white/10 group-hover:border-wff-gold/40 transition-colors bg-black/40"
+      />
+    </a>
+  );
+}
 
 const STATUS_FILTERS = ["all", "pending", "approved", "rejected"] as const;
 
@@ -308,29 +343,23 @@ export default function AdminRegistrationsPage() {
 
               <div className="bg-black/50 p-4 border border-white/5 rounded-lg space-y-3">
                 <span className="block text-[10px] uppercase tracking-widest text-white/40 font-bold border-b border-white/5 pb-2">
-                  Documents
+                  Documents · expires 5 min after opening this dossier
                 </span>
-                {DOCUMENTS.map(({ key, label }) => (
-                  <div key={key} className="flex justify-between items-center text-xs">
-                    <span>{label}</span>
-                    {selectedReg[key] ? (
-                      signedUrls[key] ? (
-                        <a
-                          href={signedUrls[key]}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-wff-gold hover:underline"
-                        >
-                          Open (expires in 5 min)
-                        </a>
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                  {DOCUMENTS.filter(({ key }) => selectedReg[key]).map(({ key, label }) => (
+                    <div key={key} className="space-y-1.5">
+                      {signedUrls[key] ? (
+                        <DocumentPreview label={label} url={signedUrls[key]} />
                       ) : (
-                        <span className="text-white/30">Generating link…</span>
-                      )
-                    ) : (
-                      <span className="text-white/30">Not provided</span>
-                    )}
-                  </div>
-                ))}
+                        <div className="aspect-square bg-black/40 border border-white/10 rounded-lg animate-pulse" />
+                      )}
+                      <span className="block text-[10px] text-white/40 text-center truncate">{label}</span>
+                    </div>
+                  ))}
+                </div>
+                {DOCUMENTS.every(({ key }) => !selectedReg[key]) && (
+                  <p className="text-xs text-white/30">No documents submitted.</p>
+                )}
               </div>
 
               <div className="flex gap-4 pt-2">

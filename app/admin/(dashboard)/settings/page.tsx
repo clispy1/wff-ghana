@@ -3,12 +3,20 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShieldCheck, KeyRound, Webhook, Database } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ShieldCheck, KeyRound, Webhook, Database, Wallet, Check } from "lucide-react";
 
 export default function AdminSettingsPage() {
   const [account, setAccount] = useState<{ email?: string; role?: string; id?: string } | null>(
     null,
   );
+
+  const [feeGhs, setFeeGhs] = useState("");
+  const [feeUsd, setFeeUsd] = useState("");
+  const [feeLoading, setFeeLoading] = useState(true);
+  const [feeSaving, setFeeSaving] = useState(false);
+  const [feeSaved, setFeeSaved] = useState(false);
+  const [feeError, setFeeError] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -26,7 +34,41 @@ export default function AdminSettingsPage() {
       setAccount({ email: user.email, role: adminRow?.role, id: user.id });
     };
     load();
+
+    const loadFee = async () => {
+      const { data } = await supabase
+        .from("site_content")
+        .select("value")
+        .eq("key", "registration_fee")
+        .maybeSingle();
+      const value = data?.value as { ghs?: number; usd?: number } | undefined;
+      setFeeGhs(String(value?.ghs ?? 500));
+      setFeeUsd(String(value?.usd ?? 45));
+      setFeeLoading(false);
+    };
+    loadFee();
   }, []);
+
+  const saveFee = async () => {
+    const ghs = Number(feeGhs);
+    const usd = Number(feeUsd);
+    if (!Number.isFinite(ghs) || ghs < 0 || !Number.isFinite(usd) || usd < 0) {
+      setFeeError("Enter valid non-negative amounts for both currencies.");
+      return;
+    }
+    setFeeError(null);
+    setFeeSaving(true);
+    const { error } = await supabase
+      .from("site_content")
+      .upsert({ key: "registration_fee", value: { ghs, usd } }, { onConflict: "key" });
+    setFeeSaving(false);
+    if (error) {
+      setFeeError(error.message);
+      return;
+    }
+    setFeeSaved(true);
+    setTimeout(() => setFeeSaved(false), 2000);
+  };
 
   return (
     <div className="space-y-6">
@@ -36,6 +78,67 @@ export default function AdminSettingsPage() {
           Account details and the configuration this dashboard depends on.
         </p>
       </div>
+
+      <Card className="bg-[#111] border-white/10 text-white">
+        <CardHeader className="flex flex-row items-center gap-3">
+          <Wallet className="h-5 w-5 text-wff-gold" />
+          <CardTitle className="font-bebas text-2xl tracking-widest">REGISTRATION FEE</CardTitle>
+        </CardHeader>
+        <CardContent className="font-sans text-sm space-y-4 text-white/70">
+          <p className="text-white/40 text-xs">
+            Shown to athletes on the registration form&apos;s payment step. Takes effect immediately
+            for new visits — no deploy needed.
+          </p>
+          {feeLoading ? (
+            <p className="text-white/30 text-xs">Loading…</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-4 max-w-sm">
+                <div>
+                  <label className="block text-[10px] uppercase tracking-widest text-white/40 mb-1.5">
+                    Amount (GHS ₵)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={feeGhs}
+                    onChange={(e) => setFeeGhs(e.target.value)}
+                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-wff-gold/70 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase tracking-widest text-white/40 mb-1.5">
+                    Amount (USD $)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={feeUsd}
+                    onChange={(e) => setFeeUsd(e.target.value)}
+                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-wff-gold/70 focus:outline-none"
+                  />
+                </div>
+              </div>
+              {feeError && <p className="text-wff-red text-xs">{feeError}</p>}
+              <Button
+                onClick={saveFee}
+                disabled={feeSaving}
+                className="bg-wff-gold text-black hover:bg-white font-bebas text-base disabled:opacity-50"
+              >
+                {feeSaved ? (
+                  <><Check className="mr-2 h-4 w-4" /> SAVED</>
+                ) : feeSaving ? (
+                  "SAVING…"
+                ) : (
+                  "SAVE FEE"
+                )}
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       <Card className="bg-[#111] border-white/10 text-white">
         <CardHeader className="flex flex-row items-center gap-3">
@@ -68,7 +171,7 @@ export default function AdminSettingsPage() {
           <EnvRow name="SUPABASE_SERVICE_ROLE_KEY" note="Server-side writes — never expose" />
           <EnvRow name="PAYSTACK_SECRET_KEY" note="Payment initialise / verify / webhook signing" />
           <EnvRow name="NEXT_PUBLIC_SITE_URL" note="Used to build Paystack callback URLs" />
-          <EnvRow name="NEXT_PUBLIC_REGISTRATION_FEE" note="Athlete entry fee in GHS" />
+          <EnvRow name="NEXT_PUBLIC_REGISTRATION_FEE" note="Fallback only — set the live fee above instead" />
           <EnvRow name="NEXT_PUBLIC_SHOP_SHIPPING_FEE" note="Flat merch shipping in GHS" />
         </CardContent>
       </Card>
