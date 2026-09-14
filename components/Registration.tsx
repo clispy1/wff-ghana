@@ -997,6 +997,14 @@ export default function Registration() {
 
       if (error) throw error;
 
+      // Best-effort SMS to the athlete + admin. Never block the
+      // registration flow on this — fire and move on.
+      fetch('/api/notify/registration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ registration_id: newId }),
+      }).catch(() => {});
+
       // Paying online: hand off to Paystack. The entry is already saved,
       // so an abandoned payment loses nothing but the fee.
       if (data.feePaid === 'paystack' && newId) {

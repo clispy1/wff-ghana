@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase-admin';
+import { notifyAdmin } from '@/lib/sms';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -40,6 +41,11 @@ export async function POST(request: Request) {
     });
 
     if (error) throw error;
+
+    // Best-effort — never fail the contact form over an SMS problem.
+    notifyAdmin(
+      `New contact message from ${name.trim()} (${subject?.trim() || 'General Inquiry'}): ${message.trim().slice(0, 100)}`,
+    ).catch(() => {});
 
     return NextResponse.json({ ok: true });
   } catch (error) {

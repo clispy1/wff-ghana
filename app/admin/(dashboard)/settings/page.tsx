@@ -173,6 +173,9 @@ export default function AdminSettingsPage() {
           <EnvRow name="NEXT_PUBLIC_SITE_URL" note="Used to build Paystack callback URLs" />
           <EnvRow name="NEXT_PUBLIC_REGISTRATION_FEE" note="Fallback only — set the live fee above instead" />
           <EnvRow name="NEXT_PUBLIC_SHOP_SHIPPING_FEE" note="Flat merch shipping in GHS" />
+          <EnvRow name="CLIFZE_API_KEY" note="SMS notifications (registrations, vendors, contact, payments)" />
+          <EnvRow name="CLIFZE_SENDER_ID" note="Optional — defaults to WFFGHANA" />
+          <EnvRow name="ADMIN_NOTIFY_PHONE" note="Where admin SMS alerts go — comma-separate for multiple numbers" />
         </CardContent>
       </Card>
 

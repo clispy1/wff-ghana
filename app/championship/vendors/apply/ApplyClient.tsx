@@ -59,27 +59,40 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
     setIsSubmitting(true);
 
     try {
-      const { data: inserted, error: insertError } = await supabase
-        .from("vendors")
-        .insert({
-          name: form.name.trim(),
-          category: form.category,
-          contact_person: form.contact_person.trim() || null,
-          phone: form.phone.trim() || null,
-          email: form.email.trim(),
-          website_url: form.website_url.trim() || null,
-          application_note: form.application_note.trim() || null,
-          package_id: packageId,
-        })
-        .select("id")
-        .single();
+      // Goes through the submit_vendor_application RPC rather than a
+      // direct table insert: anon can only read back vendors where
+      // status='approved', but a new application starts 'pending', so
+      // a plain .insert().select() fails RLS on the read-back before
+      // it ever gets to the id it needs for checkout.
+      const { data: newId, error: insertError } = await supabase.rpc(
+        "submit_vendor_application",
+        {
+          payload: {
+            name: form.name.trim(),
+            category: form.category,
+            contact_person: form.contact_person.trim() || null,
+            phone: form.phone.trim() || null,
+            email: form.email.trim(),
+            website_url: form.website_url.trim() || null,
+            application_note: form.application_note.trim() || null,
+            package_id: packageId,
+          },
+        },
+      );
 
       if (insertError) throw insertError;
+
+      // Best-effort SMS to the vendor + admin. Never block on this.
+      fetch("/api/notify/vendor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ vendor_id: newId }),
+      }).catch(() => {});
 
       const res = await fetch("/api/checkout/vendor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ vendor_id: inserted.id }),
+        body: JSON.stringify({ vendor_id: newId }),
       });
       const payment = await res.json();
 

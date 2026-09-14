@@ -378,6 +378,44 @@ $$;
 REVOKE ALL ON FUNCTION public.submit_registration(JSONB) FROM public;
 GRANT EXECUTE ON FUNCTION public.submit_registration(JSONB) TO anon, authenticated;
 
+-- Same bug, same fix, for vendor applications: anon's SELECT policy on
+-- vendors only shows status='approved' rows, but a new application
+-- defaults to 'pending', so a plain insert().select() fails the
+-- read-back before it ever gets the id it needs to start checkout.
+CREATE OR REPLACE FUNCTION public.submit_vendor_application(payload JSONB)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+    rec public.vendors;
+    new_id UUID;
+BEGIN
+    rec := jsonb_populate_record(NULL::public.vendors, payload);
+
+    rec.id := gen_random_uuid();
+    rec.created_at := now();
+    rec.status := 'pending';
+    rec.payment_status := 'pending';
+    rec.paystack_ref := NULL;
+    rec.paid_at := NULL;
+    -- jsonb_populate_record doesn't apply column defaults (only a real
+    -- INSERT without this column listed does), and the client never
+    -- sends this, so it would otherwise come through NULL and fail the
+    -- NOT NULL constraint.
+    rec.display_order := COALESCE(rec.display_order, 0);
+
+    INSERT INTO public.vendors SELECT (rec).*
+    RETURNING id INTO new_id;
+
+    RETURN new_id;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.submit_vendor_application(JSONB) FROM public;
+GRANT EXECUTE ON FUNCTION public.submit_vendor_application(JSONB) TO anon, authenticated;
+
 
 ------------------------------------------------------------------
 -- STEP FINAL — GRANT YOURSELF ADMIN

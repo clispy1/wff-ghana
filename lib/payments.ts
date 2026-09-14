@@ -1,5 +1,6 @@
 import { createSupabaseAdminClient } from './supabase-admin';
 import { fromSubunit, type PaystackVerifyData } from './paystack';
+import { sendSms, notifyAdmin } from './sms';
 
 /**
  * Single place where a Paystack transaction is turned into "this order
@@ -75,8 +76,8 @@ export async function settlePayment(
         .eq('id', payment.related_id);
       break;
 
-    case 'registration':
-      await admin
+    case 'registration': {
+      const { data: reg } = await admin
         .from('registrations')
         .update({
           fee_paid_status: 'paid',
@@ -84,15 +85,49 @@ export async function settlePayment(
           paystack_ref: reference,
           paid_at: paidAt,
         })
-        .eq('id', payment.related_id);
-      break;
+        .eq('id', payment.related_id)
+        .select('first_name, last_name, mobile, category, division')
+        .single();
 
-    case 'vendor':
-      await admin
+      if (reg) {
+        // Best-effort — a payment that just cleared must never fail
+        // over an SMS problem.
+        Promise.all([
+          sendSms(
+            reg.mobile,
+            `Payment received! Your WFF Ghana entry fee for ${reg.category} (${reg.division}) is confirmed. See you at the championship. - WFF Ghana`,
+          ),
+          notifyAdmin(
+            `Payment confirmed: ${reg.first_name} ${reg.last_name} paid their registration fee (${reg.category}, ${reg.division}). Ref: ${reference}.`,
+          ),
+        ]).catch(() => {});
+      }
+      break;
+    }
+
+    case 'vendor': {
+      const { data: vendor } = await admin
         .from('vendors')
         .update({ payment_status: 'paid', paystack_ref: reference, paid_at: paidAt })
-        .eq('id', payment.related_id);
+        .eq('id', payment.related_id)
+        .select('name, phone, category, package_name')
+        .single();
+
+      if (vendor) {
+        Promise.all([
+          vendor.phone
+            ? sendSms(
+                vendor.phone,
+                `Payment received! Your WFF Ghana vendor package (${vendor.package_name || vendor.category}) is confirmed. - WFF Ghana`,
+              )
+            : Promise.resolve(),
+          notifyAdmin(
+            `Payment confirmed: vendor ${vendor.name} paid for their package. Ref: ${reference}.`,
+          ),
+        ]).catch(() => {});
+      }
       break;
+    }
   }
 
   return { status: 'success', purpose: payment.purpose, relatedId: payment.related_id };
