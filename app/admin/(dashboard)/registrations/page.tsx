@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Eye, CheckCircle, XCircle, BadgeCent, RefreshCw, FileWarning } from "lucide-react";
+import { Eye, CheckCircle, XCircle, BadgeCent, RefreshCw, FileWarning, Trash2 } from "lucide-react";
 
 const DOCUMENTS: { key: string; label: string }[] = [
   { key: "headshot_url", label: "Athlete Photo" },
@@ -145,6 +145,22 @@ export default function AdminRegistrationsPage() {
     fetchRegistrations();
   };
 
+  const deleteRegistration = async (id: string, label: string) => {
+    if (!window.confirm(`Delete ${label}'s registration? This cannot be undone.`)) return;
+
+    setBusy(true);
+    const { error: deleteError } = await supabase.from("registrations").delete().eq("id", id);
+    setBusy(false);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      return;
+    }
+
+    setSelectedReg((prev: any) => (prev?.id === id ? null : prev));
+    fetchRegistrations();
+  };
+
   const statusClass = (status: string) =>
     status === "approved"
       ? "bg-green-500/20 text-green-400"
@@ -256,6 +272,18 @@ export default function AdminRegistrationsPage() {
                       aria-label="View application"
                     >
                       <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={busy}
+                      onClick={() =>
+                        deleteRegistration(reg.id, `${reg.first_name} ${reg.last_name}`)
+                      }
+                      className="text-white/40 hover:text-white hover:bg-red-600 transition-colors"
+                      aria-label="Delete registration"
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -382,6 +410,17 @@ export default function AdminRegistrationsPage() {
                   <XCircle className="mr-2 h-5 w-5" /> DENY
                 </Button>
               </div>
+
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() =>
+                  deleteRegistration(selectedReg.id, `${selectedReg.first_name} ${selectedReg.last_name}`)
+                }
+                className="flex items-center gap-1.5 text-[11px] text-white/30 hover:text-red-500 transition-colors mx-auto disabled:opacity-40"
+              >
+                <Trash2 className="h-3 w-3" /> Delete this registration
+              </button>
             </div>
           )}
         </DialogContent>
