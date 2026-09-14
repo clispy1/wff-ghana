@@ -926,7 +926,15 @@ export default function Registration() {
         .find(c => c.name === data.category)
         ?.divisions.find(d => d.name === data.division);
 
-      const { data: inserted, error } = await supabase.from('registrations').insert({
+      // Goes through the submit_registration RPC rather than a direct
+      // table insert: this table has no anon SELECT policy (it holds
+      // passport numbers, addresses, medical declarations and emergency
+      // contacts — deliberately not broadly readable), so a plain
+      // .insert().select() fails RLS the moment it tries to read the row
+      // back. The RPC does the insert server-side and hands back just
+      // the new id.
+      const { data: newId, error } = await supabase.rpc('submit_registration', {
+        payload: {
         first_name: data.firstName,
         last_name: data.lastName,
         middle_name: null,
@@ -984,17 +992,18 @@ export default function Registration() {
         needs_accommodation: null,
         media_consent: data.mediaConsent || false,
         terms_agreed: data.termsAgreed,
-      }).select('id').single();
+        },
+      });
 
       if (error) throw error;
 
       // Paying online: hand off to Paystack. The entry is already saved,
       // so an abandoned payment loses nothing but the fee.
-      if (data.feePaid === 'paystack' && inserted?.id) {
+      if (data.feePaid === 'paystack' && newId) {
         const res = await fetch('/api/checkout/registration', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ registration_id: inserted.id }),
+          body: JSON.stringify({ registration_id: newId }),
         });
         const payment = await res.json();
 

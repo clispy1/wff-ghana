@@ -335,6 +335,51 @@ GRANT EXECUTE ON FUNCTION public.admin_dashboard_stats() TO authenticated;
 
 
 ------------------------------------------------------------------
+-- 6. ATHLETE REGISTRATION SUBMISSION
+------------------------------------------------------------------
+
+-- registrations holds passport numbers, addresses, medical
+-- declarations and emergency contacts, so anon deliberately has no
+-- SELECT policy on it. That means a plain insert().select() from the
+-- browser fails RLS the moment it tries to read the row back — which
+-- is exactly what was silently breaking every submission on the public
+-- form. Route the insert through this SECURITY DEFINER function
+-- instead: it does the write server-side and returns only the new id,
+-- and forces the pending-only invariants itself rather than relying on
+-- an INSERT policy's WITH CHECK.
+CREATE OR REPLACE FUNCTION public.submit_registration(payload JSONB)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+    rec public.registrations;
+    new_id UUID;
+BEGIN
+    rec := jsonb_populate_record(NULL::public.registrations, payload);
+
+    -- Server-enforced, never client-controlled.
+    rec.id := gen_random_uuid();
+    rec.created_at := now();
+    rec.fee_paid_status := 'pending';
+    rec.registration_status := 'pending';
+    rec.paid_at := NULL;
+    rec.reviewed_at := NULL;
+    rec.review_notes := NULL;
+
+    INSERT INTO public.registrations SELECT (rec).*
+    RETURNING id INTO new_id;
+
+    RETURN new_id;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.submit_registration(JSONB) FROM public;
+GRANT EXECUTE ON FUNCTION public.submit_registration(JSONB) TO anon, authenticated;
+
+
+------------------------------------------------------------------
 -- STEP FINAL — GRANT YOURSELF ADMIN
 --
 -- 1. Create your admin user in Supabase Dashboard → Authentication →
