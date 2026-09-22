@@ -854,7 +854,7 @@ export default function Registration() {
     if (key === 'athletePhoto' && file) setPhotoError('');
   };
 
-  const { register, handleSubmit, formState: { errors }, watch, setValue, trigger, reset, control } =
+  const { register, handleSubmit, formState: { errors, isValid }, watch, setValue, trigger, reset, control } =
     useForm<FormData>({
       resolver: zodResolver(schema),
       mode: 'onBlur',
@@ -874,6 +874,17 @@ export default function Registration() {
     });
 
   const feePaidChoice = useWatch({ control, name: 'feePaid' });
+  const termsAgreed = useWatch({ control, name: 'termsAgreed' });
+
+  // Submit stays disabled until every required field is filled. isValid
+  // is re-run through the zod schema on each change; the photo is a File
+  // outside the form, so it's checked separately.
+  const canSubmit = isValid && !!files.athletePhoto;
+  const missing = [
+    !files.athletePhoto && 'your athlete photo (step 3)',
+    !feePaidChoice && 'how you want to pay',
+    !termsAgreed && 'agreement to the competition rules',
+  ].filter(Boolean) as string[];
 
   const scrollToTop = useCallback(() => {
     topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1296,7 +1307,8 @@ export default function Registration() {
                 ) : (
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !canSubmit}
+                    title={canSubmit ? undefined : 'Fill in all required fields to submit'}
                     className="flex items-center gap-2 font-bebas text-xl bg-wff-red text-white px-8 py-3 rounded-lg hover:bg-wff-gold hover:text-wff-dark transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
                   >
                     {isSubmitting ? (
@@ -1307,6 +1319,13 @@ export default function Registration() {
                   </button>
                 )}
               </div>
+              {currentStep === STEPS.length && !canSubmit && !isSubmitting && (
+                <p className="mt-3 text-right text-xs text-white/40">
+                  {missing.length
+                    ? <>To submit, add {missing.join(', ')}.</>
+                    : <>Some required details on an earlier step are missing — go back and check the fields marked <span className="text-wff-red">*</span>.</>}
+                </p>
+              )}
             </form>
             </div>
           </>
