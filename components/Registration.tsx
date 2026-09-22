@@ -1,12 +1,16 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import confetti from 'canvas-confetti';
 import { supabase } from '@/lib/supabase';
 import { COUNTRIES } from '@/lib/countries';
+import {
+  DEFAULT_REGISTRATION_FEE, feeFor, isGhanaianRate, parseRegistrationFee,
+  type RegistrationFeeConfig,
+} from '@/lib/registrationFee';
 import {
   User, Trophy, FileText, CreditCard,
   Upload, CheckCircle, ChevronRight, ChevronLeft, ChevronDown,
@@ -20,7 +24,7 @@ const STEPS = [
   { id: 1, label: 'Personal',    icon: User,       blurb: 'Who you are and how to reach you.' },
   { id: 2, label: 'Competition', icon: Trophy,      blurb: 'What you’re competing in.' },
   { id: 3, label: 'Documents',   icon: FileText,    blurb: 'A photo of you. Everything else can wait.' },
-  { id: 4, label: 'Payment',     icon: CreditCard,  blurb: 'Pay now, later, or when you land in Ghana.' },
+  { id: 4, label: 'Payment',     icon: CreditCard,  blurb: 'Pay now online, or pay later in person.' },
 ];
 
 // ─────────────────────────────────────────────
@@ -62,9 +66,6 @@ const schema = z.object({
   // actually paid is decided by Paystack (or an on-site official), never
   // by this form.
   feePaid:             z.string().min(1, 'Please choose how you want to pay'),
-  paymentMethod:       z.string().optional(),
-  transactionId:       z.string().optional(),
-  paystackRef:         z.string().optional(),
   // Recommended, not required — some athletes register in a hurry and
   // add this later; we'd rather have the entry than block on it.
   emergencyName:       z.string().optional(),
@@ -218,8 +219,9 @@ interface FileUploadProps {
   hint?: string;
   file?: File | null;
   onChange: (file: File | null) => void;
+  error?: string;
 }
-const FileUpload = ({ label, required, accept = 'image/*', hint, file, onChange }: FileUploadProps) => {
+const FileUpload = ({ label, required, accept = 'image/*', hint, file, onChange, error }: FileUploadProps) => {
   const ref = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -281,6 +283,8 @@ const FileUpload = ({ label, required, accept = 'image/*', hint, file, onChange 
           className={`relative border border-dashed rounded-lg p-5 text-center cursor-pointer transition-all duration-200 group ${
             isDragging
               ? 'border-wff-red bg-wff-red/8 scale-[1.01]'
+              : error
+              ? 'border-wff-red/60 hover:border-wff-red hover:bg-white/3'
               : 'border-white/15 hover:border-wff-red/50 hover:bg-white/3'
           }`}
         >
@@ -292,6 +296,7 @@ const FileUpload = ({ label, required, accept = 'image/*', hint, file, onChange 
           <input type="file" ref={ref} className="hidden" accept={accept} onChange={(e) => onChange(e.target.files?.[0] || null)} />
         </div>
       )}
+      <FieldError message={error} />
     </div>
   );
 };
@@ -622,8 +627,9 @@ function Step2({ register, errors, watch, setValue, trigger, categories, categor
 }
 
 // ── STEP 3: DOCUMENTS & VERIFICATION ──
-function Step3({ watch, setValue, errors, files, onFileChange }: {
+function Step3({ watch, setValue, errors, files, onFileChange, photoError }: {
   errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
+  photoError?: string;
   watch: ReturnType<typeof useForm<FormData>>['watch'];
   setValue: ReturnType<typeof useForm<FormData>>['setValue'];
   files: Record<string, File | null>;
@@ -643,6 +649,7 @@ function Step3({ watch, setValue, errors, files, onFileChange }: {
           hint="Clear face photo, competition or gym"
           file={files.athletePhoto}
           onChange={f => onFileChange('athletePhoto', f)}
+          error={photoError}
         />
         <FileUpload
           label="Passport / ID Copy"
@@ -687,16 +694,16 @@ function Step3({ watch, setValue, errors, files, onFileChange }: {
 }
 
 // ── STEP 4: PAYMENT & FINAL ──
-function Step4({ register, errors, watch, setValue, files, onFileChange, fee }: {
+function Step4({ register, errors, watch, setValue, fee }: {
   register: ReturnType<typeof useForm<FormData>>['register'];
   errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
   watch: ReturnType<typeof useForm<FormData>>['watch'];
   setValue: ReturnType<typeof useForm<FormData>>['setValue'];
-  files: Record<string, File | null>;
-  onFileChange: (key: string, file: File | null) => void;
-  fee: { ghs: number; usd: number };
+  fee: RegistrationFeeConfig;
 }) {
   const feePaid = watch('feePaid') || '';
+  const ghanaian = isGhanaianRate(watch('nationality'), watch('countryRepresenting'));
+  const { usd, ghs } = feeFor(fee, ghanaian);
 
   return (
     <div>
@@ -706,7 +713,11 @@ function Step4({ register, errors, watch, setValue, files, onFileChange, fee }: 
         <CreditCard size={20} className="text-wff-gold mt-0.5 flex-shrink-0" />
         <div>
           <p className="text-sm font-bebas tracking-wider text-wff-gold text-lg leading-none">
-            Registration Fee: ₵ {fee.ghs.toFixed(2)} / ${fee.usd} USD
+            Your Registration Fee: ${usd} USD
+            {ghs !== null && <span className="text-white/50"> (₵ {ghs.toFixed(2)})</span>}
+          </p>
+          <p className="text-xs text-white/50 mt-1.5">
+            {ghanaian ? 'Ghanaian rate' : 'International rate'} · Ghanaians ${fee.ghanaian_usd} · Foreign athletes ${fee.foreign_usd}
           </p>
           <p className="text-xs text-white/40 mt-1">Fee covers registration, competition bib, and entry into all judging rounds for your selected category.</p>
         </div>
@@ -720,9 +731,8 @@ function Step4({ register, errors, watch, setValue, files, onFileChange, fee }: 
         onChange={v => setValue('feePaid', v, { shouldValidate: true })}
         error={errors.feePaid?.message}
         options={[
-          { value: 'paystack', label: 'Pay now online' },
-          { value: 'offline',  label: 'Pay by bank / mobile money transfer' },
-          { value: 'onsite',   label: 'Pay when I arrive in Ghana' },
+          { value: 'paystack', label: 'Pay now' },
+          { value: 'onsite',   label: 'Pay later' },
         ]}
       />
 
@@ -731,38 +741,10 @@ function Step4({ register, errors, watch, setValue, files, onFileChange, fee }: 
           <Lock size={18} className="text-wff-gold mt-0.5 flex-shrink-0" />
           <p className="text-xs text-white/60 leading-relaxed">
             When you submit this form you will be taken to <span className="text-white font-bold">Paystack</span> to
-            pay the entry fee by card, bank transfer or mobile money. Your entry is only
-            forwarded to the selection committee once payment clears — you can close the payment
+            pay {ghs !== null ? <>₵ {ghs.toFixed(2)} (${usd})</> : <>the entry fee</>} by card, bank transfer or mobile money.
+            Your entry is only forwarded to the selection committee once payment clears — you can close the payment
             page and come back to it, your details are already saved.
           </p>
-        </div>
-      )}
-
-      {feePaid === 'offline' && (
-        <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="flex gap-3 items-start bg-white/[0.03] border border-white/10 rounded-xl p-5">
-            <CreditCard size={18} className="text-white/40 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-white/60 leading-relaxed">
-              Transfer the entry fee to the federation account, then upload your receipt below.
-              An official will confirm your payment manually — this normally takes 1–2 working days.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label>Transaction / Reference ID</Label>
-              <input {...register('transactionId')} className={inputClass} placeholder="TXN-XXXXXXXX" />
-            </div>
-            <div>
-              <Label>Paying From (Bank / MoMo number)</Label>
-              <input {...register('paymentMethod')} className={inputClass} placeholder="MTN MoMo · 024 000 0000" />
-            </div>
-          </div>
-          <FileUpload
-            label="Payment Screenshot / Receipt"
-            hint="JPEG or PNG · Clear screenshot of payment confirmation"
-            file={files.paymentScreenshot}
-            onChange={f => onFileChange('paymentScreenshot', f)}
-          />
         </div>
       )}
 
@@ -770,9 +752,9 @@ function Step4({ register, errors, watch, setValue, files, onFileChange, fee }: 
         <div className="mt-6 flex gap-3 items-start bg-wff-green/5 border border-wff-green/20 rounded-xl p-5 animate-in fade-in slide-in-from-top-2 duration-300">
           <Plane size={18} className="text-wff-green mt-0.5 flex-shrink-0" />
           <p className="text-xs text-white/60 leading-relaxed">
-            No payment needed right now. Complete registration today and settle the entry fee
-            in cash or mobile money when you check in at the event in Ghana. Your spot is
-            provisional — bring the fee with you to confirm it at check-in.
+            No payment needed right now. Complete registration today and pay the ${usd} entry fee
+            in person, in cash or mobile money, when you check in at the event. Your spot is
+            provisional until the fee is paid.
           </p>
         </div>
       )}
@@ -839,9 +821,14 @@ export default function Registration() {
   const [files, setFiles] = useState<Record<string, File | null>>({});
   const [categories, setCategories] = useState<CategoryRow[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [fee, setFee] = useState({ ghs: 500, usd: 45 });
+  const [fee, setFee] = useState<RegistrationFeeConfig>(DEFAULT_REGISTRATION_FEE);
   const [successName, setSuccessName] = useState('');
   const [successMeta, setSuccessMeta] = useState<{ category: string; division: string; country: string }>({ category: '', division: '', country: '' });
+  const [photoError, setPhotoError] = useState('');
+  const [submitError, setSubmitError] = useState('');
+  // Set once submit_registration succeeds. From then on a resubmit only
+  // retries the Paystack hand-off — it never inserts a second entry.
+  const [savedId, setSavedId] = useState<string | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -859,15 +846,15 @@ export default function Registration() {
       .select('value')
       .eq('key', 'registration_fee')
       .maybeSingle()
-      .then(({ data }) => {
-        const v = data?.value as { ghs?: number; usd?: number } | undefined;
-        if (v?.ghs && v?.usd) setFee({ ghs: v.ghs, usd: v.usd });
-      });
+      .then(({ data }) => setFee(parseRegistrationFee(data?.value)));
   }, []);
 
-  const onFileChange = (key: string, file: File | null) => setFiles(prev => ({ ...prev, [key]: file }));
+  const onFileChange = (key: string, file: File | null) => {
+    setFiles(prev => ({ ...prev, [key]: file }));
+    if (key === 'athletePhoto' && file) setPhotoError('');
+  };
 
-  const { register, handleSubmit, formState: { errors }, watch, setValue, trigger, reset } =
+  const { register, handleSubmit, formState: { errors, isValid }, watch, setValue, trigger, reset, control } =
     useForm<FormData>({
       resolver: zodResolver(schema),
       mode: 'onBlur',
@@ -886,162 +873,244 @@ export default function Registration() {
       },
     });
 
+  const feePaidChoice = useWatch({ control, name: 'feePaid' });
+  const termsAgreed = useWatch({ control, name: 'termsAgreed' });
+
+  // Submit stays disabled until every required field is filled. isValid
+  // is re-run through the zod schema on each change; the photo is a File
+  // outside the form, so it's checked separately.
+  const canSubmit = isValid && !!files.athletePhoto;
+  const missing = [
+    !files.athletePhoto && 'your athlete photo (step 3)',
+    !feePaidChoice && 'how you want to pay',
+    !termsAgreed && 'agreement to the competition rules',
+  ].filter(Boolean) as string[];
+
   const scrollToTop = useCallback(() => {
     topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
+  // The athlete photo is a File held outside react-hook-form, so the zod
+  // schema can't see it — check it alongside step 3's fields.
+  const validateStep = async (step: number) => {
+    const fieldsOk = await trigger(STEP_FIELDS[step]);
+    const photoOk = step !== 3 || !!files.athletePhoto;
+    if (!photoOk) setPhotoError('Please upload a clear photo of yourself');
+    return fieldsOk && photoOk;
+  };
+
   const goToStep = async (next: number) => {
+    setSubmitError('');
     if (next > currentStep) {
-      const valid = await trigger(STEP_FIELDS[currentStep]);
-      if (!valid) return;
+      // Validate every step being passed over, not just the current one —
+      // otherwise jumping ahead from the stepper skips steps 2–3 and the
+      // final Submit fails on fields the athlete can't see.
+      for (let s = currentStep; s < next; s++) {
+        if (!(await validateStep(s))) {
+          if (s !== currentStep) {
+            setCurrentStep(s);
+            scrollToTop();
+          }
+          return;
+        }
+      }
     }
     setCurrentStep(next);
     scrollToTop();
   };
 
+  // Submit was blocked by the schema. Send the athlete to the first step
+  // holding an error so they can actually see what to fix.
+  const onInvalid = (formErrors: typeof errors) => {
+    const step = [1, 2, 3, 4].find(s => STEP_FIELDS[s].some(f => formErrors[f]));
+    if (step && step !== currentStep) {
+      setCurrentStep(step);
+      scrollToTop();
+    }
+    setSubmitError('Some required details are missing. Check the fields marked in red.');
+  };
+
+  const startCheckout = async (registrationId: string) => {
+    const res = await fetch('/api/checkout/registration', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ registration_id: registrationId }),
+    });
+    const payment = await res.json().catch(() => ({}));
+    if (!res.ok || !payment.authorization_url) {
+      throw new Error(payment.error || 'Could not start payment.');
+    }
+    window.location.href = payment.authorization_url;
+  };
+
+  const showSuccess = (data: FormData) => {
+    setSuccessName(`${data.firstName} ${data.lastName}`.trim());
+    setSuccessMeta({ category: data.category, division: data.division, country: data.countryRepresenting });
+    setIsSubmitting(false);
+    setIsSuccess(true);
+    const duration = 4000;
+    const end = Date.now() + duration;
+    const frame = () => {
+      confetti({ particleCount: 6, angle: 60, spread: 60, origin: { x: 0 }, colors: ['#CE1126', '#FCD116', '#FFFFFF', '#006B3F'] });
+      confetti({ particleCount: 6, angle: 120, spread: 60, origin: { x: 1 }, colors: ['#CE1126', '#FCD116', '#FFFFFF', '#006B3F'] });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    };
+    frame();
+  };
+
   const onSubmit = async (data: FormData) => {
+    if (!files.athletePhoto) {
+      setPhotoError('Please upload a clear photo of yourself');
+      setSubmitError('Your athlete photo is missing.');
+      setCurrentStep(3);
+      scrollToTop();
+      return;
+    }
+
     setIsSubmitting(true);
+    setSubmitError('');
 
-    try {
-      // The athlete-documents bucket is private — these are passport and
-      // ID scans. We store the object path and the admin dashboard reads
-      // it through a short-lived signed URL, so nothing is world-readable.
-      const uploadFile = async (file: File | null | undefined) => {
-        if (!file) return null;
-        const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '');
-        const path = `registrations/${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${safeName}`;
-        const { data: udata, error } = await supabase.storage
-          .from('athlete-documents')
-          .upload(path, file);
-        if (error) throw error;
-        return udata.path;
-      };
+    let registrationId = savedId;
 
-      const passportUrl = await uploadFile(files.passportDoc);
-      const headshotUrl = await uploadFile(files.athletePhoto);
-      const fullBodyUrl = await uploadFile(files.fullBody);
-      const paymentScreenshotUrl = await uploadFile(files.paymentScreenshot);
+    if (!registrationId) {
+      try {
+        // The athlete-documents bucket is private — these are passport and
+        // ID scans. We store the object path and the admin dashboard reads
+        // it through a short-lived signed URL, so nothing is world-readable.
+        const uploadFile = async (file: File | null | undefined, what: string) => {
+          if (!file) return null;
+          const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '');
+          const path = `registrations/${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${safeName}`;
+          const { data: udata, error } = await supabase.storage
+            .from('athlete-documents')
+            .upload(path, file);
+          if (error) {
+            console.error(error);
+            throw new Error(`Your ${what} couldn't be uploaded. Try a smaller JPG or PNG file.`);
+          }
+          return udata.path;
+        };
 
-      const divisionRow = categories
-        .find(c => c.name === data.category)
-        ?.divisions.find(d => d.name === data.division);
+        const passportUrl = await uploadFile(files.passportDoc, 'passport / ID copy');
+        const headshotUrl = await uploadFile(files.athletePhoto, 'athlete photo');
+        const fullBodyUrl = await uploadFile(files.fullBody, 'full body photo');
 
-      // Goes through the submit_registration RPC rather than a direct
-      // table insert: this table has no anon SELECT policy (it holds
-      // passport numbers, addresses, medical declarations and emergency
-      // contacts — deliberately not broadly readable), so a plain
-      // .insert().select() fails RLS the moment it tries to read the row
-      // back. The RPC does the insert server-side and hands back just
-      // the new id.
-      const { data: newId, error } = await supabase.rpc('submit_registration', {
-        payload: {
-        first_name: data.firstName,
-        last_name: data.lastName,
-        middle_name: null,
-        gender: data.gender,
-        dob: data.dob,
-        nationality: data.nationality,
-        country_representing: data.countryRepresenting,
-        passport_number: data.passportNumber || null,
-        national_id: null,
-        email: data.email,
-        mobile: data.mobile,
-        whatsapp: null,
-        address: data.address,
-        city: data.city,
-        country: data.country,
-        athlete_type: data.athleteType,
-        category: data.category,
-        division: data.division,
-        division_id: divisionRow?.id || null,
-        weight_class: null,
-        height_class: null,
-        team_name: data.teamName || null,
-        club_name: data.clubName || null,
-        team_country: data.teamCountry || null,
-        coach_name: data.coachName || null,
-        manager_name: data.managerName || null,
-        manager_contact: data.managerContact || null,
-        federation_affiliation: data.federationAffiliation || null,
-        medical_declaration: data.medicalDeclaration,
-        fitness_declaration: data.fitnessDeclaration,
-        passport_url: passportUrl,
-        national_id_url: null,
-        headshot_url: headshotUrl,
-        full_body_url: fullBodyUrl,
-        prev_photos_urls: [],
-        certs_url: null,
-        // Always 'pending' here. Only a verified Paystack transaction or
-        // an admin can move this to 'paid' — RLS rejects anything else.
-        // 'onsite' registrations stay 'pending' until an admin marks them
-        // paid at event check-in.
-        fee_paid_status: 'pending',
-        payment_method: data.feePaid === 'paystack' ? 'paystack' : data.feePaid === 'onsite' ? 'onsite' : (data.paymentMethod || 'offline'),
-        transaction_id: data.transactionId || null,
-        paystack_ref: data.paystackRef || null,
-        payment_screenshot_url: paymentScreenshotUrl,
-        emergency_name: data.emergencyName || null,
-        emergency_relation: data.emergencyRelation || null,
-        emergency_phone: data.emergencyPhone || null,
-        instagram: null,
-        facebook: null,
-        tiktok: null,
-        arrival_date: null,
-        departure_date: null,
-        needs_pickup: null,
-        needs_accommodation: null,
-        media_consent: data.mediaConsent || false,
-        terms_agreed: data.termsAgreed,
-        },
-      });
+        const divisionRow = categories
+          .find(c => c.name === data.category)
+          ?.divisions.find(d => d.name === data.division);
 
-      if (error) throw error;
-
-      // Best-effort SMS to the athlete + admin. Never block the
-      // registration flow on this — fire and move on.
-      fetch('/api/notify/registration', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ registration_id: newId }),
-      }).catch(() => {});
-
-      // Paying online: hand off to Paystack. The entry is already saved,
-      // so an abandoned payment loses nothing but the fee.
-      if (data.feePaid === 'paystack' && newId) {
-        const res = await fetch('/api/checkout/registration', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ registration_id: newId }),
+        // Goes through the submit_registration RPC rather than a direct
+        // table insert: this table has no anon SELECT policy (it holds
+        // passport numbers, addresses, medical declarations and emergency
+        // contacts — deliberately not broadly readable), so a plain
+        // .insert().select() fails RLS the moment it tries to read the row
+        // back. The RPC does the insert server-side and hands back just
+        // the new id.
+        const { data: newId, error } = await supabase.rpc('submit_registration', {
+          payload: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          middle_name: null,
+          gender: data.gender,
+          dob: data.dob,
+          nationality: data.nationality,
+          country_representing: data.countryRepresenting,
+          passport_number: data.passportNumber || null,
+          national_id: null,
+          email: data.email,
+          mobile: data.mobile,
+          whatsapp: null,
+          address: data.address,
+          city: data.city,
+          country: data.country,
+          athlete_type: data.athleteType,
+          category: data.category,
+          division: data.division,
+          division_id: divisionRow?.id || null,
+          weight_class: null,
+          height_class: null,
+          team_name: data.teamName || null,
+          club_name: data.clubName || null,
+          team_country: data.teamCountry || null,
+          coach_name: data.coachName || null,
+          manager_name: data.managerName || null,
+          manager_contact: data.managerContact || null,
+          federation_affiliation: data.federationAffiliation || null,
+          medical_declaration: data.medicalDeclaration,
+          fitness_declaration: data.fitnessDeclaration,
+          passport_url: passportUrl,
+          national_id_url: null,
+          headshot_url: headshotUrl,
+          full_body_url: fullBodyUrl,
+          prev_photos_urls: [],
+          certs_url: null,
+          // Always 'pending' here. Only a verified Paystack transaction or
+          // an admin can move this to 'paid' — RLS rejects anything else.
+          // 'onsite' registrations stay 'pending' until an admin marks them
+          // paid at event check-in.
+          fee_paid_status: 'pending',
+          payment_method: data.feePaid === 'paystack' ? 'paystack' : 'onsite',
+          transaction_id: null,
+          paystack_ref: null,
+          payment_screenshot_url: null,
+          emergency_name: data.emergencyName || null,
+          emergency_relation: data.emergencyRelation || null,
+          emergency_phone: data.emergencyPhone || null,
+          instagram: null,
+          facebook: null,
+          tiktok: null,
+          arrival_date: null,
+          departure_date: null,
+          needs_pickup: null,
+          needs_accommodation: null,
+          media_consent: data.mediaConsent || false,
+          terms_agreed: data.termsAgreed,
+          },
         });
-        const payment = await res.json();
 
-        if (!res.ok) {
-          throw new Error(
-            `${payment.error || 'Could not start payment.'} Your entry was saved — contact us to pay the fee.`,
-          );
+        if (error || !newId) {
+          console.error(error);
+          throw new Error('Our server could not save your registration. Please try again in a minute.');
         }
 
-        window.location.href = payment.authorization_url;
+        registrationId = newId as string;
+        setSavedId(registrationId);
+
+        // Best-effort SMS to the athlete + admin. Never block the
+        // registration flow on this — fire and move on.
+        fetch('/api/notify/registration', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ registration_id: registrationId }),
+        }).catch(() => {});
+      } catch (e) {
+        const message = e instanceof Error ? e.message : 'Something went wrong.';
+        setSubmitError(`${message} Nothing was saved yet.`);
+        setIsSubmitting(false);
         return;
       }
-
-      setSuccessName(`${data.firstName} ${data.lastName}`.trim());
-      setSuccessMeta({ category: data.category, division: data.division, country: data.countryRepresenting });
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      const duration = 4000;
-      const end = Date.now() + duration;
-      const frame = () => {
-        confetti({ particleCount: 6, angle: 60, spread: 60, origin: { x: 0 }, colors: ['#CE1126', '#FCD116', '#FFFFFF', '#006B3F'] });
-        confetti({ particleCount: 6, angle: 120, spread: 60, origin: { x: 1 }, colors: ['#CE1126', '#FCD116', '#FFFFFF', '#006B3F'] });
-        if (Date.now() < end) requestAnimationFrame(frame);
-      };
-      frame();
-    } catch (e: any) {
-      console.error(e);
-      alert('Submission failed: ' + e.message);
-      setIsSubmitting(false);
     }
+
+    // Paying online: hand off to Paystack. The entry is already saved,
+    // so a failure here must not read as "registration failed" — that
+    // is what sent athletes back to resubmit and create duplicates.
+    if (data.feePaid === 'paystack') {
+      try {
+        await startCheckout(registrationId);
+        return;
+      } catch (e) {
+        console.error(e);
+        const message = (e instanceof Error ? e.message : 'Could not start payment').replace(/\.$/, '');
+        setSubmitError(
+          `Your registration is saved, but the payment page didn't open (${message}). ` +
+          'Click "Retry Payment". If it keeps failing, contact us to pay another way — do not register again.',
+        );
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
+    showSuccess(data);
   };
 
   const progress = ((currentStep - 1) / (STEPS.length - 1)) * 100;
@@ -1083,7 +1152,7 @@ export default function Registration() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
-                onClick={() => { setIsSuccess(false); reset(); setFiles({}); setCurrentStep(1); scrollToTop(); }}
+                onClick={() => { setIsSuccess(false); reset(); setFiles({}); setSavedId(null); setSubmitError(''); setPhotoError(''); setCurrentStep(1); scrollToTop(); }}
                 className="bg-wff-red text-white font-bebas text-xl px-10 py-3 rounded-lg hover:bg-white hover:text-wff-red transition-colors"
               >
                 Register Another Athlete
@@ -1186,15 +1255,22 @@ export default function Registration() {
             </div>
 
             {/* ── FORM PANEL ── */}
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={(e) => handleSubmit(onSubmit, onInvalid)(e)}>
               <div className="bg-[#0a0a0a] border border-white/8 rounded-2xl p-8 md:p-12 min-h-[500px] overflow-hidden">
                 <div key={currentStep} className="animate-in fade-in slide-in-from-right-3 duration-300">
                   {currentStep === 1 && <Step1 register={register} errors={errors} watch={watch} setValue={setValue} trigger={trigger} />}
                   {currentStep === 2 && <Step2 register={register} errors={errors} watch={watch} setValue={setValue} trigger={trigger} categories={categories} categoriesLoading={categoriesLoading} />}
-                  {currentStep === 3 && <Step3 errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} />}
-                  {currentStep === 4 && <Step4 register={register} errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} fee={fee} />}
+                  {currentStep === 3 && <Step3 errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} photoError={photoError} />}
+                  {currentStep === 4 && <Step4 register={register} errors={errors} watch={watch} setValue={setValue} fee={fee} />}
                 </div>
               </div>
+
+              {submitError && (
+                <div role="alert" className="mt-6 flex gap-3 items-start border border-wff-red/40 bg-wff-red/10 rounded-xl p-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                  <AlertCircle size={18} className="text-wff-red mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-white/80 leading-relaxed">{submitError}</p>
+                </div>
+              )}
 
               {/* ── NAVIGATION BUTTONS ── */}
               <div className="flex justify-between items-center mt-6">
@@ -1231,17 +1307,25 @@ export default function Registration() {
                 ) : (
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !canSubmit}
+                    title={canSubmit ? undefined : 'Fill in all required fields to submit'}
                     className="flex items-center gap-2 font-bebas text-xl bg-wff-red text-white px-8 py-3 rounded-lg hover:bg-wff-gold hover:text-wff-dark transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
                   >
                     {isSubmitting ? (
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <><Shield size={16} /> Submit Registration</>
+                      <><Shield size={16} /> {savedId && feePaidChoice === 'paystack' ? 'Retry Payment' : 'Submit Registration'}</>
                     )}
                   </button>
                 )}
               </div>
+              {currentStep === STEPS.length && !canSubmit && !isSubmitting && (
+                <p className="mt-3 text-right text-xs text-white/40">
+                  {missing.length
+                    ? <>To submit, add {missing.join(', ')}.</>
+                    : <>Some required details on an earlier step are missing — go back and check the fields marked <span className="text-wff-red">*</span>.</>}
+                </p>
+              )}
             </form>
             </div>
           </>
