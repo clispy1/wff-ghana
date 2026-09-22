@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { parseRegistrationFee } from "@/lib/registrationFee";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, KeyRound, Webhook, Database, Wallet, Check } from "lucide-react";
@@ -11,8 +12,9 @@ export default function AdminSettingsPage() {
     null,
   );
 
-  const [feeGhs, setFeeGhs] = useState("");
-  const [feeUsd, setFeeUsd] = useState("");
+  const [feeGhanaian, setFeeGhanaian] = useState("");
+  const [feeForeign, setFeeForeign] = useState("");
+  const [feeRate, setFeeRate] = useState("");
   const [feeLoading, setFeeLoading] = useState(true);
   const [feeSaving, setFeeSaving] = useState(false);
   const [feeSaved, setFeeSaved] = useState(false);
@@ -41,26 +43,31 @@ export default function AdminSettingsPage() {
         .select("value")
         .eq("key", "registration_fee")
         .maybeSingle();
-      const value = data?.value as { ghs?: number; usd?: number } | undefined;
-      setFeeGhs(String(value?.ghs ?? 500));
-      setFeeUsd(String(value?.usd ?? 45));
+      const fee = parseRegistrationFee(data?.value);
+      setFeeGhanaian(String(fee.ghanaian_usd));
+      setFeeForeign(String(fee.foreign_usd));
+      setFeeRate(fee.usd_to_ghs ? String(fee.usd_to_ghs) : "");
       setFeeLoading(false);
     };
     loadFee();
   }, []);
 
   const saveFee = async () => {
-    const ghs = Number(feeGhs);
-    const usd = Number(feeUsd);
-    if (!Number.isFinite(ghs) || ghs < 0 || !Number.isFinite(usd) || usd < 0) {
-      setFeeError("Enter valid non-negative amounts for both currencies.");
+    const ghanaian_usd = Number(feeGhanaian);
+    const foreign_usd = Number(feeForeign);
+    const usd_to_ghs = Number(feeRate);
+    if (![ghanaian_usd, foreign_usd, usd_to_ghs].every((n) => Number.isFinite(n) && n > 0)) {
+      setFeeError("Enter a positive number in all three fields.");
       return;
     }
     setFeeError(null);
     setFeeSaving(true);
     const { error } = await supabase
       .from("site_content")
-      .upsert({ key: "registration_fee", value: { ghs, usd } }, { onConflict: "key" });
+      .upsert(
+        { key: "registration_fee", value: { ghanaian_usd, foreign_usd, usd_to_ghs } },
+        { onConflict: "key" },
+      );
     setFeeSaving(false);
     if (error) {
       setFeeError(error.message);
@@ -86,41 +93,29 @@ export default function AdminSettingsPage() {
         </CardHeader>
         <CardContent className="font-sans text-sm space-y-4 text-white/70">
           <p className="text-white/40 text-xs">
-            Shown to athletes on the registration form&apos;s payment step. Takes effect immediately
-            for new visits — no deploy needed.
+            Priced in US dollars. The Ghanaian rate applies when an athlete&apos;s nationality or
+            country representing is Ghana. Paystack charges the cedi equivalent at the exchange
+            rate below. Takes effect immediately — no deploy needed.
           </p>
           {feeLoading ? (
             <p className="text-white/30 text-xs">Loading…</p>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-4 max-w-sm">
-                <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-white/40 mb-1.5">
-                    Amount (GHS ₵)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={feeGhs}
-                    onChange={(e) => setFeeGhs(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-wff-gold/70 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-white/40 mb-1.5">
-                    Amount (USD $)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={feeUsd}
-                    onChange={(e) => setFeeUsd(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-wff-gold/70 focus:outline-none"
-                  />
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-xl">
+                <FeeInput label="Ghanaian (USD $)" value={feeGhanaian} onChange={setFeeGhanaian} />
+                <FeeInput label="Foreign (USD $)" value={feeForeign} onChange={setFeeForeign} />
+                <FeeInput label="Exchange rate (₵ per $1)" value={feeRate} onChange={setFeeRate} />
               </div>
+              {Number(feeRate) > 0 ? (
+                <p className="text-white/50 text-xs">
+                  Paystack will charge Ghanaians ₵ {(Number(feeGhanaian) * Number(feeRate)).toFixed(2)} and
+                  foreign athletes ₵ {(Number(feeForeign) * Number(feeRate)).toFixed(2)}.
+                </p>
+              ) : (
+                <p className="text-wff-red text-xs">
+                  Set the exchange rate — &quot;Pay now&quot; can&apos;t charge athletes until it is set.
+                </p>
+              )}
               {feeError && <p className="text-wff-red text-xs">{feeError}</p>}
               <Button
                 onClick={saveFee}
@@ -171,7 +166,6 @@ export default function AdminSettingsPage() {
           <EnvRow name="SUPABASE_SERVICE_ROLE_KEY" note="Server-side writes — never expose" />
           <EnvRow name="PAYSTACK_SECRET_KEY" note="Payment initialise / verify / webhook signing" />
           <EnvRow name="NEXT_PUBLIC_SITE_URL" note="Used to build Paystack callback URLs" />
-          <EnvRow name="NEXT_PUBLIC_REGISTRATION_FEE" note="Fallback only — set the live fee above instead" />
           <EnvRow name="NEXT_PUBLIC_SHOP_SHIPPING_FEE" note="Flat merch shipping in GHS" />
           <EnvRow name="CLIFZE_API_KEY" note="SMS notifications (registrations, vendors, contact, payments)" />
           <EnvRow name="CLIFZE_SENDER_ID" note="Optional — defaults to WFFGHANA" />
@@ -213,6 +207,22 @@ export default function AdminSettingsPage() {
           </p>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function FeeInput({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div>
+      <label className="block text-[10px] uppercase tracking-widest text-white/40 mb-1.5">{label}</label>
+      <input
+        type="number"
+        min="0"
+        step="0.01"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-wff-gold/70 focus:outline-none"
+      />
     </div>
   );
 }

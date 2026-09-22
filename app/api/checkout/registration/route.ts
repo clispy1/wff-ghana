@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase-admin';
 import { buildReference, initializeTransaction, siteUrl } from '@/lib/paystack';
+import { feeFor, isGhanaianRate, parseRegistrationFee } from '@/lib/registrationFee';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -9,7 +10,9 @@ export const dynamic = 'force-dynamic';
  * Starts payment of the athlete entry fee for an already-submitted
  * registration. Called straight after the registration form saves.
  *
- * The fee is server-side config, not a form field.
+ * The fee is server-side config, not a form field. Which rate applies
+ * (Ghanaian or foreign) is decided here from the saved registration,
+ * never from anything the browser sends.
  */
 export async function POST(request: Request) {
   try {
@@ -23,7 +26,7 @@ export async function POST(request: Request) {
 
     const { data: registration, error } = await admin
       .from('registrations')
-      .select('id, first_name, last_name, email, fee_paid_status')
+      .select('id, first_name, last_name, email, fee_paid_status, nationality, country_representing')
       .eq('id', registration_id)
       .maybeSingle();
 
@@ -35,21 +38,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'This entry fee has already been paid.' }, { status: 409 });
     }
 
-    // The fee is admin-editable from /admin/settings (site_content,
-    // key 'registration_fee') so it can change without a redeploy.
-    // NEXT_PUBLIC_REGISTRATION_FEE is a last-resort fallback for an
-    // environment where that row hasn't been seeded yet.
+    // Priced in USD, charged in GHS at the admin-set exchange rate —
+    // both editable from /admin/settings (site_content 'registration_fee').
     const { data: feeRow } = await admin
       .from('site_content')
       .select('value')
       .eq('key', 'registration_fee')
       .maybeSingle();
-    const fee = Number(
-      (feeRow?.value as { ghs?: number } | null)?.ghs || process.env.NEXT_PUBLIC_REGISTRATION_FEE || 0,
-    );
+    const ghanaian = isGhanaianRate(registration.nationality, registration.country_representing);
+    const { usd, ghs: fee } = feeFor(parseRegistrationFee(feeRow?.value), ghanaian);
     if (!fee || fee <= 0) {
       return NextResponse.json(
-        { error: 'Registration fee is not configured. Set it from /admin/settings.' },
+        { error: 'Online payment is not set up yet (missing exchange rate). Set it from /admin/settings.' },
         { status: 500 },
       );
     }
@@ -80,6 +80,8 @@ export async function POST(request: Request) {
         purpose: 'registration',
         registration_id: registration.id,
         athlete: `${registration.first_name} ${registration.last_name}`,
+        fee_usd: usd,
+        rate: ghanaian ? 'ghanaian' : 'foreign',
       },
     });
 
@@ -87,6 +89,7 @@ export async function POST(request: Request) {
       authorization_url: paystack.authorization_url,
       reference,
       amount: fee,
+      amount_usd: usd,
     });
   } catch (error) {
     console.error('[checkout/registration]', error);

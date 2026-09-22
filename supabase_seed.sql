@@ -128,7 +128,7 @@ JOIN (VALUES
 
 -- 1c. Registration fee, editable from /admin/settings.
 INSERT INTO public.site_content (key, value)
-VALUES ('registration_fee', '{"ghs": 500, "usd": 45}'::jsonb)
+VALUES ('registration_fee', '{"ghanaian_usd": 50, "foreign_usd": 100, "usd_to_ghs": null}'::jsonb)
 ON CONFLICT (key) DO NOTHING;
 
 -- 2. Add Federation Staff

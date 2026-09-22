@@ -8,6 +8,10 @@ import confetti from 'canvas-confetti';
 import { supabase } from '@/lib/supabase';
 import { COUNTRIES } from '@/lib/countries';
 import {
+  DEFAULT_REGISTRATION_FEE, feeFor, isGhanaianRate, parseRegistrationFee,
+  type RegistrationFeeConfig,
+} from '@/lib/registrationFee';
+import {
   User, Trophy, FileText, CreditCard,
   Upload, CheckCircle, ChevronRight, ChevronLeft, ChevronDown,
   Shield, AlertCircle, Lock, Check, X, Plane, Sparkles, Medal
@@ -20,7 +24,7 @@ const STEPS = [
   { id: 1, label: 'Personal',    icon: User,       blurb: 'Who you are and how to reach you.' },
   { id: 2, label: 'Competition', icon: Trophy,      blurb: 'What you’re competing in.' },
   { id: 3, label: 'Documents',   icon: FileText,    blurb: 'A photo of you. Everything else can wait.' },
-  { id: 4, label: 'Payment',     icon: CreditCard,  blurb: 'Pay now, later, or when you land in Ghana.' },
+  { id: 4, label: 'Payment',     icon: CreditCard,  blurb: 'Pay now online, or pay later in person.' },
 ];
 
 // ─────────────────────────────────────────────
@@ -62,9 +66,6 @@ const schema = z.object({
   // actually paid is decided by Paystack (or an on-site official), never
   // by this form.
   feePaid:             z.string().min(1, 'Please choose how you want to pay'),
-  paymentMethod:       z.string().optional(),
-  transactionId:       z.string().optional(),
-  paystackRef:         z.string().optional(),
   // Recommended, not required — some athletes register in a hurry and
   // add this later; we'd rather have the entry than block on it.
   emergencyName:       z.string().optional(),
@@ -693,16 +694,16 @@ function Step3({ watch, setValue, errors, files, onFileChange, photoError }: {
 }
 
 // ── STEP 4: PAYMENT & FINAL ──
-function Step4({ register, errors, watch, setValue, files, onFileChange, fee }: {
+function Step4({ register, errors, watch, setValue, fee }: {
   register: ReturnType<typeof useForm<FormData>>['register'];
   errors: ReturnType<typeof useForm<FormData>>['formState']['errors'];
   watch: ReturnType<typeof useForm<FormData>>['watch'];
   setValue: ReturnType<typeof useForm<FormData>>['setValue'];
-  files: Record<string, File | null>;
-  onFileChange: (key: string, file: File | null) => void;
-  fee: { ghs: number; usd: number };
+  fee: RegistrationFeeConfig;
 }) {
   const feePaid = watch('feePaid') || '';
+  const ghanaian = isGhanaianRate(watch('nationality'), watch('countryRepresenting'));
+  const { usd, ghs } = feeFor(fee, ghanaian);
 
   return (
     <div>
@@ -712,7 +713,11 @@ function Step4({ register, errors, watch, setValue, files, onFileChange, fee }: 
         <CreditCard size={20} className="text-wff-gold mt-0.5 flex-shrink-0" />
         <div>
           <p className="text-sm font-bebas tracking-wider text-wff-gold text-lg leading-none">
-            Registration Fee: ₵ {fee.ghs.toFixed(2)} / ${fee.usd} USD
+            Your Registration Fee: ${usd} USD
+            {ghs !== null && <span className="text-white/50"> (₵ {ghs.toFixed(2)})</span>}
+          </p>
+          <p className="text-xs text-white/50 mt-1.5">
+            {ghanaian ? 'Ghanaian rate' : 'International rate'} · Ghanaians ${fee.ghanaian_usd} · Foreign athletes ${fee.foreign_usd}
           </p>
           <p className="text-xs text-white/40 mt-1">Fee covers registration, competition bib, and entry into all judging rounds for your selected category.</p>
         </div>
@@ -726,9 +731,8 @@ function Step4({ register, errors, watch, setValue, files, onFileChange, fee }: 
         onChange={v => setValue('feePaid', v, { shouldValidate: true })}
         error={errors.feePaid?.message}
         options={[
-          { value: 'paystack', label: 'Pay now online' },
-          { value: 'offline',  label: 'Pay by bank / mobile money transfer' },
-          { value: 'onsite',   label: 'Pay when I arrive in Ghana' },
+          { value: 'paystack', label: 'Pay now' },
+          { value: 'onsite',   label: 'Pay later' },
         ]}
       />
 
@@ -737,38 +741,10 @@ function Step4({ register, errors, watch, setValue, files, onFileChange, fee }: 
           <Lock size={18} className="text-wff-gold mt-0.5 flex-shrink-0" />
           <p className="text-xs text-white/60 leading-relaxed">
             When you submit this form you will be taken to <span className="text-white font-bold">Paystack</span> to
-            pay the entry fee by card, bank transfer or mobile money. Your entry is only
-            forwarded to the selection committee once payment clears — you can close the payment
+            pay {ghs !== null ? <>₵ {ghs.toFixed(2)} (${usd})</> : <>the entry fee</>} by card, bank transfer or mobile money.
+            Your entry is only forwarded to the selection committee once payment clears — you can close the payment
             page and come back to it, your details are already saved.
           </p>
-        </div>
-      )}
-
-      {feePaid === 'offline' && (
-        <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="flex gap-3 items-start bg-white/[0.03] border border-white/10 rounded-xl p-5">
-            <CreditCard size={18} className="text-white/40 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-white/60 leading-relaxed">
-              Transfer the entry fee to the federation account, then upload your receipt below.
-              An official will confirm your payment manually — this normally takes 1–2 working days.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label>Transaction / Reference ID</Label>
-              <input {...register('transactionId')} className={inputClass} placeholder="TXN-XXXXXXXX" />
-            </div>
-            <div>
-              <Label>Paying From (Bank / MoMo number)</Label>
-              <input {...register('paymentMethod')} className={inputClass} placeholder="MTN MoMo · 024 000 0000" />
-            </div>
-          </div>
-          <FileUpload
-            label="Payment Screenshot / Receipt"
-            hint="JPEG or PNG · Clear screenshot of payment confirmation"
-            file={files.paymentScreenshot}
-            onChange={f => onFileChange('paymentScreenshot', f)}
-          />
         </div>
       )}
 
@@ -776,9 +752,9 @@ function Step4({ register, errors, watch, setValue, files, onFileChange, fee }: 
         <div className="mt-6 flex gap-3 items-start bg-wff-green/5 border border-wff-green/20 rounded-xl p-5 animate-in fade-in slide-in-from-top-2 duration-300">
           <Plane size={18} className="text-wff-green mt-0.5 flex-shrink-0" />
           <p className="text-xs text-white/60 leading-relaxed">
-            No payment needed right now. Complete registration today and settle the entry fee
-            in cash or mobile money when you check in at the event in Ghana. Your spot is
-            provisional — bring the fee with you to confirm it at check-in.
+            No payment needed right now. Complete registration today and pay the ${usd} entry fee
+            in person, in cash or mobile money, when you check in at the event. Your spot is
+            provisional until the fee is paid.
           </p>
         </div>
       )}
@@ -845,7 +821,7 @@ export default function Registration() {
   const [files, setFiles] = useState<Record<string, File | null>>({});
   const [categories, setCategories] = useState<CategoryRow[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [fee, setFee] = useState({ ghs: 500, usd: 45 });
+  const [fee, setFee] = useState<RegistrationFeeConfig>(DEFAULT_REGISTRATION_FEE);
   const [successName, setSuccessName] = useState('');
   const [successMeta, setSuccessMeta] = useState<{ category: string; division: string; country: string }>({ category: '', division: '', country: '' });
   const [photoError, setPhotoError] = useState('');
@@ -870,10 +846,7 @@ export default function Registration() {
       .select('value')
       .eq('key', 'registration_fee')
       .maybeSingle()
-      .then(({ data }) => {
-        const v = data?.value as { ghs?: number; usd?: number } | undefined;
-        if (v?.ghs && v?.usd) setFee({ ghs: v.ghs, usd: v.usd });
-      });
+      .then(({ data }) => setFee(parseRegistrationFee(data?.value)));
   }, []);
 
   const onFileChange = (key: string, file: File | null) => {
@@ -1010,7 +983,6 @@ export default function Registration() {
         const passportUrl = await uploadFile(files.passportDoc, 'passport / ID copy');
         const headshotUrl = await uploadFile(files.athletePhoto, 'athlete photo');
         const fullBodyUrl = await uploadFile(files.fullBody, 'full body photo');
-        const paymentScreenshotUrl = await uploadFile(files.paymentScreenshot, 'payment receipt');
 
         const divisionRow = categories
           .find(c => c.name === data.category)
@@ -1066,10 +1038,10 @@ export default function Registration() {
           // 'onsite' registrations stay 'pending' until an admin marks them
           // paid at event check-in.
           fee_paid_status: 'pending',
-          payment_method: data.feePaid === 'paystack' ? 'paystack' : data.feePaid === 'onsite' ? 'onsite' : (data.paymentMethod || 'offline'),
-          transaction_id: data.transactionId || null,
-          paystack_ref: data.paystackRef || null,
-          payment_screenshot_url: paymentScreenshotUrl,
+          payment_method: data.feePaid === 'paystack' ? 'paystack' : 'onsite',
+          transaction_id: null,
+          paystack_ref: null,
+          payment_screenshot_url: null,
           emergency_name: data.emergencyName || null,
           emergency_relation: data.emergencyRelation || null,
           emergency_phone: data.emergencyPhone || null,
@@ -1278,7 +1250,7 @@ export default function Registration() {
                   {currentStep === 1 && <Step1 register={register} errors={errors} watch={watch} setValue={setValue} trigger={trigger} />}
                   {currentStep === 2 && <Step2 register={register} errors={errors} watch={watch} setValue={setValue} trigger={trigger} categories={categories} categoriesLoading={categoriesLoading} />}
                   {currentStep === 3 && <Step3 errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} photoError={photoError} />}
-                  {currentStep === 4 && <Step4 register={register} errors={errors} watch={watch} setValue={setValue} files={files} onFileChange={onFileChange} fee={fee} />}
+                  {currentStep === 4 && <Step4 register={register} errors={errors} watch={watch} setValue={setValue} fee={fee} />}
                 </div>
               </div>
 
