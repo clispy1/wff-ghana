@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { parseRegistrationFee } from "@/lib/registrationFee";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, KeyRound, Webhook, Database, Wallet, Check } from "lucide-react";
+import { ShieldCheck, Wallet, Check } from "lucide-react";
 
 export default function AdminSettingsPage() {
   const [account, setAccount] = useState<{ email?: string; role?: string; id?: string } | null>(
@@ -82,7 +82,7 @@ export default function AdminSettingsPage() {
       <div className="border-b border-white/10 pb-4">
         <h2 className="font-bebas text-4xl text-white">SYSTEM SETTINGS</h2>
         <p className="text-white/50 text-sm font-sans mt-2">
-          Account details and the configuration this dashboard depends on.
+          Registration fee and your admin account.
         </p>
       </div>
 
@@ -155,58 +155,6 @@ export default function AdminSettingsPage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-[#111] border-white/10 text-white">
-        <CardHeader className="flex flex-row items-center gap-3">
-          <KeyRound className="h-5 w-5 text-wff-red" />
-          <CardTitle className="font-bebas text-2xl tracking-widest">REQUIRED ENVIRONMENT</CardTitle>
-        </CardHeader>
-        <CardContent className="font-sans text-xs space-y-3 text-white/60">
-          <EnvRow name="NEXT_PUBLIC_SUPABASE_URL" note="Project URL" />
-          <EnvRow name="NEXT_PUBLIC_SUPABASE_ANON_KEY" note="Public anon key" />
-          <EnvRow name="SUPABASE_SERVICE_ROLE_KEY" note="Server-side writes — never expose" />
-          <EnvRow name="PAYSTACK_SECRET_KEY" note="Payment initialise / verify / webhook signing" />
-          <EnvRow name="NEXT_PUBLIC_SITE_URL" note="Used to build Paystack callback URLs" />
-          <EnvRow name="NEXT_PUBLIC_SHOP_SHIPPING_FEE" note="Flat merch shipping in GHS" />
-          <EnvRow name="CLIFZE_API_KEY" note="SMS notifications (registrations, vendors, contact, payments)" />
-          <EnvRow name="CLIFZE_SENDER_ID" note="Optional — defaults to WFFGHANA" />
-          <EnvRow name="ADMIN_NOTIFY_PHONE" note="Where admin SMS alerts go — comma-separate for multiple numbers" />
-        </CardContent>
-      </Card>
-
-      <Card className="bg-[#111] border-white/10 text-white">
-        <CardHeader className="flex flex-row items-center gap-3">
-          <Webhook className="h-5 w-5 text-wff-gold" />
-          <CardTitle className="font-bebas text-2xl tracking-widest">PAYSTACK WEBHOOK</CardTitle>
-        </CardHeader>
-        <CardContent className="font-sans text-xs space-y-2 text-white/60">
-          <p>Register this URL in Paystack → Settings → API Keys &amp; Webhooks:</p>
-          <code className="block bg-black border border-white/10 rounded p-3 text-wff-gold break-all">
-            {typeof window !== "undefined" ? window.location.origin : ""}/api/paystack/webhook
-          </code>
-          <p className="text-white/30">
-            Without it, payments completed after a customer closes the browser tab will not be
-            recorded.
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-[#111] border-white/10 text-white">
-        <CardHeader className="flex flex-row items-center gap-3">
-          <Database className="h-5 w-5 text-white/60" />
-          <CardTitle className="font-bebas text-2xl tracking-widest">DATABASE</CardTitle>
-        </CardHeader>
-        <CardContent className="font-sans text-xs space-y-2 text-white/60">
-          <p>
-            Schema and policies live in <code className="text-wff-gold">supabase_setup.sql</code>{" "}
-            then <code className="text-wff-gold">supabase_backend.sql</code>, applied in that
-            order through the Supabase SQL editor.
-          </p>
-          <p className="text-white/30">
-            Public sign-ups should be disabled in Authentication → Providers → Email. Nothing on
-            the public site creates accounts.
-          </p>
-        </CardContent>
-      </Card>
     </div>
   );
 }
@@ -223,15 +171,6 @@ function FeeInput({ label, value, onChange }: { label: string; value: string; on
         onChange={(e) => onChange(e.target.value)}
         className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-wff-gold/70 focus:outline-none"
       />
-    </div>
-  );
-}
-
-function EnvRow({ name, note }: { name: string; note: string }) {
-  return (
-    <div className="flex justify-between gap-4 border-b border-white/5 pb-2">
-      <code className="text-wff-gold break-all">{name}</code>
-      <span className="text-white/40 text-right flex-shrink-0">{note}</span>
     </div>
   );
 }
