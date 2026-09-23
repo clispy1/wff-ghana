@@ -205,6 +205,39 @@ function Switch({ checked, onChange, label, sublabel }: {
   );
 }
 
+// ── FILE PREP: runs the moment a file is picked ──
+// Android's photo picker hands back files that can become unreadable a
+// few minutes later, so by the time the athlete reaches Submit the
+// upload silently never leaves the phone. Copy the bytes into memory
+// straight away, and shrink big phone photos so any size uploads
+// quickly over mobile data. There is deliberately no size limit.
+const MAX_IMAGE_EDGE = 2000;
+
+async function shrinkImage(file: File): Promise<File> {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, MAX_IMAGE_EDGE / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  const blob = await new Promise<Blob | null>(res => canvas.toBlob(res, 'image/jpeg', 0.85));
+  if (!blob || blob.size >= file.size) return file;
+  return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+}
+
+async function prepareFile(file: File): Promise<File> {
+  const bytes = await file.arrayBuffer();
+  const copy = new File([bytes], file.name, { type: file.type || 'application/octet-stream' });
+  if (!copy.type.startsWith('image/') || copy.type === 'image/gif') return copy;
+  try {
+    return await shrinkImage(copy);
+  } catch {
+    // Formats the browser can't decode (e.g. HEIC) upload as-is.
+    return copy;
+  }
+}
+
 // ── FILE UPLOAD: drag & drop, live preview, clear success state ──
 function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -849,9 +882,21 @@ export default function Registration() {
       .then(({ data }) => setFee(parseRegistrationFee(data?.value)));
   }, []);
 
-  const onFileChange = (key: string, file: File | null) => {
-    setFiles(prev => ({ ...prev, [key]: file }));
-    if (key === 'athletePhoto' && file) setPhotoError('');
+  const onFileChange = async (key: string, picked: File | null) => {
+    if (!picked) {
+      setFiles(prev => ({ ...prev, [key]: null }));
+      return;
+    }
+    try {
+      const file = await prepareFile(picked);
+      setFiles(prev => ({ ...prev, [key]: file }));
+      if (key === 'athletePhoto') setPhotoError('');
+    } catch (e) {
+      console.error(e);
+      const message = "Couldn't read that file from your phone. Please pick it again, or choose a different photo.";
+      if (key === 'athletePhoto') setPhotoError(message);
+      else setSubmitError(message);
+    }
   };
 
   const { register, handleSubmit, formState: { errors, isValid }, watch, setValue, trigger, reset, control } =
@@ -981,14 +1026,19 @@ export default function Registration() {
           if (!file) return null;
           const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '');
           const path = `registrations/${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${safeName}`;
-          const { data: udata, error } = await supabase.storage
-            .from('athlete-documents')
-            .upload(path, file);
-          if (error) {
+          // One retry — mobile connections drop mid-upload often enough.
+          for (let attempt = 1; ; attempt++) {
+            const { data: udata, error } = await supabase.storage
+              .from('athlete-documents')
+              .upload(path, file);
+            if (!error) return udata.path;
+            // The first attempt landed but the reply was lost.
+            if (attempt > 1 && /exists|duplicate/i.test(error.message)) return path;
             console.error(error);
-            throw new Error(`Your ${what} couldn't be uploaded. Try a smaller JPG or PNG file.`);
+            if (attempt >= 2) {
+              throw new Error(`Your ${what} couldn't be uploaded. Check your internet connection and try again.`);
+            }
           }
-          return udata.path;
         };
 
         const passportUrl = await uploadFile(files.passportDoc, 'passport / ID copy');
@@ -1314,7 +1364,7 @@ export default function Registration() {
                     {isSubmitting ? (
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <><Shield size={16} /> {savedId && feePaidChoice === 'paystack' ? 'Retry Payment' : 'Submit Registration'}</>
+                      <><Shield size={16} /> {savedId && feePaidChoice === 'paystack' ? 'Retry Payment' : 'Submit'}</>
                     )}
                   </button>
                 )}
