@@ -127,17 +127,30 @@ export default function AdminRegistrationsPage() {
     };
   }, [selectedReg]);
 
+  // Session-expired message shown when a write hits RLS: Supabase reports
+  // that as 0 rows matched, not as an error, so without checking the
+  // returned row count a blocked write looks identical to a successful
+  // one — the dialog closes, the list refreshes, and the athlete is
+  // silently still there.
+  const SESSION_EXPIRED =
+    "Nothing changed. Your admin session may have expired — refresh the page and sign in again, then try once more.";
+
   const updateRegistration = async (id: string, patch: Record<string, unknown>) => {
     setBusy(true);
-    const { error: updateError } = await supabase
+    const { data, error: updateError } = await supabase
       .from("registrations")
       .update({ ...patch, reviewed_at: new Date().toISOString() })
-      .eq("id", id);
+      .eq("id", id)
+      .select("id");
 
     setBusy(false);
 
     if (updateError) {
       setError(updateError.message);
+      return;
+    }
+    if (!data || data.length === 0) {
+      setError(SESSION_EXPIRED);
       return;
     }
 
@@ -149,11 +162,19 @@ export default function AdminRegistrationsPage() {
     if (!window.confirm(`Delete ${label}'s registration? This cannot be undone.`)) return;
 
     setBusy(true);
-    const { error: deleteError } = await supabase.from("registrations").delete().eq("id", id);
+    const { data, error: deleteError } = await supabase
+      .from("registrations")
+      .delete()
+      .eq("id", id)
+      .select("id");
     setBusy(false);
 
     if (deleteError) {
       setError(deleteError.message);
+      return;
+    }
+    if (!data || data.length === 0) {
+      setError(SESSION_EXPIRED);
       return;
     }
 
