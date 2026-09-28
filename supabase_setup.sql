@@ -16,9 +16,9 @@ CREATE TABLE IF NOT EXISTS public.registrations (
     email TEXT NOT NULL,
     mobile TEXT NOT NULL,
     whatsapp TEXT,
-    address TEXT NOT NULL,
-    city TEXT NOT NULL,
-    country TEXT NOT NULL,
+    address TEXT,
+    city TEXT,
+    country TEXT,
 
     -- Step 2 — Competition
     athlete_type TEXT NOT NULL,

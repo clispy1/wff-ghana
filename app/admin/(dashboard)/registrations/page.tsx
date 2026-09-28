@@ -346,8 +346,13 @@ export default function AdminRegistrationsPage() {
                 </Field>
                 <Field label="Coach">{selectedReg.coach_name || "—"}</Field>
                 <Field label="Emergency Contact">
-                  {selectedReg.emergency_name} ({selectedReg.emergency_relation}) —{" "}
-                  {selectedReg.emergency_phone}
+                  {selectedReg.emergency_name || selectedReg.emergency_phone
+                    ? <>
+                        {selectedReg.emergency_name || "—"}
+                        {selectedReg.emergency_relation && ` (${selectedReg.emergency_relation})`}
+                        {" — "}{selectedReg.emergency_phone || "no phone"}
+                      </>
+                    : "—"}
                 </Field>
                 <Field label="Submitted">
                   {new Date(selectedReg.created_at).toLocaleDateString()}

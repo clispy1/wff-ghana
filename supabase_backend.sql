@@ -432,3 +432,11 @@ GRANT EXECUTE ON FUNCTION public.submit_vendor_application(JSONB) TO anon, authe
 -- INSERT INTO public.admin_users (user_id, email, role)
 -- SELECT id, email, 'super_admin' FROM auth.users WHERE email = 'you@wffghana.com'
 -- ON CONFLICT (user_id) DO UPDATE SET role = EXCLUDED.role;
+
+-- Residential address was dropped from the athlete form to keep it
+-- short; nationality and country representing cover location. Old rows
+-- keep their values.
+ALTER TABLE public.registrations
+    ALTER COLUMN address DROP NOT NULL,
+    ALTER COLUMN city    DROP NOT NULL,
+    ALTER COLUMN country DROP NOT NULL;
