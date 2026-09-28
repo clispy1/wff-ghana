@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { ShoppingBag, ChevronDown, Menu, X, ArrowRight } from 'lucide-react';
 import { useCart } from '@/lib/CartContext';
+import ThemeToggle from '@/components/ThemeToggle';
 
 interface SubLink {
   name: string;
@@ -95,8 +96,8 @@ export default function ScrubberNavbar() {
           <div 
             className={`mx-auto flex items-center justify-between px-6 py-3 rounded-full transition-all duration-300 border ${
               isScrolled 
-                ? 'bg-black/92 backdrop-blur-md border-white/10 shadow-[0_10px_35px_rgba(0,0,0,0.85)]' 
-                : 'bg-black/45 backdrop-blur-sm border-white/5'
+                ? 'bg-page/92 backdrop-blur-md border-fg/10 shadow-[0_10px_35px_rgba(0,0,0,0.85)]' 
+                : 'bg-page/60 backdrop-blur-sm border-fg/5'
             }`}
           >
             {/* Brand Logo */}
@@ -110,7 +111,7 @@ export default function ScrubberNavbar() {
                   priority
                 />
               </div>
-              <span className="font-bebas text-2xl tracking-widest text-white group-hover:text-wff-gold transition-colors">
+              <span className="font-bebas text-2xl tracking-widest text-fg group-hover:text-gold-ink transition-colors">
                 WFF <span className="text-wff-red">GHANA</span>
               </span>
             </Link>
@@ -126,8 +127,8 @@ export default function ScrubberNavbar() {
                       href={item.href || '/'}
                       className={`px-4 py-2 text-xs uppercase tracking-wider font-bold transition-colors ${
                         isActive 
-                          ? 'text-wff-gold' 
-                          : 'text-white/70 hover:text-white'
+                          ? 'text-gold-ink' 
+                          : 'text-fg/70 hover:text-fg'
                       }`}
                     >
                       {item.title}
@@ -146,8 +147,8 @@ export default function ScrubberNavbar() {
                     <button 
                       className={`flex items-center gap-1.5 px-4 py-2 text-xs uppercase tracking-wider font-bold transition-colors ${
                         isGroupActive 
-                          ? 'text-wff-gold' 
-                          : 'text-white/70 hover:text-white'
+                          ? 'text-gold-ink' 
+                          : 'text-fg/70 hover:text-fg'
                       }`}
                       aria-expanded={activeDropdown === itemIdx}
                     >
@@ -155,20 +156,20 @@ export default function ScrubberNavbar() {
                       <ChevronDown 
                         size={12} 
                         className={`transition-transform duration-300 ${
-                          activeDropdown === itemIdx ? 'rotate-180 text-wff-red' : 'text-white/40'
+                          activeDropdown === itemIdx ? 'rotate-180 text-wff-red' : 'text-fg/40'
                         }`} 
                       />
                     </button>
 
                     {/* Desktop Dropdown Content */}
                     <div 
-                      className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 bg-black/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl transition-all duration-300 origin-top ${
+                      className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 bg-surface/95 backdrop-blur-xl border border-fg/10 rounded-2xl p-4 shadow-2xl transition-all duration-300 origin-top ${
                         activeDropdown === itemIdx 
                           ? 'opacity-100 scale-100 pointer-events-auto visible' 
                           : 'opacity-0 scale-95 pointer-events-none invisible'
                       }`}
                     >
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 w-3 h-3 rotate-45 bg-[#050505] border-t border-l border-white/10"></div>
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 w-3 h-3 rotate-45 bg-page border-t border-l border-fg/10"></div>
                       <div className="relative z-10 space-y-1">
                         {item.items?.map((sub) => {
                           const isSubActive = pathname === sub.href;
@@ -179,18 +180,18 @@ export default function ScrubberNavbar() {
                               className={`group/item block p-3 rounded-xl transition-all duration-200 ${
                                 isSubActive 
                                   ? 'bg-wff-red/10 border border-wff-red/20' 
-                                  : 'hover:bg-white/5 border border-transparent'
+                                  : 'hover:bg-fg/5 border border-transparent'
                               }`}
                             >
                               <div className="flex items-center justify-between mb-0.5">
                                 <span className={`text-sm font-semibold uppercase tracking-wider transition-colors ${
-                                  isSubActive ? 'text-wff-red' : 'text-white group-hover/item:text-wff-gold'
+                                  isSubActive ? 'text-wff-red' : 'text-fg group-hover/item:text-gold-ink'
                                 }`}>
                                   {sub.name}
                                 </span>
-                                <ArrowRight size={12} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all text-wff-gold" />
+                                <ArrowRight size={12} className="opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all text-gold-ink" />
                               </div>
-                              <p className="text-white/50 text-[11px] leading-normal font-sans antialiased">
+                              <p className="text-fg/50 text-[11px] leading-normal font-sans antialiased">
                                 {sub.desc}
                               </p>
                             </Link>
@@ -213,15 +214,17 @@ export default function ScrubberNavbar() {
                 Register Athlete
               </Link>
 
+              <ThemeToggle className="p-2.5 text-fg/80 hover:text-fg transition-colors bg-fg/5 hover:bg-fg/10 border border-fg/5 rounded-full" />
+
               {/* Shopping Bag Icon Button */}
               <button 
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-2.5 text-white/80 hover:text-white transition-colors bg-white/5 hover:bg-white/10 border border-white/5 rounded-full"
+                className="relative p-2.5 text-fg/80 hover:text-fg transition-colors bg-fg/5 hover:bg-fg/10 border border-fg/5 rounded-full"
                 aria-label="Open cart"
               >
                 <ShoppingBag size={18} />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-wff-red text-white text-[9px] font-extrabold w-4.5 h-4.5 rounded-full flex items-center justify-center border border-black">
+                  <span className="absolute -top-1 -right-1 bg-wff-red text-white text-[9px] font-extrabold w-4.5 h-4.5 rounded-full flex items-center justify-center border border-page">
                     {cartCount}
                   </span>
                 )}
@@ -229,7 +232,7 @@ export default function ScrubberNavbar() {
 
               {/* Mobile Drawer Trigger */}
               <button 
-                className="lg:hidden p-2.5 text-white/80 hover:text-white transition-colors bg-white/5 hover:bg-white/10 border border-white/5 rounded-full"
+                className="lg:hidden p-2.5 text-fg/80 hover:text-fg transition-colors bg-fg/5 hover:bg-fg/10 border border-fg/5 rounded-full"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label="Toggle menu"
               >
@@ -242,7 +245,7 @@ export default function ScrubberNavbar() {
 
       {/* Mobile Accordion Drawer */}
       <div 
-        className={`fixed inset-0 z-40 bg-black/95 backdrop-blur-2xl transition-all duration-300 lg:hidden ${
+        className={`fixed inset-0 z-40 bg-page/95 backdrop-blur-2xl transition-all duration-300 lg:hidden ${
           isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
@@ -253,11 +256,11 @@ export default function ScrubberNavbar() {
               if (!item.isDropdown) {
                 const isActive = pathname === item.href;
                 return (
-                  <div key={item.title} className="border-b border-white/10 pb-4">
+                  <div key={item.title} className="border-b border-fg/10 pb-4">
                     <Link
                       href={item.href || '/'}
                       className={`block py-1 font-bebas text-3xl tracking-widest uppercase ${
-                        isActive ? 'text-wff-gold' : 'text-white'
+                        isActive ? 'text-gold-ink' : 'text-fg'
                       }`}
                     >
                       {item.title}
@@ -269,19 +272,19 @@ export default function ScrubberNavbar() {
               const worksInGroup = activeMobileAccordion === itemIdx;
               const isGroupActive = item.items?.some(sub => pathname === sub.href) || false;
               return (
-                <div key={item.title} className="border-b border-white/10 pb-4">
+                <div key={item.title} className="border-b border-fg/10 pb-4">
                   <button
                     onClick={() => setActiveMobileAccordion(worksInGroup ? null : itemIdx)}
                     className="w-full flex items-center justify-between py-1 text-left"
                   >
                     <span className={`font-bebas text-3xl tracking-widest uppercase ${
-                      isGroupActive ? 'text-wff-gold' : 'text-white'
+                      isGroupActive ? 'text-gold-ink' : 'text-fg'
                     }`}>
                       {item.title}
                     </span>
                     <ChevronDown 
                       size={20} 
-                      className={`text-white/40 transition-transform duration-300 ${
+                      className={`text-fg/40 transition-transform duration-300 ${
                         worksInGroup ? 'rotate-180 text-wff-red' : ''
                       }`} 
                     />
@@ -300,13 +303,13 @@ export default function ScrubberNavbar() {
                             key={sub.name}
                             href={sub.href}
                             className={`block p-2 rounded-lg transition-colors ${
-                              isSubActive ? 'text-wff-red font-semibold' : 'text-white/70 hover:text-white'
+                              isSubActive ? 'text-wff-red font-semibold' : 'text-fg/70 hover:text-fg'
                             }`}
                           >
                             <span className="text-sm font-bold uppercase tracking-wider block">
                               {sub.name}
                             </span>
-                            <span className="text-white/40 text-[11px] font-sans block mt-0.5">
+                            <span className="text-fg/40 text-[11px] font-sans block mt-0.5">
                               {sub.desc}
                             </span>
                           </Link>
@@ -327,7 +330,7 @@ export default function ScrubberNavbar() {
             >
               REGISTER ATHLETE NOW
             </Link>
-            <div className="text-center font-sans text-xs text-white/40">
+            <div className="text-center font-sans text-xs text-fg/40">
               World Fitness Federation Ghana © 2026
             </div>
           </div>

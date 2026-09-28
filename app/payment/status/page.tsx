@@ -55,39 +55,39 @@ export default async function PaymentStatusPage({
 
   const Icon = status === 'success' ? CheckCircle : status === 'failed' ? XCircle : AlertTriangle;
   const accent =
-    status === 'success' ? 'text-wff-gold' : status === 'failed' ? 'text-wff-red' : 'text-yellow-500';
+    status === 'success' ? 'text-gold-ink' : status === 'failed' ? 'text-wff-red' : 'text-yellow-500';
 
   return (
-    <main className="pt-32 pb-24 min-h-screen bg-wff-dark flex items-center justify-center">
+    <main className="pt-32 pb-24 min-h-screen bg-page flex items-center justify-center">
       {status === 'success' && params.purpose === 'shop' && <ClearCartOnSuccess />}
 
       <div className="container mx-auto px-6 text-center max-w-2xl">
         <Icon className={`w-24 h-24 ${accent} mx-auto mb-8`} />
 
-        <h1 className="font-bebas text-5xl md:text-7xl mb-6 text-white">{copy.title}</h1>
+        <h1 className="font-bebas text-5xl md:text-7xl mb-6 text-fg">{copy.title}</h1>
 
-        <p className="font-sans text-white/60 text-base leading-relaxed mb-4">
+        <p className="font-sans text-fg/60 text-base leading-relaxed mb-4">
           {params.message || copy.body}
         </p>
 
         {params.reference && (
-          <p className="font-sans text-xs text-white/40 mb-12">
+          <p className="font-sans text-xs text-fg/40 mb-12">
             Reference:{' '}
-            <span className="text-wff-gold font-bold tracking-wider">{params.reference}</span>
+            <span className="text-gold-ink font-bold tracking-wider">{params.reference}</span>
           </p>
         )}
 
         <div className="flex flex-wrap gap-4 justify-center">
           <Link
             href="/"
-            className="inline-block border border-wff-gold text-wff-gold font-bebas text-2xl px-10 py-3 hover:bg-wff-gold hover:text-black transition-colors"
+            className="inline-block border border-wff-gold text-gold-ink font-bebas text-2xl px-10 py-3 hover:bg-wff-gold hover:text-black transition-colors"
           >
             BACK TO HOME
           </Link>
           {status !== 'success' && (
             <Link
               href={purpose === 'shop' ? '/shop/checkout' : purpose === 'ticket' ? '/championship#tickets' : purpose === 'vendor' ? '/championship/vendors/apply' : '/register'}
-              className="inline-block border border-white/20 text-white font-bebas text-2xl px-10 py-3 hover:bg-white hover:text-black transition-colors"
+              className="inline-block border border-fg/20 text-fg font-bebas text-2xl px-10 py-3 hover:bg-white hover:text-black transition-colors"
             >
               TRY AGAIN
             </Link>

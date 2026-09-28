@@ -60,7 +60,7 @@ const AWARD_ICON_STYLES = [
   },
   {
     ring: "bg-wff-gold/10 border-wff-gold/20 shadow-[0_0_15px_rgba(212,175,55,0.2)]",
-    stroke: "text-wff-gold",
+    stroke: "text-gold-ink",
     path: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
   },
   {
@@ -127,7 +127,7 @@ export default function ChampionshipClient({
   return (
     <main
       ref={containerRef}
-      className="pt-32 pb-24 min-h-screen relative overflow-y-auto bg-wff-dark"
+      className="pt-32 pb-24 min-h-screen relative overflow-y-auto bg-page"
     >
       {/* Ambient Red Glow Background */}
       <div
@@ -141,7 +141,7 @@ export default function ChampionshipClient({
       <div className="container mx-auto px-6 relative z-10 max-w-6xl">
         {/* Header */}
         <div ref={headerRef} className="max-w-4xl mx-auto text-center mb-16">
-          <p className="font-sans text-wff-gold font-bold uppercase tracking-[0.3em] mb-4">
+          <p className="font-sans text-gold-ink font-bold uppercase tracking-[0.3em] mb-4">
             {championshipEvent?.start_date
               ? `${new Date(championshipEvent.start_date).getFullYear()} Continental Summit`
               : "Continental Summit"}
@@ -149,7 +149,7 @@ export default function ChampionshipClient({
           <h1 className="font-bebas text-6xl md:text-8xl mb-6">
             THE ULTIMATE <span className="text-wff-red">SHOWDOWN</span>
           </h1>
-          <p className="font-sans text-lg text-white/70 leading-relaxed md:px-12">
+          <p className="font-sans text-lg text-fg/70 leading-relaxed md:px-12">
             {championshipEvent?.description || "Event details to be announced."}
           </p>
         </div>
@@ -162,7 +162,7 @@ export default function ChampionshipClient({
               subtitle: championshipEvent?.venue_location || "Accra, Ghana",
             },
             {
-              icon: <Calendar className="text-wff-gold" size={24} />,
+              icon: <Calendar className="text-gold-ink" size={24} />,
               title: formatEventDate(championshipEvent?.start_date) || "Date To Be Announced",
               subtitle:
                 formatEventRange(
@@ -171,12 +171,12 @@ export default function ChampionshipClient({
                 ) || "To Be Announced",
             },
             {
-              icon: <Ticket className="text-white" size={24} />,
+              icon: <Ticket className="text-fg" size={24} />,
               title: TICKETS.length > 0 ? "Pre-Sale Live" : "Tickets Coming Soon",
               subtitle: TICKETS.length > 0 ? "Exquisite Seating Plans" : "Check back soon",
             },
             {
-              icon: <Award className="text-wff-gold" size={24} />,
+              icon: <Award className="text-gold-ink" size={24} />,
               title: "WFF Pro Cards",
               subtitle: "Multiple Divisions Offered",
             },
@@ -186,7 +186,7 @@ export default function ChampionshipClient({
               subtitle: logistics?.hostNationTagline || "World Fitness Federation",
             },
             {
-              icon: <ClipboardCheck className="text-wff-gold" size={24} />,
+              icon: <ClipboardCheck className="text-gold-ink" size={24} />,
               title: registrationOpen ? "Registration Open" : "Registration Closed",
               subtitle: championshipEvent?.registration_deadline
                 ? `Closes ${formatEventDate(championshipEvent.registration_deadline)}`
@@ -195,12 +195,12 @@ export default function ChampionshipClient({
           ].map((item, idx) => (
             <div
               key={idx}
-              className="bg-[#111] border border-white/5 p-6 rounded-xl flex items-center gap-4"
+              className="bg-raised border border-fg/5 p-6 rounded-xl flex items-center gap-4"
             >
-              <div className="p-3 bg-white/5 rounded-lg">{item.icon}</div>
+              <div className="p-3 bg-fg/5 rounded-lg">{item.icon}</div>
               <div>
-                <h4 className="font-bebas text-xl text-white">{item.title}</h4>
-                <p className="font-sans text-xs text-white/50">
+                <h4 className="font-bebas text-xl text-fg">{item.title}</h4>
+                <p className="font-sans text-xs text-fg/50">
                   {item.subtitle}
                 </p>
               </div>
@@ -213,7 +213,7 @@ export default function ChampionshipClient({
             <a
               href={logistics.pdfUrl}
               download
-              className="inline-flex items-center gap-2 border border-white/20 text-white font-bebas text-lg px-6 py-2.5 rounded hover:bg-white hover:text-black transition-colors"
+              className="inline-flex items-center gap-2 border border-fg/20 text-fg font-bebas text-lg px-6 py-2.5 rounded hover:bg-white hover:text-black transition-colors"
             >
               <Download size={18} />
               Download Event PDF
@@ -224,23 +224,23 @@ export default function ChampionshipClient({
         {/* Tickets Section */}
         <div
           id="tickets"
-          className="bg-[#111]/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 md:p-12 mb-16 relative overflow-hidden"
+          className="bg-raised/80 backdrop-blur-md border border-fg/10 rounded-2xl p-8 md:p-12 mb-16 relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-80 h-80 bg-wff-red/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
 
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-5">
-              <h2 className="font-bebas text-4xl md:text-5xl mb-4 text-white">
+              <h2 className="font-bebas text-4xl md:text-5xl mb-4 text-fg">
                 GET YOUR <span className="text-wff-red">TICKETS</span>
               </h2>
-              <p className="font-sans text-sm text-white/60 mb-6 leading-relaxed">
+              <p className="font-sans text-sm text-fg/60 mb-6 leading-relaxed">
                 Be a witness to absolute bodybuilding and wellness history.
                 Choose Tier 1 general admission seating or enjoy the ultimate
                 high-profile VIP experience with fully loaded backstage passes
                 and red-carpet access.
               </p>
-              <div className="p-4 bg-white/5 border border-white/5 rounded-lg max-w-sm">
-                <p className="font-sans text-xs text-white/70">
+              <div className="p-4 bg-fg/5 border border-fg/5 rounded-lg max-w-sm">
+                <p className="font-sans text-xs text-fg/70">
                   ⚡ <strong>Note:</strong> Tickets purchased online are
                   instantly compiled inside your local order tray. Check your
                   email inbox for official receipts.
@@ -250,7 +250,7 @@ export default function ChampionshipClient({
 
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
               {TICKETS.length === 0 ? (
-                <p className="text-white/40 text-sm col-span-full">
+                <p className="text-fg/40 text-sm col-span-full">
                   Ticket tiers will be announced shortly.
                 </p>
               ) : (
@@ -260,12 +260,12 @@ export default function ChampionshipClient({
                     className={`p-8 border rounded-xl flex flex-col justify-between h-80 ${
                       ticket.isVip
                         ? "border-wff-gold bg-wff-gold/5 relative overflow-hidden group"
-                        : "border-white/10 bg-black/40 group"
+                        : "border-fg/10 bg-raised group"
                     }`}
                   >
                     <div>
                       <div className="flex justify-between items-start mb-4">
-                        <span className="font-bebas text-2xl tracking-widest text-white group-hover:text-wff-red transition-colors">
+                        <span className="font-bebas text-2xl tracking-widest text-fg group-hover:text-wff-red transition-colors">
                           {ticket.isVip ? "VIP UNLIMITED" : "GENERAL SEAT"}
                         </span>
                         {ticket.isVip && (
@@ -274,20 +274,20 @@ export default function ChampionshipClient({
                           </span>
                         )}
                       </div>
-                      <h5 className="font-bebas text-3xl mb-1 text-white">
+                      <h5 className="font-bebas text-3xl mb-1 text-fg">
                         {ticket.name}
                       </h5>
-                      <p className="font-sans text-xs text-white/50 leading-relaxed mb-6">
+                      <p className="font-sans text-xs text-fg/50 leading-relaxed mb-6">
                         {ticket.description}
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-auto">
+                    <div className="flex items-center justify-between border-t border-fg/5 pt-4 mt-auto">
                       <div>
-                        <span className="text-[10px] font-sans text-white/40 block">
+                        <span className="text-[10px] font-sans text-fg/40 block">
                           Price
                         </span>
-                        <span className="font-sans font-bold text-lg text-white">
+                        <span className="font-sans font-bold text-lg text-fg">
                           ₵ {ticket.price.toFixed(2)}
                         </span>
                       </div>
@@ -312,18 +312,18 @@ export default function ChampionshipClient({
         {/* Detailed Running Order & Timetable */}
         <div
           id="schedule"
-          className="bg-[#111]/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 md:p-12 mb-16"
+          className="bg-raised/80 backdrop-blur-md border border-fg/10 rounded-2xl p-8 md:p-12 mb-16"
         >
-          <h2 className="font-bebas text-4xl md:text-5xl text-wff-gold mb-8 pb-4 border-b border-white/10">
+          <h2 className="font-bebas text-4xl md:text-5xl text-gold-ink mb-8 pb-4 border-b border-fg/10">
             TIMETABLE & RUNNING ORDER
           </h2>
 
           {!schedule || !schedule.days?.length ? (
             <div className="space-y-8">
-              <Skeleton className="h-6 w-64 bg-white/10" />
-              <Skeleton className="h-24 w-full bg-white/10" />
-              <Skeleton className="h-24 w-full bg-white/10" />
-              <Skeleton className="h-24 w-full bg-white/10" />
+              <Skeleton className="h-6 w-64 bg-fg/10" />
+              <Skeleton className="h-24 w-full bg-fg/10" />
+              <Skeleton className="h-24 w-full bg-fg/10" />
+              <Skeleton className="h-24 w-full bg-fg/10" />
             </div>
           ) : (
           <div className="space-y-12 font-sans">
@@ -337,15 +337,15 @@ export default function ChampionshipClient({
                 : "bg-wff-red shadow-[0_0_10px_rgba(206,17,38,0.8)]";
 
               return (
-                <div key={idx} className="relative pl-8 border-l border-white/10">
+                <div key={idx} className="relative pl-8 border-l border-fg/10">
                   <div
                     className={`absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full ${dotColor}`}
                   ></div>
-                  <h3 className="font-bebas text-2xl md:text-3xl text-white mb-1 uppercase tracking-wider">
+                  <h3 className="font-bebas text-2xl md:text-3xl text-fg mb-1 uppercase tracking-wider">
                     {formatScheduleDayHeading(day)}
                   </h3>
                   {(day.venueName || day.venueLocation) && (
-                    <p className="font-sans text-xs text-wff-gold mb-4">
+                    <p className="font-sans text-xs text-gold-ink mb-4">
                       {[day.venueName, day.venueLocation].filter(Boolean).join(" — ")}
                     </p>
                   )}
@@ -354,12 +354,12 @@ export default function ChampionshipClient({
                     {day.blocks.map((block, bIdx) => (
                       <div
                         key={bIdx}
-                        className="bg-black/45 border border-white/5 p-6 rounded-xl"
+                        className="bg-raised border border-fg/5 p-6 rounded-xl"
                       >
-                        <p className="text-wff-gold text-xs uppercase tracking-widest font-bold mb-4 border-b border-white/10 pb-2 font-mono">
+                        <p className="text-gold-ink text-xs uppercase tracking-widest font-bold mb-4 border-b border-fg/10 pb-2 font-mono">
                           {block.label}
                         </p>
-                        <ul className="space-y-2 text-xs text-white/70 leading-relaxed">
+                        <ul className="space-y-2 text-xs text-fg/70 leading-relaxed">
                           {block.items.map((item, itemIdx) => (
                             <li key={itemIdx} className="flex items-start">
                               <span className="text-wff-red mr-2">•</span>
@@ -380,15 +380,15 @@ export default function ChampionshipClient({
         {/* Airport Transfers, Visa Guidance, Accommodations */}
         {!logistics ? (
           <div id="logistics" className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-            <div className="bg-[#111]/80 border border-white/10 p-8 rounded-2xl space-y-4">
-              <Skeleton className="h-5 w-40 bg-white/10" />
-              <Skeleton className="h-20 w-full bg-white/10" />
-              <Skeleton className="h-20 w-full bg-white/10" />
+            <div className="bg-raised/80 border border-fg/10 p-8 rounded-2xl space-y-4">
+              <Skeleton className="h-5 w-40 bg-fg/10" />
+              <Skeleton className="h-20 w-full bg-fg/10" />
+              <Skeleton className="h-20 w-full bg-fg/10" />
             </div>
-            <div className="lg:col-span-2 bg-[#111]/80 border border-white/10 p-8 rounded-2xl space-y-4">
-              <Skeleton className="h-5 w-56 bg-white/10" />
-              <Skeleton className="h-16 w-full bg-white/10" />
-              <Skeleton className="h-28 w-full bg-white/10" />
+            <div className="lg:col-span-2 bg-raised/80 border border-fg/10 p-8 rounded-2xl space-y-4">
+              <Skeleton className="h-5 w-56 bg-fg/10" />
+              <Skeleton className="h-16 w-full bg-fg/10" />
+              <Skeleton className="h-28 w-full bg-fg/10" />
             </div>
           </div>
         ) : (
@@ -397,15 +397,15 @@ export default function ChampionshipClient({
           className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16"
         >
           {/* Shuttles & Transports */}
-          <div className="bg-[#111]/80 backdrop-blur-md border border-white/5 p-8 rounded-2xl flex flex-col justify-between">
+          <div className="bg-raised/80 backdrop-blur-md border border-fg/5 p-8 rounded-2xl flex flex-col justify-between">
             <div>
               <div className="p-3 bg-wff-red/10 border border-wff-red/20 text-wff-red w-fit rounded-lg mb-6">
                 <Plane size={24} />
               </div>
-              <h3 className="font-bebas text-3xl mb-4 text-white">
+              <h3 className="font-bebas text-3xl mb-4 text-fg">
                 AIRPORTS & VISAS
               </h3>
-              <p className="font-sans text-xs text-white/60 leading-relaxed space-y-4">
+              <p className="font-sans text-xs text-fg/60 leading-relaxed space-y-4">
                 <span>{logistics.airportIntro}</span>
                 <br />
                 <br />
@@ -417,25 +417,25 @@ export default function ChampionshipClient({
                 </span>
               </p>
             </div>
-            <div className="mt-6 pt-4 border-t border-white/5 flex items-center gap-2 text-[10px] text-white/40">
+            <div className="mt-6 pt-4 border-t border-fg/5 flex items-center gap-2 text-[10px] text-fg/40">
               <ShieldAlert size={14} className="text-wff-red" /> Mandatory
               Yellow Card Required
             </div>
           </div>
 
           {/* Official Host Hotels */}
-          <div className="lg:col-span-2 bg-[#111]/80 backdrop-blur-md border border-white/10 p-8 rounded-2xl">
-            <div className="flex items-center gap-4 mb-6 pb-2 border-b border-white/10">
-              <div className="p-3 bg-wff-gold/15 text-wff-gold rounded-lg">
+          <div className="lg:col-span-2 bg-raised/80 backdrop-blur-md border border-fg/10 p-8 rounded-2xl">
+            <div className="flex items-center gap-4 mb-6 pb-2 border-b border-fg/10">
+              <div className="p-3 bg-wff-gold/15 text-gold-ink rounded-lg">
                 <Hotel size={24} />
               </div>
-              <h3 className="font-bebas text-3xl text-white">
+              <h3 className="font-bebas text-3xl text-fg">
                 OFFICIAL ACCOMMODATIONS
               </h3>
             </div>
-            <p className="font-sans text-xs text-white/50 mb-6 leading-relaxed">
+            <p className="font-sans text-xs text-fg/50 mb-6 leading-relaxed">
               {logistics.hotelIntro} Use discount code{" "}
-              <span className="text-wff-gold font-bold">
+              <span className="text-gold-ink font-bold">
                 {logistics.hotelDiscountCode}
               </span>{" "}
               when securing rooms.
@@ -445,7 +445,7 @@ export default function ChampionshipClient({
               {HOTELS.map((hotel, hIdx) => (
                 <div
                   key={hIdx}
-                  className="bg-black/55 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors flex flex-col sm:flex-row justify-between gap-4"
+                  className="bg-raised p-4 rounded-xl border border-fg/5 hover:border-fg/10 transition-colors flex flex-col sm:flex-row justify-between gap-4"
                 >
                   <div>
                     <span
@@ -453,13 +453,13 @@ export default function ChampionshipClient({
                     >
                       {hotel.type}
                     </span>
-                    <h4 className="text-sm font-bold text-white mb-0.5">
+                    <h4 className="text-sm font-bold text-fg mb-0.5">
                       {hotel.name}
                     </h4>
-                    <p className="text-[10px] text-wff-gold mb-2">
+                    <p className="text-[10px] text-gold-ink mb-2">
                       {hotel.location}
                     </p>
-                    <p className="text-[11px] text-white/60 leading-relaxed">
+                    <p className="text-[11px] text-fg/60 leading-relaxed">
                       {hotel.desc}
                     </p>
                   </div>
@@ -473,27 +473,27 @@ export default function ChampionshipClient({
         {/* Awards & Prizes */}
         <div
           id="awards"
-          className="bg-[#111]/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 md:p-12 mb-16"
+          className="bg-raised/80 backdrop-blur-md border border-fg/10 rounded-2xl p-8 md:p-12 mb-16"
         >
-          <h2 className="font-bebas text-4xl md:text-5xl text-wff-gold mb-8 pb-4 border-b border-white/10">
+          <h2 className="font-bebas text-4xl md:text-5xl text-gold-ink mb-8 pb-4 border-b border-fg/10">
             AWARDS &amp; PRIZES
           </h2>
           {!awards || !awards.items?.length ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="space-y-3">
-                <Skeleton className="h-12 w-12 rounded-full bg-white/10" />
-                <Skeleton className="h-5 w-40 bg-white/10" />
-                <Skeleton className="h-16 w-full bg-white/10" />
+                <Skeleton className="h-12 w-12 rounded-full bg-fg/10" />
+                <Skeleton className="h-5 w-40 bg-fg/10" />
+                <Skeleton className="h-16 w-full bg-fg/10" />
               </div>
               <div className="space-y-3">
-                <Skeleton className="h-12 w-12 rounded-full bg-white/10" />
-                <Skeleton className="h-5 w-40 bg-white/10" />
-                <Skeleton className="h-16 w-full bg-white/10" />
+                <Skeleton className="h-12 w-12 rounded-full bg-fg/10" />
+                <Skeleton className="h-5 w-40 bg-fg/10" />
+                <Skeleton className="h-16 w-full bg-fg/10" />
               </div>
               <div className="space-y-3">
-                <Skeleton className="h-12 w-12 rounded-full bg-white/10" />
-                <Skeleton className="h-5 w-40 bg-white/10" />
-                <Skeleton className="h-16 w-full bg-white/10" />
+                <Skeleton className="h-12 w-12 rounded-full bg-fg/10" />
+                <Skeleton className="h-5 w-40 bg-fg/10" />
+                <Skeleton className="h-16 w-full bg-fg/10" />
               </div>
             </div>
           ) : (
@@ -520,8 +520,8 @@ export default function ChampionshipClient({
                       />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold mb-2 text-white">{award.title}</h3>
-                  <p className="text-white/60 text-sm leading-relaxed">{award.description}</p>
+                  <h3 className="text-xl font-bold mb-2 text-fg">{award.title}</h3>
+                  <p className="text-fg/60 text-sm leading-relaxed">{award.description}</p>
                 </div>
               );
             })}
@@ -530,11 +530,11 @@ export default function ChampionshipClient({
         </div>
 
         {/* Team Ghana Roster CTA */}
-        <div id="roster" className="mt-24 pt-16 border-t border-white/10 text-center">
-          <h2 className="font-bebas text-5xl md:text-7xl mb-4 text-white">
+        <div id="roster" className="mt-24 pt-16 border-t border-fg/10 text-center">
+          <h2 className="font-bebas text-5xl md:text-7xl mb-4 text-fg">
             TEAM <span className="text-wff-red">GHANA</span> ROSTER
           </h2>
-          <p className="font-sans text-sm text-white/50 max-w-xl mx-auto mb-8">
+          <p className="font-sans text-sm text-fg/50 max-w-xl mx-auto mb-8">
             Meet the elite national squad defending the home turf against
             incoming continental challengers.
           </p>

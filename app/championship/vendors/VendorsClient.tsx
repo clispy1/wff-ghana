@@ -24,48 +24,48 @@ const CATEGORY_META = [
 
 function VendorCard({ vendor }: { vendor: Vendor }) {
   return (
-    <div className="bg-[#111] border border-white/10 rounded-xl p-5 hover:border-wff-gold/40 transition-colors">
+    <div className="bg-raised border border-fg/10 rounded-xl p-5 hover:border-wff-gold/40 transition-colors">
       <div className="flex items-start gap-3">
         <div className="w-9 h-9 shrink-0 rounded-lg bg-wff-red/10 border border-wff-red/20 flex items-center justify-center">
           <Store className="h-4 w-4 text-wff-red" />
         </div>
         <div className="min-w-0">
-          <h3 className="font-bebas text-2xl text-white tracking-wide leading-none">
+          <h3 className="font-bebas text-2xl text-fg tracking-wide leading-none">
             {vendor.name}
           </h3>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-wff-gold font-sans mt-1">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gold-ink font-sans mt-1">
             {vendor.category}
           </p>
         </div>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-white/5 space-y-2 font-sans text-xs text-white/60">
+      <div className="mt-4 pt-4 border-t border-fg/5 space-y-2 font-sans text-xs text-fg/60">
         {vendor.package_name && (
-          <p className="inline-block px-2 py-0.5 rounded border border-wff-gold/30 bg-wff-gold/5 text-wff-gold uppercase tracking-widest text-[10px] font-bold">
+          <p className="inline-block px-2 py-0.5 rounded border border-wff-gold/30 bg-wff-gold/5 text-gold-ink uppercase tracking-widest text-[10px] font-bold">
             {vendor.package_name}
           </p>
         )}
         {vendor.contact_person && (
           <p className="flex items-center gap-2">
-            <User className="h-3.5 w-3.5 text-white/30 shrink-0" />
+            <User className="h-3.5 w-3.5 text-fg/30 shrink-0" />
             {vendor.contact_person}
           </p>
         )}
         {vendor.phone && (
           <a
             href={`tel:${vendor.phone.replace(/[^+\d]/g, "")}`}
-            className="flex items-center gap-2 hover:text-wff-gold transition-colors"
+            className="flex items-center gap-2 hover:text-gold-ink transition-colors"
           >
-            <Phone className="h-3.5 w-3.5 text-white/30 shrink-0" />
+            <Phone className="h-3.5 w-3.5 text-fg/30 shrink-0" />
             {vendor.phone}
           </a>
         )}
         {vendor.email && (
           <a
             href={`mailto:${vendor.email}`}
-            className="flex items-center gap-2 hover:text-wff-gold transition-colors break-all"
+            className="flex items-center gap-2 hover:text-gold-ink transition-colors break-all"
           >
-            <Mail className="h-3.5 w-3.5 text-white/30 shrink-0" />
+            <Mail className="h-3.5 w-3.5 text-fg/30 shrink-0" />
             {vendor.email}
           </a>
         )}
@@ -74,9 +74,9 @@ function VendorCard({ vendor }: { vendor: Vendor }) {
             href={vendor.website_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 hover:text-wff-gold transition-colors break-all"
+            className="flex items-center gap-2 hover:text-gold-ink transition-colors break-all"
           >
-            <Globe2 className="h-3.5 w-3.5 text-white/30 shrink-0" />
+            <Globe2 className="h-3.5 w-3.5 text-fg/30 shrink-0" />
             {vendor.website_url.replace(/^https?:\/\//, "")}
           </a>
         )}
@@ -96,10 +96,10 @@ export default function VendorsClient({ vendors }: { vendors: Vendor[] }) {
         <p className="text-wff-red font-bebas text-xl tracking-[0.3em] uppercase mb-4">
           2026 All Africa Championship
         </p>
-        <h1 className="font-bebas text-5xl md:text-6xl text-white tracking-wide">
-          EVENT <span className="text-wff-gold">VENDORS</span>
+        <h1 className="font-bebas text-5xl md:text-6xl text-fg tracking-wide">
+          EVENT <span className="text-gold-ink">VENDORS</span>
         </h1>
-        <p className="font-sans text-sm text-white/50 max-w-xl mx-auto mt-6">
+        <p className="font-sans text-sm text-fg/50 max-w-xl mx-auto mt-6">
           The food, merch and services fuelling the championship weekend in
           Accra. More vendors will be added as we get closer to October 2–4, 2026.
         </p>
@@ -113,7 +113,7 @@ export default function VendorsClient({ vendors }: { vendors: Vendor[] }) {
       </div>
 
       {!hasVendors ? (
-        <p className="text-center text-white/40 font-sans text-sm py-24 max-w-md mx-auto">
+        <p className="text-center text-fg/40 font-sans text-sm py-24 max-w-md mx-auto">
           The vendor lineup is coming soon. Check back closer to the event.
         </p>
       ) : (
@@ -124,10 +124,10 @@ export default function VendorsClient({ vendors }: { vendors: Vendor[] }) {
             return (
               <section key={cat.key}>
                 <div className="flex items-baseline gap-4 mb-6">
-                  <h2 className="font-bebas text-3xl text-white tracking-widest">
+                  <h2 className="font-bebas text-3xl text-fg tracking-widest">
                     {cat.label.toUpperCase()}
                   </h2>
-                  <span className="text-[10px] font-sans text-white/40 uppercase tracking-widest">
+                  <span className="text-[10px] font-sans text-fg/40 uppercase tracking-widest">
                     {cat.desc}
                   </span>
                 </div>

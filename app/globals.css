@@ -12,6 +12,18 @@
   --color-wff-black: #000000;
   --color-wff-white: #FFFFFF;
 
+  /* Site theme tokens. Light is the default; .site-dark (on <html> via
+     the navbar toggle, or on any subtree such as a photo banner) swaps
+     them to the original dark look. Use these instead of white/black
+     so pages work in both themes. */
+  --color-fg: #16130F;          /* main text; /50 etc. for muted text, borders, tints */
+  --color-page: #F6F4EF;        /* page background */
+  --color-surface: #FFFFFF;     /* panels and forms */
+  --color-raised: #FFFFFF;      /* cards */
+  --color-raised-2: #EEEBE4;    /* hover / nested cards */
+  --color-gold-ink: #8A6A00;    /* gold text: bright gold is unreadable on white */
+  --color-green-ink: #007A4D;
+
   --font-bebas: var(--font-bebas), sans-serif;
   --font-sans: var(--font-dm-sans), sans-serif;
 
@@ -23,8 +35,23 @@
 }
 
 :root {
-  --bg-color: #050505; /* Default Act 3 / Base */ --background: oklch(1 0 0); --foreground: oklch(0.145 0 0); --card: oklch(1 0 0); --card-foreground: oklch(0.145 0 0); --popover: oklch(1 0 0); --popover-foreground: oklch(0.145 0 0); --primary: oklch(0.205 0 0); --primary-foreground: oklch(0.985 0 0); --secondary: oklch(0.97 0 0); --secondary-foreground: oklch(0.205 0 0); --muted: oklch(0.97 0 0); --muted-foreground: oklch(0.556 0 0); --accent: oklch(0.97 0 0); --accent-foreground: oklch(0.205 0 0); --destructive: oklch(0.577 0.245 27.325); --border: oklch(0.922 0 0); --input: oklch(0.922 0 0); --ring: oklch(0.708 0 0); --chart-1: oklch(0.87 0 0); --chart-2: oklch(0.556 0 0); --chart-3: oklch(0.439 0 0); --chart-4: oklch(0.371 0 0); --chart-5: oklch(0.269 0 0); --radius: 0.625rem; --sidebar: oklch(0.985 0 0); --sidebar-foreground: oklch(0.145 0 0); --sidebar-primary: oklch(0.205 0 0); --sidebar-primary-foreground: oklch(0.985 0 0); --sidebar-accent: oklch(0.97 0 0); --sidebar-accent-foreground: oklch(0.205 0 0); --sidebar-border: oklch(0.922 0 0); --sidebar-ring: oklch(0.708 0 0);
+  --background: oklch(1 0 0); --foreground: oklch(0.145 0 0); --card: oklch(1 0 0); --card-foreground: oklch(0.145 0 0); --popover: oklch(1 0 0); --popover-foreground: oklch(0.145 0 0); --primary: oklch(0.205 0 0); --primary-foreground: oklch(0.985 0 0); --secondary: oklch(0.97 0 0); --secondary-foreground: oklch(0.205 0 0); --muted: oklch(0.97 0 0); --muted-foreground: oklch(0.556 0 0); --accent: oklch(0.97 0 0); --accent-foreground: oklch(0.205 0 0); --destructive: oklch(0.577 0.245 27.325); --border: oklch(0.922 0 0); --input: oklch(0.922 0 0); --ring: oklch(0.708 0 0); --chart-1: oklch(0.87 0 0); --chart-2: oklch(0.556 0 0); --chart-3: oklch(0.439 0 0); --chart-4: oklch(0.371 0 0); --chart-5: oklch(0.269 0 0); --radius: 0.625rem; --sidebar: oklch(0.985 0 0); --sidebar-foreground: oklch(0.145 0 0); --sidebar-primary: oklch(0.205 0 0); --sidebar-primary-foreground: oklch(0.985 0 0); --sidebar-accent: oklch(0.97 0 0); --sidebar-accent-foreground: oklch(0.205 0 0); --sidebar-border: oklch(0.922 0 0); --sidebar-ring: oklch(0.708 0 0);
 }
+
+.site-dark {
+  --color-fg: #FFFFFF;
+  --color-page: #050505;
+  --color-surface: #0A0A0A;
+  --color-raised: #111111;
+  --color-raised-2: #161616;
+  --color-gold-ink: #FCD116;
+  --color-green-ink: #00A86B;
+}
+
+html { --bg-color: #F6F4EF; color-scheme: light; }
+html.site-dark { --bg-color: #050505; color-scheme: dark; }
+html.bg-federation { --bg-color: #E7EFE9; }
+html.site-dark.bg-federation { --bg-color: #0F1A15; }
 
 body {
   background-color: var(--bg-color);
@@ -46,7 +73,7 @@ body {
 
 @layer utilities {
   .text-stroke {
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+    -webkit-text-stroke: 1px color-mix(in oklab, var(--color-fg) 20%, transparent);
     color: transparent;
   }
   .text-stroke-hover:hover {
@@ -54,7 +81,7 @@ body {
     color: #CE1126;
   }
   .text-stroke-gold {
-    -webkit-text-stroke: 1px #FCD116;
+    -webkit-text-stroke: 1px var(--color-gold-ink);
     color: transparent;
   }
 }

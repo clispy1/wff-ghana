@@ -92,11 +92,11 @@ export default function Athletes() {
   }, [selectedAthlete]);
 
   return (
-    <section id="athletes" className="py-24 bg-[#050505] relative border-t border-white/5">
+    <section id="athletes" className="py-24 bg-page relative border-t border-fg/5">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="font-bebas text-5xl md:text-6xl mb-4">TEAM <span className="text-wff-red">GHANA</span> ROSTER</h2>
-          <p className="font-sans text-white/60 max-w-2xl mx-auto">Meet the elite athletes representing Ghana on the international stage.</p>
+          <p className="font-sans text-fg/60 max-w-2xl mx-auto">Meet the elite athletes representing Ghana on the international stage.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -115,15 +115,15 @@ export default function Athletes() {
                 className="object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/40 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500"></div>
               
               <div className="absolute bottom-0 left-0 w-full p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                 <div className="flex items-center space-x-2 mb-2">
                   <span className="text-xl">🇬🇭</span>
-                  <span className="font-sans text-xs uppercase tracking-widest text-wff-gold">{athlete.category}</span>
+                  <span className="font-sans text-xs uppercase tracking-widest text-gold-ink">{athlete.category}</span>
                 </div>
-                <h3 className="font-bebas text-3xl text-white mb-1">{athlete.name}</h3>
-                <p className="font-sans text-sm text-white/60">{athlete.weightClass}</p>
+                <h3 className="font-bebas text-3xl text-fg mb-1">{athlete.name}</h3>
+                <p className="font-sans text-sm text-fg/60">{athlete.weightClass}</p>
               </div>
             </div>
           ))}
@@ -132,10 +132,10 @@ export default function Athletes() {
 
       {/* Modal */}
       {selectedAthlete && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-wff-dark/90 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-page/90 backdrop-blur-sm">
           <div 
             ref={modalRef}
-            className="bg-[#111] border border-white/10 w-full max-w-5xl max-h-[90vh] overflow-y-auto no-scrollbar relative flex flex-col md:flex-row"
+            className="bg-raised border border-fg/10 w-full max-w-5xl max-h-[90vh] overflow-y-auto no-scrollbar relative flex flex-col md:flex-row"
           >
             <button 
               onClick={() => setSelectedAthlete(null)}
@@ -157,7 +157,7 @@ export default function Athletes() {
             <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
               <div className="flex items-center space-x-3 mb-4">
                 <span className="text-2xl">🇬🇭</span>
-                <span className="font-sans text-sm uppercase tracking-widest text-wff-gold border border-wff-gold/30 px-3 py-1">
+                <span className="font-sans text-sm uppercase tracking-widest text-gold-ink border border-wff-gold/30 px-3 py-1">
                   {selectedAthlete.category}
                 </span>
               </div>
@@ -167,16 +167,16 @@ export default function Athletes() {
                 Weight Class: {selectedAthlete.weightClass}
               </p>
               
-              <p className="font-sans text-white/70 leading-relaxed mb-8">
+              <p className="font-sans text-fg/70 leading-relaxed mb-8">
                 {selectedAthlete.bio}
               </p>
 
               <div>
-                <h4 className="font-bebas text-2xl mb-4 text-white/50">Key Achievements</h4>
+                <h4 className="font-bebas text-2xl mb-4 text-fg/50">Key Achievements</h4>
                 <ul className="space-y-3">
                   {selectedAthlete.achievements.map((ach, i) => (
-                    <li key={i} className="flex items-start font-sans text-sm text-white/80">
-                      <span className="text-wff-gold mr-3">★</span>
+                    <li key={i} className="flex items-start font-sans text-sm text-fg/80">
+                      <span className="text-gold-ink mr-3">★</span>
                       {ach}
                     </li>
                   ))}

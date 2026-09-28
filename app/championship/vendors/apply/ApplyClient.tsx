@@ -21,7 +21,7 @@ const CATEGORIES = [
 ];
 
 const inputCls =
-  "w-full border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/20 focus:border-wff-red/70 focus:outline-none focus:bg-white/8 transition-all duration-200";
+  "w-full border border-fg/10 bg-fg/5 px-4 py-3 text-sm text-fg placeholder-fg/20 focus:border-wff-red/70 focus:outline-none focus:bg-fg/8 transition-all duration-200";
 
 export default function ApplyClient({ packages }: { packages: VendorPackage[] }) {
   const [form, setForm] = useState({
@@ -114,7 +114,7 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
     <div className="container mx-auto px-6 max-w-5xl py-24">
       <Link
         href="/championship/vendors"
-        className="inline-flex items-center gap-2 text-xs font-sans text-white/50 hover:text-wff-gold transition-colors mb-8"
+        className="inline-flex items-center gap-2 text-xs font-sans text-fg/50 hover:text-gold-ink transition-colors mb-8"
       >
         <ArrowLeft className="h-3.5 w-3.5" /> Back to Event Vendors
       </Link>
@@ -123,10 +123,10 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
         <p className="text-wff-red font-bebas text-xl tracking-[0.3em] uppercase mb-4">
           2026 All Africa Championship
         </p>
-        <h1 className="font-bebas text-5xl md:text-6xl text-white tracking-wide">
-          BECOME A <span className="text-wff-gold">VENDOR</span>
+        <h1 className="font-bebas text-5xl md:text-6xl text-fg tracking-wide">
+          BECOME A <span className="text-gold-ink">VENDOR</span>
         </h1>
-        <p className="font-sans text-sm text-white/50 max-w-xl mx-auto mt-6">
+        <p className="font-sans text-sm text-fg/50 max-w-xl mx-auto mt-6">
           Pick a sponsorship or booth package, tell us about your business and pay
           online. Once your application is approved you will appear in the event
           directory.
@@ -134,10 +134,10 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
       </div>
 
       {packages.length === 0 ? (
-        <div className="max-w-xl mx-auto text-center border border-white/10 bg-[#111] rounded-xl p-12">
-          <Store className="h-10 w-10 text-wff-gold mx-auto mb-6" />
-          <h2 className="font-bebas text-3xl text-white mb-3">APPLICATIONS OPENING SOON</h2>
-          <p className="font-sans text-sm text-white/50">
+        <div className="max-w-xl mx-auto text-center border border-fg/10 bg-raised rounded-xl p-12">
+          <Store className="h-10 w-10 text-gold-ink mx-auto mb-6" />
+          <h2 className="font-bebas text-3xl text-fg mb-3">APPLICATIONS OPENING SOON</h2>
+          <p className="font-sans text-sm text-fg/50">
             Vendor packages are being finalised. Check back closer to the event, or
             email us to express interest.
           </p>
@@ -146,10 +146,10 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
         <form onSubmit={handleSubmit} className="space-y-14">
           {/* Package selection */}
           <section>
-            <h2 className="font-bebas text-3xl text-white tracking-widest mb-1">
+            <h2 className="font-bebas text-3xl text-fg tracking-widest mb-1">
               CHOOSE YOUR PACKAGE
             </h2>
-            <p className="font-sans text-xs text-white/40 mb-6">
+            <p className="font-sans text-xs text-fg/40 mb-6">
               Pay online with Paystack when you submit.
             </p>
 
@@ -164,7 +164,7 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
                     className={`text-left border rounded-xl p-6 transition-all duration-200 ${
                       selected
                         ? "border-wff-gold bg-wff-gold/5"
-                        : "border-white/10 bg-[#111] hover:border-wff-gold/40"
+                        : "border-fg/10 bg-raised hover:border-wff-gold/40"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -173,20 +173,20 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
                       </div>
                       <div
                         className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
-                          selected ? "border-wff-gold bg-wff-gold" : "border-white/25"
+                          selected ? "border-wff-gold bg-wff-gold" : "border-fg/25"
                         }`}
                       >
                         {selected && <Check className="h-3.5 w-3.5 text-black" />}
                       </div>
                     </div>
-                    <h3 className="font-bebas text-2xl text-white tracking-wide mt-4 leading-none">
+                    <h3 className="font-bebas text-2xl text-fg tracking-wide mt-4 leading-none">
                       {pkg.name}
                     </h3>
-                    <p className="font-sans text-lg text-wff-gold font-bold mt-2">
+                    <p className="font-sans text-lg text-gold-ink font-bold mt-2">
                       ₵ {Number(pkg.price).toFixed(2)}
                     </p>
                     {pkg.description && (
-                      <p className="font-sans text-xs text-white/50 mt-3 leading-relaxed">
+                      <p className="font-sans text-xs text-fg/50 mt-3 leading-relaxed">
                         {pkg.description}
                       </p>
                     )}
@@ -199,9 +199,9 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
                           .map((b, i) => (
                             <li
                               key={i}
-                              className="flex items-start gap-2 font-sans text-xs text-white/60"
+                              className="flex items-start gap-2 font-sans text-xs text-fg/60"
                             >
-                              <Check className="h-3.5 w-3.5 text-wff-gold shrink-0 mt-0.5" />
+                              <Check className="h-3.5 w-3.5 text-gold-ink shrink-0 mt-0.5" />
                               {b}
                             </li>
                           ))}
@@ -215,13 +215,13 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
 
           {/* Business details */}
           <section>
-            <h2 className="font-bebas text-3xl text-white tracking-widest mb-6">
+            <h2 className="font-bebas text-3xl text-fg tracking-widest mb-6">
               YOUR BUSINESS
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="md:col-span-2">
-                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-white/60 mb-2">
+                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-fg/60 mb-2">
                   Business Name *
                 </label>
                 <input
@@ -233,7 +233,7 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
               </div>
 
               <div className="md:col-span-2">
-                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-white/60 mb-2">
+                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-fg/60 mb-2">
                   Category *
                 </label>
                 <select
@@ -241,11 +241,11 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
                   value={form.category}
                   onChange={set("category")}
                 >
-                  <option value="" className="bg-[#111]">
+                  <option value="" className="bg-raised">
                     Select a category…
                   </option>
                   {CATEGORIES.map((c) => (
-                    <option key={c.value} value={c.value} className="bg-[#111]">
+                    <option key={c.value} value={c.value} className="bg-raised">
                       {c.label} — {c.desc}
                     </option>
                   ))}
@@ -253,7 +253,7 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
               </div>
 
               <div>
-                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-white/60 mb-2">
+                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-fg/60 mb-2">
                   Contact Person
                 </label>
                 <input
@@ -265,7 +265,7 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
               </div>
 
               <div>
-                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-white/60 mb-2">
+                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-fg/60 mb-2">
                   Phone
                 </label>
                 <input
@@ -277,7 +277,7 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
               </div>
 
               <div>
-                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-white/60 mb-2">
+                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-fg/60 mb-2">
                   Email *
                 </label>
                 <input
@@ -290,7 +290,7 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
               </div>
 
               <div>
-                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-white/60 mb-2">
+                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-fg/60 mb-2">
                   Website / Social
                 </label>
                 <input
@@ -302,7 +302,7 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
               </div>
 
               <div className="md:col-span-2">
-                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-white/60 mb-2">
+                <label className="block font-sans text-xs font-bold uppercase tracking-widest text-fg/60 mb-2">
                   What will you offer?
                 </label>
                 <textarea
@@ -321,8 +321,8 @@ export default function ApplyClient({ packages }: { packages: VendorPackage[] })
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row items-center gap-4 justify-between border-t border-white/10 pt-8">
-            <p className="font-sans text-xs text-white/40">
+          <div className="flex flex-col sm:flex-row items-center gap-4 justify-between border-t border-fg/10 pt-8">
+            <p className="font-sans text-xs text-fg/40">
               {selectedPkg
                 ? `Total: ₵ ${Number(selectedPkg.price).toFixed(2)} · paid securely via Paystack`
                 : "Select a package to see your total."}

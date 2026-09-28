@@ -56,7 +56,7 @@ export default function Loader() {
   }, []);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center pointer-events-none">
+    <div ref={containerRef} className="fixed inset-0 z-[100] bg-page flex flex-col items-center justify-center pointer-events-none">
       <div className="relative w-48 h-48 md:w-64 md:h-64 mb-8">
         <Image 
           ref={logoRef}
@@ -69,7 +69,7 @@ export default function Loader() {
       </div>
       
       {/* Loading Progress Bar */}
-      <div className="w-48 md:w-64 h-[2px] bg-white/10 rounded-full overflow-hidden">
+      <div className="w-48 md:w-64 h-[2px] bg-fg/10 rounded-full overflow-hidden">
         <div ref={progressRef} className="h-full bg-wff-gold w-full"></div>
       </div>
     </div>

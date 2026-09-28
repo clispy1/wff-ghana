@@ -31,10 +31,10 @@ export default function ProductClient({ product }: { product: ProductDetail | nu
 
   if (!product) {
     return (
-      <main className="pt-32 pb-24 min-h-screen bg-wff-dark flex items-center justify-center">
+      <main className="pt-32 pb-24 min-h-screen bg-page flex items-center justify-center">
         <div className="text-center">
-          <h1 className="font-bebas text-6xl text-white mb-4">PRODUCT NOT FOUND</h1>
-          <Link href="/shop" className="text-wff-gold hover:underline font-sans tracking-widest uppercase text-sm">
+          <h1 className="font-bebas text-6xl text-fg mb-4">PRODUCT NOT FOUND</h1>
+          <Link href="/shop" className="text-gold-ink hover:underline font-sans tracking-widest uppercase text-sm">
             Return to Shop
           </Link>
         </div>
@@ -43,10 +43,10 @@ export default function ProductClient({ product }: { product: ProductDetail | nu
   }
 
   return (
-    <main className="pt-32 pb-24 min-h-screen bg-wff-dark">
+    <main className="pt-32 pb-24 min-h-screen bg-page">
       <div className="container mx-auto px-6">
 
-        <Link href="/shop" className="inline-flex items-center text-white/50 hover:text-wff-gold transition-colors font-sans text-xs uppercase tracking-widest mb-12">
+        <Link href="/shop" className="inline-flex items-center text-fg/50 hover:text-gold-ink transition-colors font-sans text-xs uppercase tracking-widest mb-12">
           <ChevronLeft size={16} className="mr-2" /> Back to Armory
         </Link>
 
@@ -54,7 +54,7 @@ export default function ProductClient({ product }: { product: ProductDetail | nu
 
           {/* Image */}
           <div className="space-y-6">
-            <div className="relative aspect-square bg-[#111] border border-white/10 w-full rounded-xl overflow-hidden">
+            <div className="relative aspect-square bg-raised border border-fg/10 w-full rounded-xl overflow-hidden">
               {product.image ? (
                 <Image
                   src={product.image}
@@ -64,7 +64,7 @@ export default function ProductClient({ product }: { product: ProductDetail | nu
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <div className="absolute inset-0 bg-[#161616]" />
+                <div className="absolute inset-0 bg-raised-2" />
               )}
               {product.tag && (
                 <div className="absolute top-6 left-6 bg-wff-red text-white font-sans text-sm font-bold uppercase tracking-widest px-4 py-2 z-10 rounded-md">
@@ -77,29 +77,29 @@ export default function ProductClient({ product }: { product: ProductDetail | nu
           {/* Product Info */}
           <div className="flex flex-col">
             <p className="font-sans text-wff-red font-bold uppercase tracking-[0.3em] text-sm mb-4">{product.category}</p>
-            <h1 className="font-bebas text-5xl md:text-7xl text-white mb-6 leading-none">{product.name}</h1>
-            <p className="font-bebas text-4xl text-wff-gold mb-8">₵ {product.price.toFixed(2)}</p>
+            <h1 className="font-bebas text-5xl md:text-7xl text-fg mb-6 leading-none">{product.name}</h1>
+            <p className="font-bebas text-4xl text-gold-ink mb-8">₵ {product.price.toFixed(2)}</p>
 
-            <div className="border-y border-white/10 py-8 mb-8">
-              <p className="font-sans text-white/70 text-lg leading-relaxed">
+            <div className="border-y border-fg/10 py-8 mb-8">
+              <p className="font-sans text-fg/70 text-lg leading-relaxed">
                 {product.description}
               </p>
             </div>
 
             {/* Quantity */}
             <div className="mb-8">
-              <span className="block font-sans text-sm uppercase tracking-widest text-white/50 mb-4">Quantity</span>
-              <div className="flex items-center border border-white/20 w-max rounded-md overflow-hidden">
+              <span className="block font-sans text-sm uppercase tracking-widest text-fg/50 mb-4">Quantity</span>
+              <div className="flex items-center border border-fg/20 w-max rounded-md overflow-hidden">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-12 h-12 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                  className="w-12 h-12 flex items-center justify-center text-fg/60 hover:text-fg hover:bg-fg/5 transition-colors"
                 >
                   -
                 </button>
                 <span className="w-12 text-center font-sans font-bold">{quantity}</span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="w-12 h-12 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                  className="w-12 h-12 flex items-center justify-center text-fg/60 hover:text-fg hover:bg-fg/5 transition-colors"
                 >
                   +
                 </button>

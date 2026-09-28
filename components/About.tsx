@@ -80,7 +80,7 @@ export default function About() {
   }, []);
 
   return (
-    <section id="about" ref={sectionRef} className="py-24 md:py-32 bg-wff-dark relative overflow-hidden border-t border-white/5">
+    <section id="about" ref={sectionRef} className="py-24 md:py-32 bg-page relative overflow-hidden border-t border-fg/5">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
           
@@ -89,7 +89,7 @@ export default function About() {
             <h2 className="font-bebas text-5xl md:text-7xl mb-8 reveal-text">
               AESTHETICS. <span className="text-wff-red">SYMMETRY.</span> PRESENCE.
             </h2>
-            <div className="font-sans text-lg md:text-xl text-white/70 space-y-6 max-w-3xl">
+            <div className="font-sans text-lg md:text-xl text-fg/70 space-y-6 max-w-3xl">
               <p className="reveal-text">
                 The World Fitness Federation (WFF) is an international bodybuilding and fitness organisation founded in 1968 in Germany. We promote classic, aesthetic bodybuilding — not just size, but symmetry, conditioning, and stage presence.
               </p>
@@ -99,18 +99,18 @@ export default function About() {
             </div>
 
             {/* Stats */}
-            <div ref={statsRef} className="grid grid-cols-3 gap-8 mt-16 border-t border-white/10 pt-12">
+            <div ref={statsRef} className="grid grid-cols-3 gap-8 mt-16 border-t border-fg/10 pt-12">
               <div>
-                <div className="font-bebas text-5xl md:text-6xl text-wff-gold mb-2 stat-counter" data-target="70" data-suffix="+">0</div>
-                <div className="font-sans text-sm uppercase tracking-widest text-white/50">Countries</div>
+                <div className="font-bebas text-5xl md:text-6xl text-gold-ink mb-2 stat-counter" data-target="70" data-suffix="+">0</div>
+                <div className="font-sans text-sm uppercase tracking-widest text-fg/50">Countries</div>
               </div>
               <div>
-                <div className="font-bebas text-5xl md:text-6xl text-wff-gold mb-2 stat-counter" data-target="1968">0</div>
-                <div className="font-sans text-sm uppercase tracking-widest text-white/50">Founded</div>
+                <div className="font-bebas text-5xl md:text-6xl text-gold-ink mb-2 stat-counter" data-target="1968">0</div>
+                <div className="font-sans text-sm uppercase tracking-widest text-fg/50">Founded</div>
               </div>
               <div>
-                <div className="font-bebas text-5xl md:text-6xl text-wff-gold mb-2 stat-counter" data-target="2026">0</div>
-                <div className="font-sans text-sm uppercase tracking-widest text-white/50">World Champs</div>
+                <div className="font-bebas text-5xl md:text-6xl text-gold-ink mb-2 stat-counter" data-target="2026">0</div>
+                <div className="font-sans text-sm uppercase tracking-widest text-fg/50">World Champs</div>
               </div>
             </div>
           </div>
@@ -119,11 +119,11 @@ export default function About() {
           <div className="lg:col-span-5 flex justify-center lg:justify-end">
             <div 
               ref={cardRef}
-              className="relative group w-full max-w-md bg-[#111] border border-white/10 p-6 transition-all duration-500 hover:border-wff-red/50"
+              className="relative group w-full max-w-md bg-raised border border-fg/10 p-6 transition-all duration-500 hover:border-wff-red/50"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-wff-red/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               
-              <div className="relative aspect-[4/5] mb-6 overflow-hidden bg-wff-dark">
+              <div className="relative aspect-[4/5] mb-6 overflow-hidden bg-page">
                 <Image 
                   src="https://picsum.photos/seed/president/600/800" 
                   alt="WFF Ghana President"
@@ -131,13 +131,13 @@ export default function About() {
                   className="object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-raised via-transparent to-transparent"></div>
               </div>
               
               <div className="relative z-10">
                 <h3 className="font-bebas text-3xl mb-1">Victor Ahenkorah Baiden</h3>
                 <p className="font-sans text-wff-red uppercase tracking-widest text-sm font-bold mb-4">President, WFF Ghana</p>
-                <p className="font-sans text-sm text-white/60 italic">
+                <p className="font-sans text-sm text-fg/60 italic">
                   &quot;Our athletes have the genetics, the work ethic, and the heart. It&apos;s time the world sees what Ghana brings to the stage.&quot;
                 </p>
               </div>

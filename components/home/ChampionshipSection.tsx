@@ -17,29 +17,29 @@ export function ChampionshipSection({
   if (!championship) return <SectionSkeleton />;
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black py-24 border-b border-white/5">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-page py-24 border-b border-fg/5">
       <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(206,17,38,0.1)_0%,transparent_75%)]"></div>
 
       <div className="container mx-auto px-6 relative z-10 max-w-7xl">
         <div className="max-w-4xl mx-auto text-center mb-16 reveal-target">
-          <p className="font-sans text-wff-gold font-bold uppercase tracking-[0.4em] text-xs mb-4">
+          <p className="font-sans text-gold-ink font-bold uppercase tracking-[0.4em] text-xs mb-4">
             {championship.supertitle}
           </p>
-          <h2 className="font-bebas text-6xl md:text-8xl text-white mb-6 leading-none select-none">
+          <h2 className="font-bebas text-6xl md:text-8xl text-fg mb-6 leading-none select-none">
             {eventData ? eventData.title : championship.title}
           </h2>
-          <p className="font-sans text-base text-white/70 max-w-2xl mx-auto leading-relaxed">
+          <p className="font-sans text-base text-fg/70 max-w-2xl mx-auto leading-relaxed">
             {eventData ? eventData.description : championship.description}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch mb-16">
-          <div className="bg-[#070707]/95 border border-white/10 p-8 reveal-target rounded-2xl flex flex-col justify-between">
+          <div className="bg-page/95 border border-fg/10 p-8 reveal-target rounded-2xl flex flex-col justify-between">
             <div>
-              <h3 className="font-bebas text-2xl text-wff-gold mb-6 tracking-wider border-b border-white/5 pb-2">
+              <h3 className="font-bebas text-2xl text-gold-ink mb-6 tracking-wider border-b border-fg/5 pb-2">
                 {championship.categoriesTitle}
               </h3>
-              <ul className="space-y-4 font-sans text-white/75 text-sm font-semibold">
+              <ul className="space-y-4 font-sans text-fg/75 text-sm font-semibold">
                 {championship.categories.map((cat, i) => (
                   <li key={i} className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-wff-red"></span>
@@ -48,13 +48,13 @@ export function ChampionshipSection({
                 ))}
               </ul>
             </div>
-            <p className="font-sans text-[10px] text-white/40 mt-6 tracking-wide">
+            <p className="font-sans text-[10px] text-fg/40 mt-6 tracking-wide">
               * ACCORDING TO WFF INTERNATIONAL DIVISION RULES
             </p>
           </div>
 
-          <div className="bg-[#070707]/95 border border-white/10 p-8 reveal-target rounded-2xl flex flex-col items-center text-center">
-            <h3 className="font-bebas text-2xl text-wff-gold mb-4 tracking-wider">
+          <div className="bg-page/95 border border-fg/10 p-8 reveal-target rounded-2xl flex flex-col items-center text-center">
+            <h3 className="font-bebas text-2xl text-gold-ink mb-4 tracking-wider">
               {championship.stakesTitle}
             </h3>
 
@@ -68,7 +68,7 @@ export function ChampionshipSection({
               />
             </div>
 
-            <p className="font-sans text-white/70 text-xs leading-relaxed max-w-xs mb-4">
+            <p className="font-sans text-fg/70 text-xs leading-relaxed max-w-xs mb-4">
               {championship.stakesDescription}
             </p>
             <p className="font-sans text-wff-red font-bold uppercase tracking-widest text-[9px] border border-wff-red/20 px-3 py-1 bg-wff-red/5 rounded-full">
@@ -76,27 +76,27 @@ export function ChampionshipSection({
             </p>
           </div>
 
-          <div className="bg-[#070707]/95 border border-white/10 p-8 reveal-target rounded-2xl flex flex-col justify-between">
+          <div className="bg-page/95 border border-fg/10 p-8 reveal-target rounded-2xl flex flex-col justify-between">
             <div>
-              <h3 className="font-bebas text-2xl text-wff-gold mb-4 tracking-wider">
+              <h3 className="font-bebas text-2xl text-gold-ink mb-4 tracking-wider">
                 VENUE PORTAL
               </h3>
-              <p className="font-sans text-white font-extrabold text-sm mb-1 uppercase">
+              <p className="font-sans text-fg font-extrabold text-sm mb-1 uppercase">
                 {eventData ? eventData.venue_name : championship.venueTitle}
               </p>
               <p className="font-sans text-wff-red text-xs font-semibold mb-2">
                 {eventData ? eventData.venue_location : championship.venueLocation}
               </p>
               {eventData && (
-                <p className="font-sans text-white/50 text-xs font-semibold mb-6 uppercase tracking-wider">
+                <p className="font-sans text-fg/50 text-xs font-semibold mb-6 uppercase tracking-wider">
                   {formatEventRange(eventData.start_date, eventData.end_date)}
                 </p>
               )}
-              <p className="font-sans text-white/70 text-xs leading-relaxed">
+              <p className="font-sans text-fg/70 text-xs leading-relaxed">
                 {championship.venueDetails}
               </p>
             </div>
-            <p className="font-sans text-[10px] text-white/40 mt-6 tracking-wide">
+            <p className="font-sans text-[10px] text-fg/40 mt-6 tracking-wide">
               ★ FEATURING DEDICATED ATHLETE PUMP-UP ANTECABINS
             </p>
           </div>
@@ -111,7 +111,7 @@ export function ChampionshipSection({
           </Link>
           <Link
             href="/register"
-            className="inline-block border border-wff-gold text-wff-gold py-4 px-10 rounded-xl font-bebas text-xl tracking-widest hover:bg-wff-gold hover:text-black transition-colors w-full sm:w-auto font-bold uppercase"
+            className="inline-block border border-wff-gold text-gold-ink py-4 px-10 rounded-xl font-bebas text-xl tracking-widest hover:bg-wff-gold hover:text-black transition-colors w-full sm:w-auto font-bold uppercase"
           >
             {championship.ctas.register.text}
           </Link>

@@ -76,11 +76,11 @@ export default function Gallery() {
   }, [selectedIndex]);
 
   return (
-    <section id="gallery" ref={sectionRef} className="py-24 bg-wff-dark relative border-t border-white/5">
+    <section id="gallery" ref={sectionRef} className="py-24 bg-page relative border-t border-fg/5">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="font-bebas text-5xl md:text-6xl mb-4">STAGE <span className="text-wff-red">MOMENTS</span></h2>
-          <p className="font-sans text-white/60 max-w-2xl mx-auto">Highlights from past qualifiers and international appearances.</p>
+          <p className="font-sans text-fg/60 max-w-2xl mx-auto">Highlights from past qualifiers and international appearances.</p>
         </div>
 
         {/* Masonry-ish Grid using CSS columns */}
@@ -101,7 +101,7 @@ export default function Gallery() {
                 />
                 <div className="absolute inset-0 bg-wff-red/0 group-hover:bg-wff-red/20 transition-colors duration-500 mix-blend-multiply"></div>
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <Maximize2 className="text-white drop-shadow-lg" size={32} />
+                  <Maximize2 className="text-fg drop-shadow-lg" size={32} />
                 </div>
               </div>
             </div>
@@ -112,18 +112,18 @@ export default function Gallery() {
       {/* Lightbox */}
       {selectedIndex !== null && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md"
+          className="site-dark fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md"
           onClick={() => setSelectedIndex(null)}
         >
           <button 
-            className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors z-50"
+            className="absolute top-6 right-6 text-fg/50 hover:text-fg transition-colors z-50"
             onClick={(e) => { e.stopPropagation(); setSelectedIndex(null); }}
           >
             <X size={32} />
           </button>
 
           <button 
-            className="absolute left-6 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors z-50 p-4"
+            className="absolute left-6 top-1/2 -translate-y-1/2 text-fg/50 hover:text-fg transition-colors z-50 p-4"
             onClick={handlePrev}
           >
             <ChevronLeft size={48} />
@@ -140,13 +140,13 @@ export default function Gallery() {
           </div>
 
           <button 
-            className="absolute right-6 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors z-50 p-4"
+            className="absolute right-6 top-1/2 -translate-y-1/2 text-fg/50 hover:text-fg transition-colors z-50 p-4"
             onClick={handleNext}
           >
             <ChevronRight size={48} />
           </button>
           
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 font-sans text-white/50 tracking-widest text-sm">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 font-sans text-fg/50 tracking-widest text-sm">
             {selectedIndex + 1} / {images.length}
           </div>
         </div>

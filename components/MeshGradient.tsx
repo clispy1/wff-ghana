@@ -6,7 +6,7 @@ import { motion } from 'motion/react';
 export default function MeshGradient() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-      <div className="absolute inset-0 bg-wff-dark"></div>
+      <div className="absolute inset-0 bg-page"></div>
       
       {/* Red Orb */}
       <motion.div 

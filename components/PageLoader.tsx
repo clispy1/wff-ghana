@@ -39,7 +39,7 @@ export default function PageLoader() {
   if (!isLoading) return null;
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-[9999] bg-[#050505] flex flex-col items-center justify-center">
+    <div ref={containerRef} className="fixed inset-0 z-[9999] bg-page flex flex-col items-center justify-center">
       {/* Simplified Ghana Map SVG */}
       <svg width="200" height="250" viewBox="0 0 200 250" className="mb-12 overflow-visible">
         <path 
@@ -52,7 +52,7 @@ export default function PageLoader() {
       </svg>
 
       {/* Kente Loading Bar */}
-      <div className="w-64 h-2 bg-white/10 rounded-full overflow-hidden relative">
+      <div className="w-64 h-2 bg-fg/10 rounded-full overflow-hidden relative">
         <div 
           ref={barRef}
           className="absolute top-0 left-0 h-full w-0"

@@ -3,6 +3,7 @@ import { Teko, DM_Sans, Geist } from 'next/font/google';
 import SmoothScrolling from '@/components/SmoothScrolling';
 import { CartProvider } from '@/lib/CartContext';
 import SiteChrome from '@/components/SiteChrome';
+import { THEME_INIT_SCRIPT } from '@/components/ThemeToggle';
 import './globals.css'; // Global styles
 import { cn } from "@/lib/utils";
 import {Analytics} from "@vercel/analytics/next";
@@ -27,8 +28,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="en" className={cn(teko.variable, dmSans.variable, "font-sans", geist.variable)}>
-      <body className="text-white font-sans antialiased overflow-x-hidden selection:bg-wff-red selection:text-white" suppressHydrationWarning>
+    <html lang="en" className={cn(teko.variable, dmSans.variable, "font-sans", geist.variable)} suppressHydrationWarning>
+      <head>
+        {/* Applies a saved dark-theme choice before first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="text-fg font-sans antialiased overflow-x-hidden selection:bg-wff-red selection:text-white" suppressHydrationWarning>
         <CartProvider>
           <SmoothScrolling>
             <SiteChrome>{children}</SiteChrome>

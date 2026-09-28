@@ -77,14 +77,14 @@ type CategoryRow = { id: string; name: string; group_name: string | null; divisi
 // REUSABLE FIELD COMPONENTS
 // ─────────────────────────────────────────────
 const Label = ({ children }: { children: React.ReactNode }) => (
-  <label className="block font-sans text-[10px] uppercase tracking-[0.2em] text-white/40 mb-2">
+  <label className="block font-sans text-[10px] uppercase tracking-[0.2em] text-fg/40 mb-2">
     {children}
   </label>
 );
 
 const RequiredMark = () => <span className="text-wff-red ml-1">*</span>;
 const OptionalMark = ({ recommended }: { recommended?: boolean } = {}) => (
-  <span className="text-white/25 ml-1.5 normal-case text-[9px] tracking-normal">
+  <span className="text-fg/25 ml-1.5 normal-case text-[9px] tracking-normal">
     {recommended ? 'Optional · recommended' : 'Optional'}
   </span>
 );
@@ -97,15 +97,15 @@ const FieldError = ({ message }: { message?: string }) =>
   ) : null;
 
 const inputClass =
-  'w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/20 focus:border-wff-red/70 focus:outline-none focus:bg-white/8 focus:ring-2 focus:ring-wff-red/10 transition-all duration-200';
+  'w-full bg-fg/5 border border-fg/10 rounded-lg px-4 py-3 text-sm text-fg placeholder-fg/20 focus:border-wff-red/70 focus:outline-none focus:bg-fg/8 focus:ring-2 focus:ring-wff-red/10 transition-all duration-200';
 
 const selectClass =
-  'w-full bg-[#0d0d0d] border border-white/10 rounded-lg px-4 py-3 pr-10 text-sm text-white focus:border-wff-red/70 focus:outline-none focus:ring-2 focus:ring-wff-red/10 transition-all duration-200 appearance-none cursor-pointer';
+  'w-full bg-surface border border-fg/10 rounded-lg px-4 py-3 pr-10 text-sm text-fg focus:border-wff-red/70 focus:outline-none focus:ring-2 focus:ring-wff-red/10 transition-all duration-200 appearance-none cursor-pointer';
 
 const Select = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
   <div className="relative">
     <select {...props} className={selectClass}>{props.children}</select>
-    <ChevronDown size={14} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/30" />
+    <ChevronDown size={14} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-fg/30" />
   </div>
 );
 
@@ -159,13 +159,13 @@ function ComboboxField({
         autoComplete="off"
       />
       {open && filtered.length > 0 && (
-        <div className="absolute z-20 mt-1.5 w-full max-h-56 overflow-y-auto bg-[#0d0d0d] border border-white/10 rounded-lg shadow-2xl animate-in fade-in slide-in-from-top-1 duration-150">
+        <div className="absolute z-20 mt-1.5 w-full max-h-56 overflow-y-auto bg-surface border border-fg/10 rounded-lg shadow-2xl animate-in fade-in slide-in-from-top-1 duration-150">
           {filtered.map(opt => (
             <button
               type="button"
               key={opt}
               onClick={() => pick(opt)}
-              className="w-full text-left px-4 py-2.5 text-sm text-white/70 hover:bg-wff-red/10 hover:text-white transition-colors"
+              className="w-full text-left px-4 py-2.5 text-sm text-fg/70 hover:bg-wff-red/10 hover:text-fg transition-colors"
             >
               {opt}
             </button>
@@ -189,12 +189,12 @@ function Switch({ checked, onChange, label, sublabel }: {
       role="switch"
       aria-checked={checked}
     >
-      <span className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors duration-200 ${checked ? 'bg-wff-red' : 'bg-white/15 group-hover:bg-white/25'}`}>
+      <span className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors duration-200 ${checked ? 'bg-wff-red' : 'bg-fg/15 group-hover:bg-fg/25'}`}>
         <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${checked ? 'translate-x-6' : 'translate-x-1'}`} />
       </span>
       <span className="text-left">
-        <span className="block text-sm text-white/80">{label}</span>
-        {sublabel && <span className="block text-xs text-white/35 mt-0.5">{sublabel}</span>}
+        <span className="block text-sm text-fg/80">{label}</span>
+        {sublabel && <span className="block text-xs text-fg/35 mt-0.5">{sublabel}</span>}
       </span>
     </button>
   );
@@ -280,22 +280,22 @@ const FileUpload = ({ label, required, accept = 'image/*', hint, file, onChange,
           className="flex items-center gap-3 border border-wff-green/40 bg-wff-green/5 rounded-lg p-3.5 cursor-pointer hover:bg-wff-green/8 transition-colors animate-in fade-in zoom-in-95 duration-200"
         >
           {preview ? (
-            <img src={preview} alt="" className="w-11 h-11 object-cover rounded-md flex-shrink-0 border border-white/10" />
+            <img src={preview} alt="" className="w-11 h-11 object-cover rounded-md flex-shrink-0 border border-fg/10" />
           ) : (
             <div className="w-11 h-11 flex-shrink-0 bg-wff-green/10 border border-wff-green/30 rounded-md flex items-center justify-center">
               <FileText size={16} className="text-wff-green" />
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <p className="text-xs text-white/85 truncate flex items-center gap-1.5">
+            <p className="text-xs text-fg/85 truncate flex items-center gap-1.5">
               <CheckCircle size={12} className="text-wff-green flex-shrink-0" /> {file.name}
             </p>
-            <p className="text-[10px] text-white/35 mt-0.5">{formatBytes(file.size)} · click to replace</p>
+            <p className="text-[10px] text-fg/35 mt-0.5">{formatBytes(file.size)} · click to replace</p>
           </div>
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onChange(null); }}
-            className="relative z-10 text-white/30 hover:text-wff-red transition-colors flex-shrink-0 p-1"
+            className="relative z-10 text-fg/30 hover:text-wff-red transition-colors flex-shrink-0 p-1"
             aria-label={`Remove ${label}`}
           >
             <X size={15} />
@@ -312,15 +312,15 @@ const FileUpload = ({ label, required, accept = 'image/*', hint, file, onChange,
             isDragging
               ? 'border-wff-red bg-wff-red/8 scale-[1.01]'
               : error
-              ? 'border-wff-red/60 hover:border-wff-red hover:bg-white/3'
-              : 'border-white/15 hover:border-wff-red/50 hover:bg-white/3'
+              ? 'border-wff-red/60 hover:border-wff-red hover:bg-fg/3'
+              : 'border-fg/15 hover:border-wff-red/50 hover:bg-fg/3'
           }`}
         >
-          <Upload size={20} className={`mx-auto mb-2 transition-colors ${isDragging ? 'text-wff-red' : 'text-white/30 group-hover:text-wff-red/60'}`} />
-          <p className="text-xs text-white/50 group-hover:text-white/70 transition-colors">
+          <Upload size={20} className={`mx-auto mb-2 transition-colors ${isDragging ? 'text-wff-red' : 'text-fg/30 group-hover:text-wff-red/60'}`} />
+          <p className="text-xs text-fg/50 group-hover:text-fg/70 transition-colors">
             {isDragging ? 'Drop it here' : 'Click or drag a file here'}
           </p>
-          {hint && <p className="text-[10px] text-white/25 mt-1">{hint}</p>}
+          {hint && <p className="text-[10px] text-fg/25 mt-1">{hint}</p>}
           <input type="file" ref={ref} className="hidden" accept={accept} onChange={(e) => onChange(e.target.files?.[0] || null)} />
         </div>
       )}
@@ -346,14 +346,14 @@ const CheckboxField = ({ id, checked, onChange, label, sublabel, error }: Checkb
     >
       <div
         className={`mt-0.5 w-5 h-5 flex-shrink-0 rounded-md border flex items-center justify-center transition-all duration-200 ${
-          checked ? 'bg-wff-red border-wff-red' : 'border-white/20 group-hover:border-wff-red/50'
+          checked ? 'bg-wff-red border-wff-red' : 'border-fg/20 group-hover:border-wff-red/50'
         }`}
       >
-        {checked && <Check size={12} className="text-white" />}
+        {checked && <Check size={12} className="text-fg" />}
       </div>
       <div>
-        <p className="text-sm text-white/80 leading-snug">{label}</p>
-        {sublabel && <p className="text-xs text-white/40 mt-0.5">{sublabel}</p>}
+        <p className="text-sm text-fg/80 leading-snug">{label}</p>
+        {sublabel && <p className="text-xs text-fg/40 mt-0.5">{sublabel}</p>}
       </div>
     </label>
     <FieldError message={error} />
@@ -361,7 +361,7 @@ const CheckboxField = ({ id, checked, onChange, label, sublabel, error }: Checkb
 );
 
 const SectionHeading = ({ children }: { children: React.ReactNode }) => (
-  <h4 className="font-bebas text-xl text-white/50 tracking-widest uppercase border-b border-white/8 pb-2 mb-5 mt-8 first:mt-0">
+  <h4 className="font-bebas text-xl text-fg/50 tracking-widest uppercase border-b border-fg/8 pb-2 mb-5 mt-8 first:mt-0">
     {children}
   </h4>
 );
@@ -383,7 +383,7 @@ const RadioGroup = ({
           className={`px-4 py-2.5 text-xs font-sans border rounded-lg transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] ${
             value === opt.value
               ? 'bg-wff-red border-wff-red text-white shadow-[0_0_0_3px_rgba(206,17,38,0.15)]'
-              : 'border-white/15 text-white/50 hover:border-wff-red/40 hover:text-white'
+              : 'border-fg/15 text-fg/50 hover:border-wff-red/40 hover:text-fg'
           }`}
         >
           {opt.label}
@@ -546,11 +546,11 @@ function Step2({ register, errors, watch, setValue, trigger, categories, categor
       )}
 
       <SectionHeading>Categories</SectionHeading>
-      <p className="text-sm text-white/40 -mt-3 mb-5">
+      <p className="text-sm text-fg/40 -mt-3 mb-5">
         Pick up to {MAX_CATEGORIES}. One entry fee covers all of them.
       </p>
       {categoriesLoading ? (
-        <p className="text-sm text-white/30">Loading categories…</p>
+        <p className="text-sm text-fg/30">Loading categories…</p>
       ) : (
         <div className="mb-5">
           {groups.map(([groupName, cats]) => (
@@ -569,7 +569,7 @@ function Step2({ register, errors, watch, setValue, trigger, categories, categor
                       className={`inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-sans border rounded-lg transition-all duration-150 enabled:hover:scale-[1.02] enabled:active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed ${
                         picked
                           ? 'bg-wff-red border-wff-red text-white shadow-[0_0_0_3px_rgba(206,17,38,0.15)]'
-                          : 'border-white/15 text-white/50 hover:border-wff-red/40 hover:text-white'
+                          : 'border-fg/15 text-fg/50 hover:border-wff-red/40 hover:text-fg'
                       }`}
                     >{picked && <Check size={12} />}{c.name}</button>
                   );
@@ -578,7 +578,7 @@ function Step2({ register, errors, watch, setValue, trigger, categories, categor
             </div>
           ))}
           {atLimit && (
-            <p className="text-xs text-white/40 mt-3">
+            <p className="text-xs text-fg/40 mt-3">
               That&apos;s the maximum of {MAX_CATEGORIES}. Tap a selected category to swap it out.
             </p>
           )}
@@ -645,7 +645,7 @@ function Step3({ watch, setValue, errors, files, onFileChange, photoError }: {
   return (
     <div>
       <SectionHeading>Your Photo</SectionHeading>
-      <p className="text-sm text-white/40 -mt-3 mb-5">Just one clear photo of you — that&apos;s all we need to keep moving.</p>
+      <p className="text-sm text-fg/40 -mt-3 mb-5">Just one clear photo of you — that&apos;s all we need to keep moving.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
         <FileUpload
           label="Athlete Photo"
@@ -675,7 +675,7 @@ function Step3({ watch, setValue, errors, files, onFileChange, photoError }: {
       </div>
 
       <SectionHeading>Medical Declaration</SectionHeading>
-      <div className="space-y-4 p-5 border border-white/8 rounded-xl bg-white/2">
+      <div className="space-y-4 p-5 border border-fg/8 rounded-xl bg-fg/2">
         <CheckboxField
           id="medicalDeclaration"
           checked={medicalDeclaration}
@@ -706,16 +706,16 @@ function Step4({ register, errors, watch, setValue, fee }: {
       <SectionHeading>Registration Fee</SectionHeading>
 
       <div className="p-5 border border-wff-gold/20 bg-wff-gold/5 rounded-xl mb-6 flex items-start gap-3">
-        <CreditCard size={20} className="text-wff-gold mt-0.5 flex-shrink-0" />
+        <CreditCard size={20} className="text-gold-ink mt-0.5 flex-shrink-0" />
         <div>
-          <p className="text-sm font-bebas tracking-wider text-wff-gold text-lg leading-none">
+          <p className="text-sm font-bebas tracking-wider text-gold-ink text-lg leading-none">
             Your Registration Fee: ${usd} USD
-            {ghs !== null && <span className="text-white/50"> (₵ {ghs.toFixed(2)})</span>}
+            {ghs !== null && <span className="text-fg/50"> (₵ {ghs.toFixed(2)})</span>}
           </p>
-          <p className="text-xs text-white/50 mt-1.5">
+          <p className="text-xs text-fg/50 mt-1.5">
             {ghanaian ? 'Ghanaian rate' : 'International rate'} · Ghanaians ${fee.ghanaian_usd} · Foreign athletes ${fee.foreign_usd}
           </p>
-          <p className="text-xs text-white/40 mt-1">Fee covers registration, competition bib, and entry into all judging rounds for every category you selected.</p>
+          <p className="text-xs text-fg/40 mt-1">Fee covers registration, competition bib, and entry into all judging rounds for every category you selected.</p>
         </div>
       </div>
 
@@ -734,9 +734,9 @@ function Step4({ register, errors, watch, setValue, fee }: {
 
       {feePaid === 'paystack' && (
         <div className="mt-6 flex gap-3 items-start bg-wff-gold/5 border border-wff-gold/20 rounded-xl p-5 animate-in fade-in slide-in-from-top-2 duration-300">
-          <Lock size={18} className="text-wff-gold mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-white/60 leading-relaxed">
-            When you submit this form you will be taken to <span className="text-white font-bold">Paystack</span> to
+          <Lock size={18} className="text-gold-ink mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-fg/60 leading-relaxed">
+            When you submit this form you will be taken to <span className="text-fg font-bold">Paystack</span> to
             pay {ghs !== null ? <>₵ {ghs.toFixed(2)} (${usd})</> : <>the entry fee</>} by card, bank transfer or mobile money.
             Your entry is only forwarded to the selection committee once payment clears — you can close the payment
             page and come back to it, your details are already saved.
@@ -747,7 +747,7 @@ function Step4({ register, errors, watch, setValue, fee }: {
       {feePaid === 'onsite' && (
         <div className="mt-6 flex gap-3 items-start bg-wff-green/5 border border-wff-green/20 rounded-xl p-5 animate-in fade-in slide-in-from-top-2 duration-300">
           <Plane size={18} className="text-wff-green mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-white/60 leading-relaxed">
+          <p className="text-xs text-fg/60 leading-relaxed">
             No payment needed right now. Complete registration today and pay the ${usd} entry fee
             in person, in cash or mobile money, when you check in at the event. Your spot is
             provisional until the fee is paid.
@@ -756,7 +756,7 @@ function Step4({ register, errors, watch, setValue, fee }: {
       )}
 
       <SectionHeading>Emergency Contact</SectionHeading>
-      <p className="text-sm text-white/40 -mt-3 mb-5">Not required, but it helps us reach someone for you if needed.</p>
+      <p className="text-sm text-fg/40 -mt-3 mb-5">Not required, but it helps us reach someone for you if needed.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
         <div>
           <Label>Full Name <OptionalMark recommended /></Label>
@@ -771,7 +771,7 @@ function Step4({ register, errors, watch, setValue, fee }: {
       </div>
 
       <SectionHeading>Consents & Agreements</SectionHeading>
-      <div className="space-y-4 p-5 border border-white/8 rounded-xl bg-white/2">
+      <div className="space-y-4 p-5 border border-fg/8 rounded-xl bg-fg/2">
         <CheckboxField
           id="mediaConsent"
           checked={watch('mediaConsent') || false}
@@ -1132,7 +1132,7 @@ export default function Registration() {
   const progress = ((currentStep - 1) / (STEPS.length - 1)) * 100;
 
   return (
-    <section id="register" className="py-24 bg-wff-dark relative border-t border-white/5" ref={topRef}>
+    <section id="register" className="py-24 bg-page relative border-t border-fg/5" ref={topRef}>
       {/* Ambient background */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-wff-red/4 blur-[180px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-wff-gold/3 blur-[150px] rounded-full pointer-events-none" />
@@ -1140,32 +1140,32 @@ export default function Registration() {
       <div className="container mx-auto px-6 relative z-10">
         {isSuccess ? (
           // ── SUCCESS STATE: personalized, ego-boosting ──
-          <div className="max-w-2xl mx-auto border border-wff-gold/30 rounded-2xl p-12 text-center bg-gradient-to-b from-[#120d02] to-[#0a0a0a] animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
+          <div className="max-w-2xl mx-auto border border-wff-gold/30 rounded-2xl p-12 text-center bg-gradient-to-b from-[#120d02] to-surface animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-wff-red via-wff-gold to-wff-green" />
             <div className="w-20 h-20 rounded-full bg-wff-gold/10 border border-wff-gold/40 flex items-center justify-center mx-auto mb-8">
-              <Medal size={40} className="text-wff-gold" />
+              <Medal size={40} className="text-gold-ink" />
             </div>
-            <p className="font-sans text-[10px] uppercase tracking-[0.3em] text-wff-gold mb-3 flex items-center justify-center gap-2">
+            <p className="font-sans text-[10px] uppercase tracking-[0.3em] text-gold-ink mb-3 flex items-center justify-center gap-2">
               <Sparkles size={12} /> Welcome to the roster <Sparkles size={12} />
             </p>
-            <h3 className="font-bebas text-3xl sm:text-4xl mb-2 text-white/60 tracking-wide">
+            <h3 className="font-bebas text-3xl sm:text-4xl mb-2 text-fg/60 tracking-wide">
               YOU&apos;RE IN,
             </h3>
-            <h2 className="font-bebas text-6xl sm:text-7xl mb-6 leading-none text-wff-gold break-words">
+            <h2 className="font-bebas text-6xl sm:text-7xl mb-6 leading-none text-gold-ink break-words">
               {successName || 'ATHLETE'}
             </h2>
             {(successMeta.entries.length > 0 || successMeta.country) && (
-              <div className="font-sans text-white/50 text-sm mb-8 space-y-1">
+              <div className="font-sans text-fg/50 text-sm mb-8 space-y-1">
                 {successMeta.entries.map(e => (
                   <p key={e.category}>
-                    Competing in <span className="text-white font-bold">{e.category}</span>
-                    {e.division && <> · <span className="text-white/70">{e.division}</span></>}
+                    Competing in <span className="text-fg font-bold">{e.category}</span>
+                    {e.division && <> · <span className="text-fg/70">{e.division}</span></>}
                   </p>
                 ))}
-                {successMeta.country && <p>Representing <span className="text-white font-bold">{successMeta.country}</span></p>}
+                {successMeta.country && <p>Representing <span className="text-fg font-bold">{successMeta.country}</span></p>}
               </div>
             )}
-            <p className="font-sans text-white/40 text-sm max-w-sm mx-auto mb-10">
+            <p className="font-sans text-fg/40 text-sm max-w-sm mx-auto mb-10">
               You just took the step most people only talk about. Our team will review your
               submission and reach out within 48 hours with your status and next steps.
               See you on stage.
@@ -1187,7 +1187,7 @@ export default function Registration() {
               <h2 className="font-bebas text-6xl md:text-8xl mb-4 leading-none">
                 ATHLETE <span className="text-wff-red">REGISTRATION</span>
               </h2>
-              <p className="font-sans text-white/50 text-base max-w-xl mx-auto">
+              <p className="font-sans text-fg/50 text-base max-w-xl mx-auto">
                 Four short steps. Most athletes finish in under five minutes.
               </p>
             </div>
@@ -1213,19 +1213,19 @@ export default function Registration() {
                         <div className={`w-10 h-10 rounded-lg border flex items-center justify-center transition-all duration-200 ${
                           done    ? 'bg-wff-red border-wff-red' :
                           active  ? 'border-wff-red bg-wff-red/10 shadow-[0_0_0_4px_rgba(206,17,38,0.1)]' :
-                                    'border-white/20 bg-white/3'
+                                    'border-fg/20 bg-fg/3'
                         }`}>
                           {done
-                            ? <Check size={16} className="text-white" />
-                            : <Icon size={16} className={active ? 'text-wff-red' : 'text-white/50'} />
+                            ? <Check size={16} className="text-fg" />
+                            : <Icon size={16} className={active ? 'text-wff-red' : 'text-fg/50'} />
                           }
                         </div>
-                        <span className={`font-bebas text-sm tracking-wider ${active ? 'text-wff-red' : 'text-white/50'}`}>
+                        <span className={`font-bebas text-sm tracking-wider ${active ? 'text-wff-red' : 'text-fg/50'}`}>
                           {step.label}
                         </span>
                       </button>
                       {idx < STEPS.length - 1 && (
-                        <div className="flex-1 mx-3 h-px bg-white/10 relative overflow-hidden">
+                        <div className="flex-1 mx-3 h-px bg-fg/10 relative overflow-hidden">
                           <div
                             className="absolute inset-y-0 left-0 bg-wff-red transition-all duration-500"
                             style={{ width: currentStep > step.id ? '100%' : '0%' }}
@@ -1250,33 +1250,33 @@ export default function Registration() {
                       className={`w-8 h-8 rounded-lg border flex items-center justify-center cursor-pointer transition-all duration-200 ${
                         done    ? 'bg-wff-red border-wff-red' :
                         active  ? 'border-wff-red bg-wff-red/10' :
-                                  'border-white/15 bg-white/3'
+                                  'border-fg/15 bg-fg/3'
                       }`}
                     >
-                      {done ? <Check size={14} className="text-white" /> : <Icon size={14} className={active ? 'text-wff-red' : 'text-white/30'} />}
+                      {done ? <Check size={14} className="text-fg" /> : <Icon size={14} className={active ? 'text-wff-red' : 'text-fg/30'} />}
                     </div>
                   );
                 })}
               </div>
 
               {/* Progress bar */}
-              <div className="h-px bg-white/8 rounded-full overflow-hidden">
+              <div className="h-px bg-fg/8 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-wff-red to-wff-red/60 transition-all duration-500"
                   style={{ width: `${progress}%` }}
                 />
               </div>
               <div className="flex justify-between mt-1.5">
-                <span className="text-[10px] text-white/25 font-sans uppercase tracking-wider">
+                <span className="text-[10px] text-fg/25 font-sans uppercase tracking-wider">
                   Step {currentStep} of {STEPS.length} — {STEPS[currentStep - 1].blurb}
                 </span>
-                <span className="text-[10px] text-white/25 font-sans">{Math.round(progress)}% complete</span>
+                <span className="text-[10px] text-fg/25 font-sans">{Math.round(progress)}% complete</span>
               </div>
             </div>
 
             {/* ── FORM PANEL ── */}
             <form onSubmit={(e) => handleSubmit(onSubmit, onInvalid)(e)}>
-              <div className="bg-[#0a0a0a] border border-white/8 rounded-2xl p-8 md:p-12 min-h-[500px] overflow-hidden">
+              <div className="bg-surface border border-fg/8 rounded-2xl p-8 md:p-12 min-h-[500px] overflow-hidden">
                 <div key={currentStep} className="animate-in fade-in slide-in-from-right-3 duration-300">
                   {currentStep === 1 && <Step1 register={register} errors={errors} watch={watch} setValue={setValue} trigger={trigger} />}
                   {currentStep === 2 && <Step2 register={register} errors={errors} watch={watch} setValue={setValue} trigger={trigger} categories={categories} categoriesLoading={categoriesLoading} />}
@@ -1288,7 +1288,7 @@ export default function Registration() {
               {submitError && (
                 <div role="alert" className="mt-6 flex gap-3 items-start border border-wff-red/40 bg-wff-red/10 rounded-xl p-4 animate-in fade-in slide-in-from-top-1 duration-200">
                   <AlertCircle size={18} className="text-wff-red mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-white/80 leading-relaxed">{submitError}</p>
+                  <p className="text-sm text-fg/80 leading-relaxed">{submitError}</p>
                 </div>
               )}
 
@@ -1298,7 +1298,7 @@ export default function Registration() {
                   type="button"
                   onClick={() => goToStep(currentStep - 1)}
                   disabled={currentStep === 1}
-                  className="flex items-center gap-2 font-bebas text-lg text-white/40 hover:text-white disabled:opacity-0 disabled:pointer-events-none transition-all duration-200"
+                  className="flex items-center gap-2 font-bebas text-lg text-fg/40 hover:text-fg disabled:opacity-0 disabled:pointer-events-none transition-all duration-200"
                 >
                   <ChevronLeft size={18} /> Previous
                 </button>
@@ -1310,7 +1310,7 @@ export default function Registration() {
                       className={`transition-all duration-300 rounded-full ${
                         s.id === currentStep ? 'w-6 h-1.5 bg-wff-red' :
                         s.id < currentStep  ? 'w-1.5 h-1.5 bg-wff-red/40' :
-                                              'w-1.5 h-1.5 bg-white/15'
+                                              'w-1.5 h-1.5 bg-fg/15'
                       }`}
                     />
                   ))}
@@ -1332,7 +1332,7 @@ export default function Registration() {
                     className="flex items-center gap-2 font-bebas text-xl bg-wff-red text-white px-8 py-3 rounded-lg hover:bg-wff-gold hover:text-wff-dark transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
                   >
                     {isSubmitting ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-fg border-t-transparent rounded-full animate-spin" />
                     ) : (
                       <><Shield size={16} /> {savedId && feePaidChoice === 'paystack' ? 'Retry Payment' : 'Submit'}</>
                     )}
@@ -1340,7 +1340,7 @@ export default function Registration() {
                 )}
               </div>
               {currentStep === STEPS.length && !canSubmit && !isSubmitting && (
-                <p className="mt-3 text-right text-xs text-white/40">
+                <p className="mt-3 text-right text-xs text-fg/40">
                   {missing.length
                     ? <>To submit, add {missing.join(', ')}.</>
                     : <>Some required details on an earlier step are missing — go back and check the fields marked <span className="text-wff-red">*</span>.</>}

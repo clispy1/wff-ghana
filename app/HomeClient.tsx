@@ -101,7 +101,7 @@ export default function HomeClient({
   }, []);
 
   return (
-    <main ref={containerRef} className="relative bg-wff-dark min-h-screen overflow-hidden">
+    <main ref={containerRef} className="relative bg-page min-h-screen overflow-hidden">
 
       {/* 1. Hero Module — always shown */}
       <Hero event={eventData} />

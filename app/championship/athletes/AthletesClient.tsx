@@ -98,7 +98,7 @@ export default function AthletesClient({ athletes }: { athletes: Athlete[] }) {
   }, []);
 
   return (
-    <main className="pt-32 pb-24 min-h-screen bg-wff-dark relative overflow-hidden">
+    <main className="pt-32 pb-24 min-h-screen bg-page relative overflow-hidden">
       
       {/* Ambient Red Glow Background */}
       <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(206,17,38,0.12) 0%, transparent 70%)' }}></div>
@@ -108,7 +108,7 @@ export default function AthletesClient({ athletes }: { athletes: Athlete[] }) {
         {/* Header */}
         <div ref={headerRef} className="max-w-4xl mx-auto text-center mb-24 opacity-0">
           <h1 className="font-bebas text-6xl md:text-8xl mb-6">TEAM <span className="text-wff-red">GHANA</span> ROSTER</h1>
-          <p className="font-sans text-xl text-white/70">
+          <p className="font-sans text-xl text-fg/70">
             Meet the elite athletes defending the home turf.
           </p>
         </div>
@@ -118,7 +118,7 @@ export default function AthletesClient({ athletes }: { athletes: Athlete[] }) {
           {athletes.map((athlete) => (
             <div 
               key={athlete.id}
-              className="athlete-card relative aspect-[3/4] cursor-pointer group rounded-xl overflow-hidden border border-white/10 bg-[#111]"
+              className="athlete-card relative aspect-[3/4] cursor-pointer group rounded-xl overflow-hidden border border-fg/10 bg-raised"
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
               onClick={() => setSelectedAthlete(athlete)}
@@ -132,17 +132,17 @@ export default function AthletesClient({ athletes }: { athletes: Athlete[] }) {
                 referrerPolicy="no-referrer"
               />
               ) : (
-                <div className="absolute inset-0 bg-[#161616]" />
+                <div className="absolute inset-0 bg-raised-2" />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/40 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500"></div>
               
               <div className="absolute bottom-0 left-0 w-full p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                 <div className="flex items-center space-x-2 mb-2">
                   <span className="text-xl">🇬🇭</span>
-                  <span className="font-sans text-xs uppercase tracking-widest text-wff-gold">{athlete.category}</span>
+                  <span className="font-sans text-xs uppercase tracking-widest text-gold-ink">{athlete.category}</span>
                 </div>
-                <h3 className="font-bebas text-3xl text-white mb-1">{athlete.name}</h3>
-                <p className="font-sans text-sm text-white/60">{athlete.weightClass}</p>
+                <h3 className="font-bebas text-3xl text-fg mb-1">{athlete.name}</h3>
+                <p className="font-sans text-sm text-fg/60">{athlete.weightClass}</p>
               </div>
               
               {/* Decorative corner accents */}
@@ -156,10 +156,10 @@ export default function AthletesClient({ athletes }: { athletes: Athlete[] }) {
 
       {/* Modal */}
       {selectedAthlete && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-wff-dark/90 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-page/90 backdrop-blur-sm">
           <div 
             ref={modalRef}
-            className="bg-[#111] border border-white/10 w-full max-w-5xl max-h-[90vh] overflow-y-auto no-scrollbar relative flex flex-col md:flex-row rounded-xl"
+            className="bg-raised border border-fg/10 w-full max-w-5xl max-h-[90vh] overflow-y-auto no-scrollbar relative flex flex-col md:flex-row rounded-xl"
           >
             <button 
               onClick={() => setSelectedAthlete(null)}
@@ -178,14 +178,14 @@ export default function AthletesClient({ athletes }: { athletes: Athlete[] }) {
                 referrerPolicy="no-referrer"
               />
               ) : (
-                <div className="w-full h-full bg-[#161616]" />
+                <div className="w-full h-full bg-raised-2" />
               )}
             </div>
 
             <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
               <div className="flex items-center space-x-3 mb-4">
                 <span className="text-2xl">🇬🇭</span>
-                <span className="font-sans text-sm uppercase tracking-widest text-wff-gold border border-wff-gold/30 px-3 py-1">
+                <span className="font-sans text-sm uppercase tracking-widest text-gold-ink border border-wff-gold/30 px-3 py-1">
                   {selectedAthlete.category}
                 </span>
               </div>
@@ -195,16 +195,16 @@ export default function AthletesClient({ athletes }: { athletes: Athlete[] }) {
                 Weight Class: {selectedAthlete.weightClass}
               </p>
               
-              <p className="font-sans text-white/70 leading-relaxed mb-8">
+              <p className="font-sans text-fg/70 leading-relaxed mb-8">
                 {selectedAthlete.bio}
               </p>
 
               <div>
-                <h4 className="font-bebas text-2xl mb-4 text-white/50">Key Achievements</h4>
+                <h4 className="font-bebas text-2xl mb-4 text-fg/50">Key Achievements</h4>
                 <ul className="space-y-3">
                   {selectedAthlete.achievements.map((ach: string, i: number) => (
-                    <li key={i} className="flex items-start font-sans text-sm text-white/80">
-                      <span className="text-wff-gold mr-3">★</span>
+                    <li key={i} className="flex items-start font-sans text-sm text-fg/80">
+                      <span className="text-gold-ink mr-3">★</span>
                       {ach}
                     </li>
                   ))}
