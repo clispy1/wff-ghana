@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { registrationEntries } from "@/lib/registrationEntries";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -262,7 +263,11 @@ export default function AdminRegistrationsPage() {
                   </TableCell>
                   <TableCell className="text-white/60">{reg.country_representing || reg.country}</TableCell>
                   <TableCell className="text-xs text-wff-gold">
-                    {reg.divisions?.name || reg.division} • {reg.category}
+                    {registrationEntries(reg).map((e) => (
+                      <div key={e.category}>
+                        {e.division} • {e.category}
+                      </div>
+                    ))}
                   </TableCell>
                   <TableCell>
                     <span
@@ -335,8 +340,12 @@ export default function AdminRegistrationsPage() {
                 <Field label="Date of Birth">{selectedReg.dob}</Field>
                 <Field label="Representing">{selectedReg.country_representing}</Field>
                 <Field label="Athlete Type">{selectedReg.athlete_type}</Field>
-                <Field label="Category / Division">
-                  {selectedReg.category} • {selectedReg.divisions?.name || selectedReg.division}
+                <Field label={registrationEntries(selectedReg).length > 1 ? "Categories / Divisions" : "Category / Division"}>
+                  {registrationEntries(selectedReg).map((e) => (
+                    <span key={e.category} className="block">
+                      {e.category} • {e.division || "—"}
+                    </span>
+                  ))}
                 </Field>
                 <Field label="Weight / Height Class">
                   {selectedReg.weight_class || "—"} / {selectedReg.height_class || "—"}

@@ -440,3 +440,8 @@ ALTER TABLE public.registrations
     ALTER COLUMN address DROP NOT NULL,
     ALTER COLUMN city    DROP NOT NULL,
     ALTER COLUMN country DROP NOT NULL;
+
+-- Athletes can enter up to 3 categories for one fee. entries holds
+-- [{category, division, division_id}]; category/division/division_id
+-- keep the first pick so older readers still work.
+ALTER TABLE public.registrations ADD COLUMN IF NOT EXISTS entries JSONB;

@@ -43,8 +43,12 @@ const schema = z.object({
 
   // Step 2 — Competition (+ Team/Club, shown only when the team toggle is on)
   athleteType:         z.string().min(1, 'Athlete type is required'),
-  category:            z.string().min(1, 'Category is required'),
-  division:            z.string().min(1, 'Division is required'),
+  // Up to MAX_CATEGORIES categories, each with its own division. One
+  // entry fee covers all of them.
+  entries:             z.array(z.object({ category: z.string(), division: z.string() }))
+                         .min(1, 'Pick at least one category')
+                         .max(3, 'You can enter up to 3 categories')
+                         .refine(es => es.every(e => e.division), 'Pick a division for each category'),
   clubName:            z.string().optional(),
   coachName:           z.string().optional(),
 
@@ -65,6 +69,8 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
+const MAX_CATEGORIES = 3;
+type Entry = { category: string; division: string };
 type CategoryRow = { id: string; name: string; group_name: string | null; divisions: { id: string; name: string; display_order: number }[] };
 
 // ─────────────────────────────────────────────
@@ -493,8 +499,7 @@ function Step2({ register, errors, watch, setValue, trigger, categories, categor
   categoriesLoading: boolean;
 }) {
   const athleteType = watch('athleteType') || 'individual';
-  const category    = watch('category') || '';
-  const division    = watch('division') || '';
+  const entries: Entry[] = watch('entries') || [];
   const isTeamAthlete = athleteType === 'club' || athleteType === 'national';
 
   const groups = useMemo(() => {
@@ -507,7 +512,14 @@ function Step2({ register, errors, watch, setValue, trigger, categories, categor
     return Array.from(byGroup.entries());
   }, [categories]);
 
-  const selectedCategory = categories.find(c => c.name === category);
+  const setEntries = (next: Entry[]) => setValue('entries', next, { shouldValidate: true });
+  const isPicked = (name: string) => entries.some(e => e.category === name);
+  const atLimit = entries.length >= MAX_CATEGORIES;
+
+  const toggleCategory = (name: string) => {
+    if (isPicked(name)) setEntries(entries.filter(e => e.category !== name));
+    else if (!atLimit) setEntries([...entries, { category: name, division: '' }]);
+  };
 
   return (
     <div>
@@ -533,7 +545,10 @@ function Step2({ register, errors, watch, setValue, trigger, categories, categor
         </div>
       )}
 
-      <SectionHeading>Category</SectionHeading>
+      <SectionHeading>Categories</SectionHeading>
+      <p className="text-sm text-white/40 -mt-3 mb-5">
+        Pick up to {MAX_CATEGORIES}. One entry fee covers all of them.
+      </p>
       {categoriesLoading ? (
         <p className="text-sm text-white/30">Loading categories…</p>
       ) : (
@@ -542,44 +557,60 @@ function Step2({ register, errors, watch, setValue, trigger, categories, categor
             <div key={groupName} className="mb-4 last:mb-0">
               <Label>{groupName}</Label>
               <div className="flex flex-wrap gap-2">
-                {cats.map(c => (
-                  <button
-                    key={c.id} type="button"
-                    onClick={() => {
-                      setValue('category', c.name, { shouldValidate: true });
-                      setValue('division', '', { shouldValidate: false });
-                    }}
-                    className={`px-4 py-2.5 text-xs font-sans border rounded-lg transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] ${
-                      category === c.name
-                        ? 'bg-wff-red border-wff-red text-white shadow-[0_0_0_3px_rgba(206,17,38,0.15)]'
-                        : 'border-white/15 text-white/50 hover:border-wff-red/40 hover:text-white'
-                    }`}
-                  >{c.name}</button>
-                ))}
+                {cats.map(c => {
+                  const picked = isPicked(c.name);
+                  const disabled = !picked && atLimit;
+                  return (
+                    <button
+                      key={c.id} type="button"
+                      aria-pressed={picked}
+                      disabled={disabled}
+                      onClick={() => toggleCategory(c.name)}
+                      className={`inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-sans border rounded-lg transition-all duration-150 enabled:hover:scale-[1.02] enabled:active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed ${
+                        picked
+                          ? 'bg-wff-red border-wff-red text-white shadow-[0_0_0_3px_rgba(206,17,38,0.15)]'
+                          : 'border-white/15 text-white/50 hover:border-wff-red/40 hover:text-white'
+                      }`}
+                    >{picked && <Check size={12} />}{c.name}</button>
+                  );
+                })}
               </div>
             </div>
           ))}
-          <FieldError message={errors.category?.message} />
+          {atLimit && (
+            <p className="text-xs text-white/40 mt-3">
+              That&apos;s the maximum of {MAX_CATEGORIES}. Tap a selected category to swap it out.
+            </p>
+          )}
         </div>
       )}
 
-      {selectedCategory && (
+      {entries.length > 0 && (
         <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-          <SectionHeading>Division</SectionHeading>
-          <RadioGroup
-            label={`Division within ${selectedCategory.name}`}
-            name="division"
-            required
-            value={division}
-            onChange={v => setValue('division', v, { shouldValidate: true })}
-            error={errors.division?.message}
-            options={selectedCategory.divisions
-              .slice()
-              .sort((a, b) => a.display_order - b.display_order)
-              .map(d => ({ value: d.name, label: d.name }))}
-          />
+          <SectionHeading>{entries.length > 1 ? 'Divisions' : 'Division'}</SectionHeading>
+          <div className="space-y-5">
+            {entries.map((entry, i) => {
+              const cat = categories.find(c => c.name === entry.category);
+              if (!cat) return null;
+              return (
+                <RadioGroup
+                  key={entry.category}
+                  label={`Division within ${entry.category}`}
+                  name={`division-${i}`}
+                  required
+                  value={entry.division}
+                  onChange={v => setEntries(entries.map(e => e.category === entry.category ? { ...e, division: v } : e))}
+                  options={cat.divisions
+                    .slice()
+                    .sort((a, b) => a.display_order - b.display_order)
+                    .map(d => ({ value: d.name, label: d.name }))}
+                />
+              );
+            })}
+          </div>
         </div>
       )}
+      <FieldError message={errors.entries?.message ?? errors.entries?.root?.message} />
 
       {isTeamAthlete && (
         <div className="animate-in fade-in slide-in-from-top-2 duration-300">
@@ -684,7 +715,7 @@ function Step4({ register, errors, watch, setValue, fee }: {
           <p className="text-xs text-white/50 mt-1.5">
             {ghanaian ? 'Ghanaian rate' : 'International rate'} · Ghanaians ${fee.ghanaian_usd} · Foreign athletes ${fee.foreign_usd}
           </p>
-          <p className="text-xs text-white/40 mt-1">Fee covers registration, competition bib, and entry into all judging rounds for your selected category.</p>
+          <p className="text-xs text-white/40 mt-1">Fee covers registration, competition bib, and entry into all judging rounds for every category you selected.</p>
         </div>
       </div>
 
@@ -766,7 +797,7 @@ function Step4({ register, errors, watch, setValue, fee }: {
 // ─────────────────────────────────────────────
 const STEP_FIELDS: Record<number, (keyof FormData)[]> = {
   1: ['firstName', 'lastName', 'gender', 'dob', 'nationality', 'countryRepresenting', 'email', 'mobile'],
-  2: ['athleteType', 'category', 'division'],
+  2: ['athleteType', 'entries'],
   3: ['medicalDeclaration'],
   4: ['feePaid', 'termsAgreed'],
 };
@@ -783,7 +814,7 @@ export default function Registration() {
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [fee, setFee] = useState<RegistrationFeeConfig>(DEFAULT_REGISTRATION_FEE);
   const [successName, setSuccessName] = useState('');
-  const [successMeta, setSuccessMeta] = useState<{ category: string; division: string; country: string }>({ category: '', division: '', country: '' });
+  const [successMeta, setSuccessMeta] = useState<{ entries: Entry[]; country: string }>({ entries: [], country: '' });
   const [photoError, setPhotoError] = useState('');
   const [submitError, setSubmitError] = useState('');
   // Set once submit_registration succeeds. From then on a resubmit only
@@ -838,7 +869,7 @@ export default function Registration() {
       // "Invalid input" instead of real guidance the first time they
       // hit Submit.
       defaultValues: {
-        athleteType: 'individual', category: '', division: '',
+        athleteType: 'individual', entries: [],
         nationality: '', countryRepresenting: '',
         medicalDeclaration: false,
         feePaid: '', mediaConsent: false, termsAgreed: false,
@@ -917,7 +948,7 @@ export default function Registration() {
 
   const showSuccess = (data: FormData) => {
     setSuccessName(`${data.firstName} ${data.lastName}`.trim());
-    setSuccessMeta({ category: data.category, division: data.division, country: data.countryRepresenting });
+    setSuccessMeta({ entries: data.entries, country: data.countryRepresenting });
     setIsSubmitting(false);
     setIsSuccess(true);
     const duration = 4000;
@@ -972,9 +1003,13 @@ export default function Registration() {
         const headshotUrl = await uploadFile(files.athletePhoto, 'athlete photo');
         const fullBodyUrl = await uploadFile(files.fullBody, 'full body photo');
 
-        const divisionRow = categories
-          .find(c => c.name === data.category)
-          ?.divisions.find(d => d.name === data.division);
+        const entries = data.entries.map(e => ({
+          ...e,
+          division_id: categories
+            .find(c => c.name === e.category)
+            ?.divisions.find(d => d.name === e.division)?.id || null,
+        }));
+        const [first] = entries;
 
         // Goes through the submit_registration RPC rather than a direct
         // table insert: this table has no anon SELECT policy (it holds
@@ -1001,9 +1036,12 @@ export default function Registration() {
           city: null,
           country: null,
           athlete_type: data.athleteType,
-          category: data.category,
-          division: data.division,
-          division_id: divisionRow?.id || null,
+          // category/division/division_id keep the first pick so older
+          // readers still work; entries holds the full list.
+          category: first.category,
+          division: first.division,
+          division_id: first.division_id,
+          entries,
           weight_class: null,
           height_class: null,
           team_name: null,
@@ -1116,12 +1154,16 @@ export default function Registration() {
             <h2 className="font-bebas text-6xl sm:text-7xl mb-6 leading-none text-wff-gold break-words">
               {successName || 'ATHLETE'}
             </h2>
-            {(successMeta.category || successMeta.country) && (
-              <p className="font-sans text-white/50 text-sm mb-8">
-                {successMeta.category && <>Competing in <span className="text-white font-bold">{successMeta.category}</span></>}
-                {successMeta.division && <> · <span className="text-white/70">{successMeta.division}</span></>}
-                {successMeta.country && <> · Representing <span className="text-white font-bold">{successMeta.country}</span></>}
-              </p>
+            {(successMeta.entries.length > 0 || successMeta.country) && (
+              <div className="font-sans text-white/50 text-sm mb-8 space-y-1">
+                {successMeta.entries.map(e => (
+                  <p key={e.category}>
+                    Competing in <span className="text-white font-bold">{e.category}</span>
+                    {e.division && <> · <span className="text-white/70">{e.division}</span></>}
+                  </p>
+                ))}
+                {successMeta.country && <p>Representing <span className="text-white font-bold">{successMeta.country}</span></p>}
+              </div>
             )}
             <p className="font-sans text-white/40 text-sm max-w-sm mx-auto mb-10">
               You just took the step most people only talk about. Our team will review your
