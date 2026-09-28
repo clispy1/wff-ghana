@@ -5,6 +5,11 @@ import ScrubberNavbar from "@/components/ScrubberNavbar";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 
+// Pages that keep the navbar but drop the footer. The athlete
+// registration form is a focused task, and on phones the footer sat
+// right under Submit and pulled athletes away from finishing.
+const NO_FOOTER = ["/register"];
+
 /**
  * The public navbar/footer/cart wrap every page from the root layout,
  * but the admin dashboard has its own chrome (AppSidebar in
@@ -14,6 +19,7 @@ import CartDrawer from "@/components/CartDrawer";
 export default function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
+  const hideFooter = NO_FOOTER.includes(pathname ?? "");
 
   if (isAdmin) return <>{children}</>;
 
@@ -22,7 +28,7 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
       <ScrubberNavbar />
       <CartDrawer />
       {children}
-      <Footer />
+      {!hideFooter && <Footer />}
     </>
   );
 }
