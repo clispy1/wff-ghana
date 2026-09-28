@@ -1,6 +1,7 @@
 import { createSupabaseAdminClient } from './supabase-admin';
 import { fromSubunit, type PaystackVerifyData } from './paystack';
 import { sendSms, notifyAdmin } from './sms';
+import { formatEntries } from './registrationEntries';
 
 /**
  * Single place where a Paystack transaction is turned into "this order
@@ -86,7 +87,7 @@ export async function settlePayment(
           paid_at: paidAt,
         })
         .eq('id', payment.related_id)
-        .select('first_name, last_name, mobile, category, division')
+        .select('first_name, last_name, mobile, category, division, entries')
         .single();
 
       if (reg) {
@@ -95,10 +96,10 @@ export async function settlePayment(
         Promise.all([
           sendSms(
             reg.mobile,
-            `Payment received! Your WFF Ghana entry fee for ${reg.category} (${reg.division}) is confirmed. See you at the championship. - WFF Ghana`,
+            `Payment received! Your WFF Ghana entry fee for ${formatEntries(reg)} is confirmed. See you at the championship. - WFF Ghana`,
           ),
           notifyAdmin(
-            `Payment confirmed: ${reg.first_name} ${reg.last_name} paid their registration fee (${reg.category}, ${reg.division}). Ref: ${reference}.`,
+            `Payment confirmed: ${reg.first_name} ${reg.last_name} paid their registration fee (${formatEntries(reg)}). Ref: ${reference}.`,
           ),
         ]).catch(() => {});
       }

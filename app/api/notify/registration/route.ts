@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase-admin';
 import { sendSms, notifyAdmin } from '@/lib/sms';
+import { formatEntries } from '@/lib/registrationEntries';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
     const admin = createSupabaseAdminClient();
     const { data: reg } = await admin
       .from('registrations')
-      .select('first_name, last_name, mobile, category, division, payment_method')
+      .select('first_name, last_name, mobile, category, division, entries, payment_method')
       .eq('id', registration_id)
       .maybeSingle();
 
@@ -30,14 +31,15 @@ export async function POST(request: Request) {
     }
 
     const athleteName = `${reg.first_name} ${reg.last_name}`.trim();
+    const entered = formatEntries(reg);
 
     await Promise.all([
       sendSms(
         reg.mobile,
-        `Hi ${reg.first_name}, your WFF Ghana registration for ${reg.category} (${reg.division}) is received! We'll review and reach out within 48 hours. - WFF Ghana`,
+        `Hi ${reg.first_name}, your WFF Ghana registration for ${entered} is received! We'll review and reach out within 48 hours. - WFF Ghana`,
       ),
       notifyAdmin(
-        `New athlete registration: ${athleteName} - ${reg.category} (${reg.division}). Payment: ${reg.payment_method || 'unpaid'}. Review in /admin/registrations.`,
+        `New athlete registration: ${athleteName} - ${entered}. Payment: ${reg.payment_method || 'unpaid'}. Review in /admin/registrations.`,
       ),
     ]);
 
