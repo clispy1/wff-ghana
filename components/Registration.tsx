@@ -38,28 +38,18 @@ const schema = z.object({
   dob:                 z.string().min(1, 'Date of birth is required'),
   nationality:         z.string().min(2, 'Nationality is required'),
   countryRepresenting: z.string().min(2, 'Country representing is required'),
-  passportNumber:      z.string().optional(),
   email:               z.string().email('Invalid email address'),
   mobile:              z.string().min(10, 'Valid mobile number required'),
-  address:             z.string().min(5, 'Residential address is required'),
-  city:                z.string().min(2, 'City is required'),
-  country:             z.string().min(2, 'Country is required'),
 
   // Step 2 — Competition (+ Team/Club, shown only when the team toggle is on)
   athleteType:         z.string().min(1, 'Athlete type is required'),
   category:            z.string().min(1, 'Category is required'),
   division:            z.string().min(1, 'Division is required'),
-  teamName:            z.string().optional(),
   clubName:            z.string().optional(),
-  teamCountry:         z.string().optional(),
   coachName:           z.string().optional(),
-  managerName:         z.string().optional(),
-  managerContact:      z.string().optional(),
-  federationAffiliation: z.string().optional(),
 
   // Step 3 — Documents / Medical
-  medicalDeclaration:  z.boolean().refine(v => v === true, 'You must confirm your medical fitness'),
-  fitnessDeclaration:  z.boolean().refine(v => v === true, 'You must confirm your fitness declaration'),
+  medicalDeclaration:  z.boolean().refine(v => v === true, 'You must confirm you are fit to compete'),
 
   // Step 4 — Payment & Final
   // How the athlete intends to settle the entry fee. Whether it is
@@ -69,7 +59,6 @@ const schema = z.object({
   // Recommended, not required — some athletes register in a hurry and
   // add this later; we'd rather have the entry than block on it.
   emergencyName:       z.string().optional(),
-  emergencyRelation:   z.string().optional(),
   emergencyPhone:      z.string().optional(),
   mediaConsent:        z.boolean().optional(),
   termsAgreed:         z.boolean().refine(v => v === true, 'You must agree to the terms and conditions'),
@@ -449,7 +438,14 @@ function Step1({ register, errors, watch, setValue, trigger }: {
         <ComboboxField
           label="Nationality" required
           value={watch('nationality') || ''}
-          onChange={v => setValue('nationality', v, { shouldValidate: true })}
+          onChange={v => {
+            // Most athletes represent their own country, so keep
+            // "Country Representing" in step with nationality until the
+            // athlete sets it to something different.
+            const rep = watch('countryRepresenting');
+            if (!rep || rep === watch('nationality')) setValue('countryRepresenting', v);
+            setValue('nationality', v, { shouldValidate: true });
+          }}
           onBlur={() => trigger('nationality')}
           options={COUNTRIES}
           placeholder="Ghanaian"
@@ -467,14 +463,10 @@ function Step1({ register, errors, watch, setValue, trigger }: {
           placeholder="Ghana"
           error={errors.countryRepresenting?.message}
         />
-        <div>
-          <Label>Passport Number <OptionalMark /></Label>
-          <input {...register('passportNumber')} className={inputClass} placeholder="G12345678" />
-        </div>
       </div>
 
       <SectionHeading>Contact Details</SectionHeading>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
         <div>
           <Label>Email Address <RequiredMark /></Label>
           <input {...register('email')} type="email" className={inputClass} placeholder="athlete@email.com" />
@@ -485,29 +477,6 @@ function Step1({ register, errors, watch, setValue, trigger }: {
           <input {...register('mobile')} className={inputClass} placeholder="+233 20 123 4567" />
           <FieldError message={errors.mobile?.message} />
         </div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-        <div className="sm:col-span-2">
-          <Label>Residential Address <RequiredMark /></Label>
-          <input {...register('address')} className={inputClass} placeholder="House No., Street Name" />
-          <FieldError message={errors.address?.message} />
-        </div>
-        <div>
-          <Label>City <RequiredMark /></Label>
-          <input {...register('city')} className={inputClass} placeholder="Accra" />
-          <FieldError message={errors.city?.message} />
-        </div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
-        <ComboboxField
-          label="Country" required
-          value={watch('country') || ''}
-          onChange={v => setValue('country', v, { shouldValidate: true })}
-          onBlur={() => trigger('country')}
-          options={COUNTRIES}
-          placeholder="Ghana"
-          error={errors.country?.message}
-        />
       </div>
     </div>
   );
@@ -615,42 +584,14 @@ function Step2({ register, errors, watch, setValue, trigger, categories, categor
       {isTeamAthlete && (
         <div className="animate-in fade-in slide-in-from-top-2 duration-300">
           <SectionHeading>Team & Club</SectionHeading>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <Label>Team Name</Label>
-              <input {...register('teamName')} className={inputClass} placeholder="Team Strength Ghana" />
-            </div>
-            <div>
-              <Label>Club Name</Label>
+              <Label>Team / Club Name <OptionalMark /></Label>
               <input {...register('clubName')} className={inputClass} placeholder="Iron Temple GH" />
             </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <ComboboxField
-              label="Team / Club Country"
-              value={watch('teamCountry') || ''}
-              onChange={v => setValue('teamCountry', v)}
-              onBlur={() => trigger('teamCountry')}
-              options={COUNTRIES}
-              placeholder="Ghana"
-            />
             <div>
-              <Label>Federation Affiliation</Label>
-              <input {...register('federationAffiliation')} className={inputClass} placeholder="WFF Ghana" />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <Label>Coach Name</Label>
+              <Label>Coach Name <OptionalMark /></Label>
               <input {...register('coachName')} className={inputClass} placeholder="Coach John Doe" />
-            </div>
-            <div>
-              <Label>Team Manager Name</Label>
-              <input {...register('managerName')} className={inputClass} placeholder="Jane Smith" />
-            </div>
-            <div>
-              <Label>Manager Contact</Label>
-              <input {...register('managerContact')} className={inputClass} placeholder="+233 20 000 0000" />
             </div>
           </div>
         </div>
@@ -669,7 +610,6 @@ function Step3({ watch, setValue, errors, files, onFileChange, photoError }: {
   onFileChange: (key: string, file: File | null) => void;
 }) {
   const medicalDeclaration = watch('medicalDeclaration') || false;
-  const fitnessDeclaration = watch('fitnessDeclaration') || false;
 
   return (
     <div>
@@ -703,23 +643,15 @@ function Step3({ watch, setValue, errors, files, onFileChange, photoError }: {
         />
       </div>
 
-      <SectionHeading>Medical Declarations</SectionHeading>
+      <SectionHeading>Medical Declaration</SectionHeading>
       <div className="space-y-4 p-5 border border-white/8 rounded-xl bg-white/2">
         <CheckboxField
           id="medicalDeclaration"
           checked={medicalDeclaration}
           onChange={v => setValue('medicalDeclaration', v, { shouldValidate: true })}
-          label="I confirm that I am medically fit to compete in this championship."
-          sublabel="I have no known medical conditions that would prevent safe participation."
+          label="I am medically fit to compete in this championship."
+          sublabel="I have no known medical condition that would prevent safe participation, and I take full responsibility for my own wellbeing."
           error={errors.medicalDeclaration?.message}
-        />
-        <CheckboxField
-          id="fitnessDeclaration"
-          checked={fitnessDeclaration}
-          onChange={v => setValue('fitnessDeclaration', v, { shouldValidate: true })}
-          label="I declare that I am in peak physical condition and ready to compete."
-          sublabel="I take full personal responsibility for my participation and physical wellbeing."
-          error={errors.fitnessDeclaration?.message}
         />
       </div>
     </div>
@@ -794,16 +726,11 @@ function Step4({ register, errors, watch, setValue, fee }: {
 
       <SectionHeading>Emergency Contact</SectionHeading>
       <p className="text-sm text-white/40 -mt-3 mb-5">Not required, but it helps us reach someone for you if needed.</p>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-0">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-0">
         <div>
           <Label>Full Name <OptionalMark recommended /></Label>
           <input {...register('emergencyName')} className={inputClass} placeholder="Jane Mensah" />
           <FieldError message={errors.emergencyName?.message} />
-        </div>
-        <div>
-          <Label>Relationship <OptionalMark recommended /></Label>
-          <input {...register('emergencyRelation')} className={inputClass} placeholder="Spouse / Parent / Sibling" />
-          <FieldError message={errors.emergencyRelation?.message} />
         </div>
         <div>
           <Label>Phone Number <OptionalMark recommended /></Label>
@@ -838,9 +765,9 @@ function Step4({ register, errors, watch, setValue, fee }: {
 // STEP FIELDS for validation
 // ─────────────────────────────────────────────
 const STEP_FIELDS: Record<number, (keyof FormData)[]> = {
-  1: ['firstName', 'lastName', 'gender', 'dob', 'nationality', 'countryRepresenting', 'email', 'mobile', 'address', 'city', 'country'],
+  1: ['firstName', 'lastName', 'gender', 'dob', 'nationality', 'countryRepresenting', 'email', 'mobile'],
   2: ['athleteType', 'category', 'division'],
-  3: ['medicalDeclaration', 'fitnessDeclaration'],
+  3: ['medicalDeclaration'],
   4: ['feePaid', 'termsAgreed'],
 };
 
@@ -912,8 +839,8 @@ export default function Registration() {
       // hit Submit.
       defaultValues: {
         athleteType: 'individual', category: '', division: '',
-        nationality: '', countryRepresenting: '', country: '', teamCountry: '',
-        medicalDeclaration: false, fitnessDeclaration: false,
+        nationality: '', countryRepresenting: '',
+        medicalDeclaration: false,
         feePaid: '', mediaConsent: false, termsAgreed: false,
       },
     });
@@ -1065,29 +992,30 @@ export default function Registration() {
           dob: data.dob,
           nationality: data.nationality,
           country_representing: data.countryRepresenting,
-          passport_number: data.passportNumber || null,
+          passport_number: null,
           national_id: null,
           email: data.email,
           mobile: data.mobile,
           whatsapp: null,
-          address: data.address,
-          city: data.city,
-          country: data.country,
+          address: null,
+          city: null,
+          country: null,
           athlete_type: data.athleteType,
           category: data.category,
           division: data.division,
           division_id: divisionRow?.id || null,
           weight_class: null,
           height_class: null,
-          team_name: data.teamName || null,
+          team_name: null,
           club_name: data.clubName || null,
-          team_country: data.teamCountry || null,
+          team_country: null,
           coach_name: data.coachName || null,
-          manager_name: data.managerName || null,
-          manager_contact: data.managerContact || null,
-          federation_affiliation: data.federationAffiliation || null,
+          manager_name: null,
+          manager_contact: null,
+          federation_affiliation: null,
           medical_declaration: data.medicalDeclaration,
-          fitness_declaration: data.fitnessDeclaration,
+          // One combined checkbox now covers both declarations.
+          fitness_declaration: data.medicalDeclaration,
           passport_url: passportUrl,
           national_id_url: null,
           headshot_url: headshotUrl,
@@ -1104,7 +1032,7 @@ export default function Registration() {
           paystack_ref: null,
           payment_screenshot_url: null,
           emergency_name: data.emergencyName || null,
-          emergency_relation: data.emergencyRelation || null,
+          emergency_relation: null,
           emergency_phone: data.emergencyPhone || null,
           instagram: null,
           facebook: null,
