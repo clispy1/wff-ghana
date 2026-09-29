@@ -1,6 +1,7 @@
 import { createSupabaseAdminClient } from './supabase-admin';
 import { fromSubunit, type PaystackVerifyData } from './paystack';
 import { sendSms, notifyAdmin } from './sms';
+import { sendEmail, cedis } from './email';
 import { formatEntries } from './registrationEntries';
 
 /**
@@ -63,19 +64,36 @@ export async function settlePayment(
   const paidAt = data.paid_at || new Date().toISOString();
 
   switch (payment.purpose) {
-    case 'shop':
-      await admin
+    case 'shop': {
+      const { data: order } = await admin
         .from('shop_orders')
         .update({ payment_status: 'paid', paystack_ref: reference, paid_at: paidAt })
-        .eq('id', payment.related_id);
+        .eq('id', payment.related_id)
+        .select('buyer_name, buyer_email, total')
+        .single();
+
+      if (order) {
+        sendEmail({
+          to: order.buyer_email,
+          toName: order.buyer_name,
+          subject: 'Your WFF Ghana order is confirmed',
+          heading: 'Order confirmed',
+          paragraphs: [
+            `Hi ${order.buyer_name}, thank you for your order. Your payment is confirmed and we are preparing your items for dispatch.`,
+            'We will be in touch when your order is on its way.',
+          ],
+          details: [['Amount paid', cedis(order.total)], ['Reference', reference]],
+        }).catch(() => {});
+      }
       break;
+    }
 
     case 'ticket': {
       const { data: order } = await admin
         .from('ticket_orders')
         .update({ payment_status: 'paid', paystack_ref: reference, paid_at: paidAt })
         .eq('id', payment.related_id)
-        .select('buyer_name, buyer_phone, quantity, ticket_tiers(name)')
+        .select('buyer_name, buyer_email, buyer_phone, quantity, total, ticket_tiers(name)')
         .single();
 
       if (order) {
@@ -89,6 +107,21 @@ export async function settlePayment(
               )
             : Promise.resolve(),
           notifyAdmin(`Ticket sale: ${order.buyer_name} bought ${passes}. Ref: ${reference}.`),
+          sendEmail({
+            to: order.buyer_email,
+            toName: order.buyer_name,
+            subject: 'Your WFF Ghana championship tickets',
+            heading: 'Tickets confirmed',
+            paragraphs: [
+              `Hi ${order.buyer_name}, your payment is confirmed. See you at the 2026 All Africa Bodybuilding Championship!`,
+              'Show your reference at the entrance, either in this email or the SMS we sent you.',
+            ],
+            details: [
+              ['Tickets', passes],
+              ['Amount paid', cedis(order.total)],
+              ['Reference', reference],
+            ],
+          }),
         ]).catch(() => {});
       }
       break;
@@ -104,7 +137,7 @@ export async function settlePayment(
           paid_at: paidAt,
         })
         .eq('id', payment.related_id)
-        .select('first_name, last_name, mobile, category, division, entries')
+        .select('first_name, last_name, email, mobile, category, division, entries')
         .single();
 
       if (reg) {
@@ -118,6 +151,21 @@ export async function settlePayment(
           notifyAdmin(
             `Payment confirmed: ${reg.first_name} ${reg.last_name} paid their registration fee (${formatEntries(reg)}). Ref: ${reference}.`,
           ),
+          sendEmail({
+            to: reg.email,
+            toName: `${reg.first_name} ${reg.last_name}`.trim(),
+            subject: 'Your WFF Ghana entry fee is confirmed',
+            heading: 'Entry fee received',
+            paragraphs: [
+              `Hi ${reg.first_name}, your entry fee payment is confirmed.`,
+              'Your application is with the selection committee. We will contact you once it has been reviewed.',
+            ],
+            details: [
+              ['Competing in', formatEntries(reg)],
+              ['Amount paid', cedis(paidAmount)],
+              ['Reference', reference],
+            ],
+          }),
         ]).catch(() => {});
       }
       break;
@@ -128,7 +176,7 @@ export async function settlePayment(
         .from('vendors')
         .update({ payment_status: 'paid', paystack_ref: reference, paid_at: paidAt })
         .eq('id', payment.related_id)
-        .select('name, phone, category, package_name')
+        .select('name, email, phone, category, package_name')
         .single();
 
       if (vendor) {
@@ -142,6 +190,21 @@ export async function settlePayment(
           notifyAdmin(
             `Payment confirmed: vendor ${vendor.name} paid for their package. Ref: ${reference}.`,
           ),
+          sendEmail({
+            to: vendor.email,
+            toName: vendor.name,
+            subject: 'Your WFF Ghana vendor payment is confirmed',
+            heading: 'Vendor payment received',
+            paragraphs: [
+              `Hi ${vendor.name}, your payment for your vendor package is confirmed.`,
+              'We are reviewing your application. Once approved, you will appear in the event vendor directory.',
+            ],
+            details: [
+              ['Package', vendor.package_name || vendor.category],
+              ['Amount paid', cedis(paidAmount)],
+              ['Reference', reference],
+            ],
+          }),
         ]).catch(() => {});
       }
       break;

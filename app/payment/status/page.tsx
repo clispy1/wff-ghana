@@ -16,7 +16,7 @@ const COPY = {
     },
     ticket: {
       title: 'TICKETS SECURED',
-      body: 'Payment received. Your tickets are reserved. We have texted your reference to your phone. Show it at the entrance.',
+      body: 'Payment received. Your tickets are reserved. We have emailed and texted you your reference. Show it at the entrance.',
     },
     vendor: {
       title: 'APPLICATION & FEE RECEIVED',
