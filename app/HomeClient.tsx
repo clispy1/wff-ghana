@@ -5,7 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Hero from '@/components/Hero';
 import WorldChampionships from '@/components/WorldChampionships';
-import { SponsorsMarquee } from '@/components/home/SponsorsMarquee';
+import { SponsorsMarquee, type Sponsor } from '@/components/home/SponsorsMarquee';
 import { FederationSection } from '@/components/home/FederationSection';
 import { JourneySection } from '@/components/home/JourneySection';
 import { ChampionshipSection } from '@/components/home/ChampionshipSection';
@@ -26,7 +26,7 @@ import type { HomeSectionVisibility } from '@/lib/homeSections';
 gsap.registerPlugin(ScrollTrigger);
 
 export interface HomeClientProps {
-  sponsors: { name: string; role: string }[];
+  sponsors: Sponsor[];
   news: { id: string; date: string; title: string; summary: string }[];
   products: {
     id: string;
