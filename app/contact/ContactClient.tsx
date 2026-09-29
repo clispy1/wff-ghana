@@ -62,13 +62,13 @@ export default function ContactClient() {
   }, []);
 
   return (
-    <main className="pt-32 pb-24 min-h-screen bg-wff-dark">
+    <main className="pt-32 pb-24 min-h-screen bg-page">
       <div className="container mx-auto px-6">
         
         {/* Header */}
         <div ref={headerRef} className="max-w-4xl mx-auto text-center mb-20 opacity-0">
           <h1 className="font-bebas text-6xl md:text-8xl mb-6">GET IN <span className="text-wff-red">TOUCH</span></h1>
-          <p className="font-sans text-xl text-white/70">
+          <p className="font-sans text-xl text-fg/70">
             Have questions about the 2026 All Africa Championship, athlete registration, or sponsorships? We are here to help.
           </p>
         </div>
@@ -78,8 +78,8 @@ export default function ContactClient() {
           {/* Contact Info */}
           <div className="space-y-12">
             <div>
-              <h3 className="font-bebas text-3xl mb-6 text-wff-gold">HEADQUARTERS</h3>
-              <div className="space-y-4 font-sans text-white/70">
+              <h3 className="font-bebas text-3xl mb-6 text-gold-ink">HEADQUARTERS</h3>
+              <div className="space-y-4 font-sans text-fg/70">
                 <p className="flex items-center"><MapPin className="mr-4 text-wff-red" />Accra, Ghana</p>
                 <p className="flex items-center"><Phone className="mr-4 text-wff-red" /> +233 55 011 4716</p>
                 <p className="flex items-center"><Mail className="mr-4 text-wff-red" /> info@wffghana.com</p>
@@ -87,36 +87,36 @@ export default function ContactClient() {
             </div>
 
             <div>
-              <h3 className="font-bebas text-3xl mb-6 text-wff-gold">SOCIAL MEDIA</h3>
+              <h3 className="font-bebas text-3xl mb-6 text-gold-ink">SOCIAL MEDIA</h3>
               <div className="flex space-x-6">
-                <a href="#" className="w-12 h-12 rounded-full bg-[#111] border border-white/10 flex items-center justify-center hover:bg-wff-red hover:border-wff-red transition-colors group">
-                  <Instagram className="text-white/70 group-hover:text-white" />
+                <a href="#" className="w-12 h-12 rounded-full bg-raised border border-fg/10 flex items-center justify-center hover:bg-wff-red hover:border-wff-red transition-colors group">
+                  <Instagram className="text-fg/70 group-hover:text-fg" />
                 </a>
-                <a href="#" className="w-12 h-12 rounded-full bg-[#111] border border-white/10 flex items-center justify-center hover:bg-wff-red hover:border-wff-red transition-colors group">
-                  <Facebook className="text-white/70 group-hover:text-white" />
+                <a href="#" className="w-12 h-12 rounded-full bg-raised border border-fg/10 flex items-center justify-center hover:bg-wff-red hover:border-wff-red transition-colors group">
+                  <Facebook className="text-fg/70 group-hover:text-fg" />
                 </a>
-                <a href="#" className="w-12 h-12 rounded-full bg-[#111] border border-white/10 flex items-center justify-center hover:bg-wff-red hover:border-wff-red transition-colors group">
-                  <Twitter className="text-white/70 group-hover:text-white" />
+                <a href="#" className="w-12 h-12 rounded-full bg-raised border border-fg/10 flex items-center justify-center hover:bg-wff-red hover:border-wff-red transition-colors group">
+                  <Twitter className="text-fg/70 group-hover:text-fg" />
                 </a>
               </div>
             </div>
           </div>
 
           {/* Contact Form */}
-          <div ref={formRef} className="bg-[#111] border border-white/10 p-8 md:p-12 opacity-0 rounded-xl">
+          <div ref={formRef} className="bg-raised border border-fg/10 p-8 md:p-12 opacity-0 rounded-xl">
             <h3 className="font-bebas text-4xl mb-8">SEND A MESSAGE</h3>
 
             {status === 'sent' ? (
               <div className="text-center py-12">
-                <CheckCircle className="w-16 h-16 text-wff-gold mx-auto mb-6" />
-                <h4 className="font-bebas text-3xl text-white mb-3">MESSAGE RECEIVED</h4>
-                <p className="font-sans text-sm text-white/60 leading-relaxed mb-8">
+                <CheckCircle className="w-16 h-16 text-gold-ink mx-auto mb-6" />
+                <h4 className="font-bebas text-3xl text-fg mb-3">MESSAGE RECEIVED</h4>
+                <p className="font-sans text-sm text-fg/60 leading-relaxed mb-8">
                   Thanks for reaching out. The federation office will get back to you at the
                   address you gave us, usually within two working days.
                 </p>
                 <button
                   onClick={() => setStatus('idle')}
-                  className="font-bebas text-lg text-wff-gold hover:underline uppercase tracking-widest"
+                  className="font-bebas text-lg text-gold-ink hover:underline uppercase tracking-widest"
                 >
                   Send another message
                 </button>
@@ -125,17 +125,17 @@ export default function ContactClient() {
               <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Name</label>
-                    <input required type="text" value={form.name} onChange={set('name')} className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
+                    <label className="block font-sans text-xs uppercase tracking-widest text-fg/50 mb-2">Name</label>
+                    <input required type="text" value={form.name} onChange={set('name')} className="w-full bg-surface border border-fg/10 p-4 text-fg focus:border-wff-red outline-none transition-colors rounded-md" />
                   </div>
                   <div>
-                    <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Email</label>
-                    <input required type="email" value={form.email} onChange={set('email')} className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors rounded-md" />
+                    <label className="block font-sans text-xs uppercase tracking-widest text-fg/50 mb-2">Email</label>
+                    <input required type="email" value={form.email} onChange={set('email')} className="w-full bg-surface border border-fg/10 p-4 text-fg focus:border-wff-red outline-none transition-colors rounded-md" />
                   </div>
                 </div>
                 <div>
-                  <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Subject</label>
-                  <select value={form.subject} onChange={set('subject')} className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors appearance-none rounded-md">
+                  <label className="block font-sans text-xs uppercase tracking-widest text-fg/50 mb-2">Subject</label>
+                  <select value={form.subject} onChange={set('subject')} className="w-full bg-surface border border-fg/10 p-4 text-fg focus:border-wff-red outline-none transition-colors appearance-none rounded-md">
                     <option>General Inquiry</option>
                     <option>Athlete Registration</option>
                     <option>Sponsorships</option>
@@ -143,8 +143,8 @@ export default function ContactClient() {
                   </select>
                 </div>
                 <div>
-                  <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Message</label>
-                  <textarea required rows={5} value={form.message} onChange={set('message')} className="w-full bg-[#0A0A0A] border border-white/10 p-4 text-white focus:border-wff-red outline-none transition-colors resize-none rounded-md"></textarea>
+                  <label className="block font-sans text-xs uppercase tracking-widest text-fg/50 mb-2">Message</label>
+                  <textarea required rows={5} value={form.message} onChange={set('message')} className="w-full bg-surface border border-fg/10 p-4 text-fg focus:border-wff-red outline-none transition-colors resize-none rounded-md"></textarea>
                 </div>
 
                 {/* Honeypot: hidden from people, tempting to bots. */}

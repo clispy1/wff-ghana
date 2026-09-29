@@ -36,14 +36,14 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 bg-wff-dark relative border-t border-white/5">
+    <section id="contact" className="py-24 bg-page relative border-t border-fg/5">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           
           {/* Contact Info */}
           <div>
             <h2 className="font-bebas text-5xl md:text-7xl mb-6">GET IN <span className="text-wff-red">TOUCH</span></h2>
-            <p className="font-sans text-white/70 text-lg mb-12 max-w-md">
+            <p className="font-sans text-fg/70 text-lg mb-12 max-w-md">
               Have questions about the qualifiers, sponsorship opportunities, or general inquiries? Reach out to the WFF Ghana executive team.
             </p>
 
@@ -52,7 +52,7 @@ export default function Contact() {
                 <MapPin className="text-wff-red mr-4 mt-1" size={24} />
                 <div>
                   <h4 className="font-bebas text-2xl mb-1">Headquarters</h4>
-                  <p className="font-sans text-white/60">Sports Directorate Building<br />Accra Sports Stadium<br />Accra, Ghana</p>
+                  <p className="font-sans text-fg/60">Sports Directorate Building<br />Accra Sports Stadium<br />Accra, Ghana</p>
                 </div>
               </div>
               
@@ -60,7 +60,7 @@ export default function Contact() {
                 <Mail className="text-wff-red mr-4 mt-1" size={24} />
                 <div>
                   <h4 className="font-bebas text-2xl mb-1">Email</h4>
-                  <p className="font-sans text-white/60">info@wffghana.com<br />athletes@wffghana.com</p>
+                  <p className="font-sans text-fg/60">info@wffghana.com<br />athletes@wffghana.com</p>
                 </div>
               </div>
 
@@ -68,7 +68,7 @@ export default function Contact() {
                 <Phone className="text-wff-red mr-4 mt-1" size={24} />
                 <div>
                   <h4 className="font-bebas text-2xl mb-1">Phone</h4>
-                  <p className="font-sans text-white/60">+233 24 123 4567<br />+233 20 987 6543</p>
+                  <p className="font-sans text-fg/60">+233 24 123 4567<br />+233 20 987 6543</p>
                 </div>
               </div>
             </div>
@@ -77,13 +77,13 @@ export default function Contact() {
             <div>
               <h4 className="font-bebas text-2xl mb-4">Follow Us</h4>
               <div className="flex space-x-4">
-                <a href="#" className="w-12 h-12 border border-white/20 flex items-center justify-center hover:bg-wff-red hover:border-wff-red transition-colors">
+                <a href="#" className="w-12 h-12 border border-fg/20 flex items-center justify-center hover:bg-wff-red hover:border-wff-red transition-colors">
                   <Instagram size={20} />
                 </a>
-                <a href="#" className="w-12 h-12 border border-white/20 flex items-center justify-center hover:bg-wff-red hover:border-wff-red transition-colors">
+                <a href="#" className="w-12 h-12 border border-fg/20 flex items-center justify-center hover:bg-wff-red hover:border-wff-red transition-colors">
                   <Facebook size={20} />
                 </a>
-                <a href="#" className="w-12 h-12 border border-white/20 flex items-center justify-center hover:bg-wff-red hover:border-wff-red transition-colors">
+                <a href="#" className="w-12 h-12 border border-fg/20 flex items-center justify-center hover:bg-wff-red hover:border-wff-red transition-colors">
                   <Twitter size={20} />
                 </a>
               </div>
@@ -91,42 +91,42 @@ export default function Contact() {
           </div>
 
           {/* Contact Form */}
-          <div className="bg-[#111] border border-white/10 p-8 md:p-12 relative overflow-hidden">
+          <div className="bg-raised border border-fg/10 p-8 md:p-12 relative overflow-hidden">
             {isSuccess ? (
-              <div className="absolute inset-0 bg-[#111] flex flex-col items-center justify-center text-center p-8 z-10">
+              <div className="absolute inset-0 bg-raised flex flex-col items-center justify-center text-center p-8 z-10">
                 <CheckCircle size={64} className="text-wff-red mb-6" />
                 <h3 className="font-bebas text-4xl mb-4">MESSAGE SENT</h3>
-                <p className="font-sans text-white/70">Thank you for reaching out. A member of our team will get back to you shortly.</p>
+                <p className="font-sans text-fg/70">Thank you for reaching out. A member of our team will get back to you shortly.</p>
               </div>
             ) : null}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 relative z-0">
               <div>
-                <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Name</label>
+                <label className="block font-sans text-xs uppercase tracking-widest text-fg/50 mb-2">Name</label>
                 <input 
                   {...register('name')}
-                  className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-wff-red focus:outline-none transition-colors"
+                  className="w-full bg-transparent border-b border-fg/20 py-3 text-fg focus:border-wff-red focus:outline-none transition-colors"
                   placeholder="Your Name"
                 />
                 {errors.name && <span className="text-wff-red text-xs mt-1 block">{errors.name.message}</span>}
               </div>
 
               <div>
-                <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Email</label>
+                <label className="block font-sans text-xs uppercase tracking-widest text-fg/50 mb-2">Email</label>
                 <input 
                   {...register('email')}
                   type="email"
-                  className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-wff-red focus:outline-none transition-colors"
+                  className="w-full bg-transparent border-b border-fg/20 py-3 text-fg focus:border-wff-red focus:outline-none transition-colors"
                   placeholder="your@email.com"
                 />
                 {errors.email && <span className="text-wff-red text-xs mt-1 block">{errors.email.message}</span>}
               </div>
 
               <div>
-                <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Enquiry Type</label>
+                <label className="block font-sans text-xs uppercase tracking-widest text-fg/50 mb-2">Enquiry Type</label>
                 <select 
                   {...register('enquiryType')}
-                  className="w-full bg-[#111] border-b border-white/20 py-3 text-white focus:border-wff-red focus:outline-none transition-colors"
+                  className="w-full bg-raised border-b border-fg/20 py-3 text-fg focus:border-wff-red focus:outline-none transition-colors"
                 >
                   <option value="">Select a topic</option>
                   <option value="athlete">Athlete Registration</option>
@@ -138,11 +138,11 @@ export default function Contact() {
               </div>
 
               <div>
-                <label className="block font-sans text-xs uppercase tracking-widest text-white/50 mb-2">Message</label>
+                <label className="block font-sans text-xs uppercase tracking-widest text-fg/50 mb-2">Message</label>
                 <textarea 
                   {...register('message')}
                   rows={4}
-                  className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-wff-red focus:outline-none transition-colors resize-none"
+                  className="w-full bg-transparent border-b border-fg/20 py-3 text-fg focus:border-wff-red focus:outline-none transition-colors resize-none"
                   placeholder="How can we help you?"
                 ></textarea>
                 {errors.message && <span className="text-wff-red text-xs mt-1 block">{errors.message.message}</span>}

@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function RegisterPage() {
   return (
-    <main className="min-h-screen bg-wff-dark pt-28">
+    <main className="min-h-screen bg-page pt-28">
       <Registration />
     </main>
   );

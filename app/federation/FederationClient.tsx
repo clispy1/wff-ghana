@@ -118,10 +118,14 @@ export default function FederationClient() {
         trigger: containerRef.current,
         start: 'top center',
         end: 'bottom center',
-        onEnter: () => gsap.to(document.documentElement, { '--bg-color': '#0F1A15', duration: 1 }), // Soft deep green/black
-        onLeaveBack: () => gsap.to(document.documentElement, { '--bg-color': '#050505', duration: 1 }),
-        onLeave: () => gsap.to(document.documentElement, { '--bg-color': '#050505', duration: 1 }),
-        onEnterBack: () => gsap.to(document.documentElement, { '--bg-color': '#0F1A15', duration: 1 }),
+        // Tints the page green while this section is in view. A class
+        // (not an inline --bg-color) so the light/dark toggle still wins;
+        // globals.css picks the tint for each theme and body's
+        // transition does the fade.
+        onEnter: () => document.documentElement.classList.add('bg-federation'),
+        onLeaveBack: () => document.documentElement.classList.remove('bg-federation'),
+        onLeave: () => document.documentElement.classList.remove('bg-federation'),
+        onEnterBack: () => document.documentElement.classList.add('bg-federation'),
       });
 
       // Header Animation
@@ -201,11 +205,15 @@ export default function FederationClient() {
       );
     }, containerRef);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      // Don't leave the green tint behind when navigating away mid-section.
+      document.documentElement.classList.remove('bg-federation');
+    };
   }, []);
 
   return (
-    <main ref={containerRef} className="pt-32 pb-24 min-h-screen relative overflow-hidden bg-wff-dark">
+    <main ref={containerRef} className="pt-32 pb-24 min-h-screen relative overflow-hidden bg-page">
       
       {/* Ambient Red/Green/Gold Accent Glow Backgrounds */}
       <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-wff-red/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
@@ -216,11 +224,11 @@ export default function FederationClient() {
         
         {/* Header Section */}
         <div ref={headerRef} className="max-w-4xl mx-auto text-center mb-24">
-          <p className="font-sans text-wff-gold font-bold uppercase tracking-[0.35em] mb-4 text-xs md:text-sm">World Fitness Federation Ghana</p>
-          <h1 className="font-bebas text-6xl md:text-8xl mb-6 text-white leading-none">
+          <p className="font-sans text-gold-ink font-bold uppercase tracking-[0.35em] mb-4 text-xs md:text-sm">World Fitness Federation Ghana</p>
+          <h1 className="font-bebas text-6xl md:text-8xl mb-6 text-fg leading-none">
             THE <span className="text-stroke-gold inline-block mr-2">GHANAIAN</span> <span className="text-wff-red">FEDERATION</span>
           </h1>
-          <p className="font-sans text-lg md:text-xl text-white/75 max-w-3xl mx-auto leading-relaxed">
+          <p className="font-sans text-lg md:text-xl text-fg/75 max-w-3xl mx-auto leading-relaxed">
             Representing the certified national chapter of the World Fitness Federation (WFF). We establish deep structural networks for athletes, fair judging committees, and holistic recovery systems.
           </p>
         </div>
@@ -230,16 +238,16 @@ export default function FederationClient() {
           
           {/* Animated SVG Map of Ghana */}
           <div className="flex flex-col items-center">
-            <div className="map-container relative w-full max-w-[420px] aspect-[4/5] flex items-center justify-center bg-[#090909]/80 border border-white/10 p-8 rounded-3xl backdrop-blur-md shadow-[0_15px_50px_rgba(0,0,0,0.8)]">
-              <svg width="100%" height="100%" viewBox="0 0 200 250" className="overflow-visible select-none">
+            <div className="map-container relative w-full max-w-[420px] aspect-[4/5] flex items-center justify-center bg-surface/80 border border-fg/10 p-8 rounded-3xl backdrop-blur-md shadow-[0_15px_50px_rgba(0,0,0,0.8)]">
+              <svg width="100%" height="100%" viewBox="0 0 200 250" className="overflow-visible select-none text-fg">
                 {/* Visual grid lines for structural technical look */}
-                <line x1="0" y1="50" x2="200" y2="50" stroke="rgba(255,255,255,0.03)" strokeWidth="0.8" />
-                <line x1="0" y1="100" x2="200" y2="100" stroke="rgba(255,255,255,0.03)" strokeWidth="0.8" />
-                <line x1="0" y1="150" x2="200" y2="150" stroke="rgba(255,255,255,0.03)" strokeWidth="0.8" />
-                <line x1="0" y1="200" x2="200" y2="200" stroke="rgba(255,255,255,0.03)" strokeWidth="0.8" />
-                <line x1="50" y1="0" x2="50" y2="250" stroke="rgba(255,255,255,0.03)" strokeWidth="0.8" />
-                <line x1="100" y1="0" x2="100" y2="250" stroke="rgba(255,255,255,0.03)" strokeWidth="0.8" />
-                <line x1="150" y1="0" x2="150" y2="250" stroke="rgba(255,255,255,0.03)" strokeWidth="0.8" />
+                <line x1="0" y1="50" x2="200" y2="50" stroke="currentColor" strokeOpacity={0.06} strokeWidth="0.8" />
+                <line x1="0" y1="100" x2="200" y2="100" stroke="currentColor" strokeOpacity={0.06} strokeWidth="0.8" />
+                <line x1="0" y1="150" x2="200" y2="150" stroke="currentColor" strokeOpacity={0.06} strokeWidth="0.8" />
+                <line x1="0" y1="200" x2="200" y2="200" stroke="currentColor" strokeOpacity={0.06} strokeWidth="0.8" />
+                <line x1="50" y1="0" x2="50" y2="250" stroke="currentColor" strokeOpacity={0.06} strokeWidth="0.8" />
+                <line x1="100" y1="0" x2="100" y2="250" stroke="currentColor" strokeOpacity={0.06} strokeWidth="0.8" />
+                <line x1="150" y1="0" x2="150" y2="250" stroke="currentColor" strokeOpacity={0.06} strokeWidth="0.8" />
 
                 {/* Stylized Ghana Map Border Contour */}
                 <path 
@@ -309,43 +317,43 @@ export default function FederationClient() {
               </svg>
 
               {/* absolute coordinates watermark */}
-              <div className="absolute top-4 right-6 font-mono text-[9px] text-white/30 tracking-widest">
+              <div className="absolute top-4 right-6 font-mono text-[9px] text-fg/30 tracking-widest">
                 GH CRD: 5.6037° N, 0.1870° W
               </div>
             </div>
 
             {/* Regional Hub Detail Reveal Drawer */}
-            <div className="mt-6 w-full max-w-[420px] bg-[#0E0E0E] border border-white/5 p-5 rounded-2xl flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-wff-gold/10 text-wff-gold font-bold">
+            <div className="mt-6 w-full max-w-[420px] bg-surface border border-fg/5 p-5 rounded-2xl flex items-start gap-4">
+              <div className="p-3 rounded-xl bg-wff-gold/10 text-gold-ink font-bold">
                 <Globe2 size={20} />
               </div>
               <div className="font-sans">
                 {selectedHub === 'accra' && (
                   <>
                     <h4 className="text-xs uppercase tracking-wider text-wff-red font-bold font-mono">Accra Regional HQ</h4>
-                    <p className="text-white text-sm font-semibold mb-1">National Board Admin & Pro-Am Stadium</p>
-                    <p className="text-xs text-white/50 leading-normal">Our central administrative hub. Coordinated training centers, registration logistics, and the designated 2026 World Championship Stage.</p>
+                    <p className="text-fg text-sm font-semibold mb-1">National Board Admin & Pro-Am Stadium</p>
+                    <p className="text-xs text-fg/50 leading-normal">Our central administrative hub. Coordinated training centers, registration logistics, and the designated 2026 World Championship Stage.</p>
                   </>
                 )}
                 {selectedHub === 'kumasi' && (
                   <>
                     <h4 className="text-xs uppercase tracking-wider text-wff-green font-bold font-mono">Kumasi Division</h4>
-                    <p className="text-white text-sm font-semibold mb-1">Garden City Aesthetic Cluster</p>
-                    <p className="text-xs text-white/50 leading-normal">Represents a massive powerhouse roster for Classic Physique training. Highly active community camps and public workshops.</p>
+                    <p className="text-fg text-sm font-semibold mb-1">Garden City Aesthetic Cluster</p>
+                    <p className="text-xs text-fg/50 leading-normal">Represents a massive powerhouse roster for Classic Physique training. Highly active community camps and public workshops.</p>
                   </>
                 )}
                 {selectedHub === 'takoradi' && (
                   <>
-                    <h4 className="text-xs uppercase tracking-wider text-wff-gold font-bold font-mono">Takoradi Division</h4>
-                    <p className="text-white text-sm font-semibold mb-1">Western Gold Powerhouse Chapter</p>
-                    <p className="text-xs text-white/50 leading-normal">Strong recruitment pipeline focus on Heavyweight-Extreme Bodybuilding divisions. Known for intense powerlifting facilities.</p>
+                    <h4 className="text-xs uppercase tracking-wider text-gold-ink font-bold font-mono">Takoradi Division</h4>
+                    <p className="text-fg text-sm font-semibold mb-1">Western Gold Powerhouse Chapter</p>
+                    <p className="text-xs text-fg/50 leading-normal">Strong recruitment pipeline focus on Heavyweight-Extreme Bodybuilding divisions. Known for intense powerlifting facilities.</p>
                   </>
                 )}
                 {selectedHub === 'tamale' && (
                   <>
-                    <h4 className="text-xs uppercase tracking-wider text-wff-gold font-bold font-mono">Tamale Division</h4>
-                    <p className="text-white text-sm font-semibold mb-1">Savannah Conditioning & Speed Camp</p>
-                    <p className="text-xs text-white/50 leading-normal">Leading training camp for high-stamina Sports Modeling, aerobics, and natural diet adaptation seminars.</p>
+                    <h4 className="text-xs uppercase tracking-wider text-gold-ink font-bold font-mono">Tamale Division</h4>
+                    <p className="text-fg text-sm font-semibold mb-1">Savannah Conditioning & Speed Camp</p>
+                    <p className="text-xs text-fg/50 leading-normal">Leading training camp for high-stamina Sports Modeling, aerobics, and natural diet adaptation seminars.</p>
                   </>
                 )}
               </div>
@@ -354,32 +362,32 @@ export default function FederationClient() {
 
           {/* Counters & Statistics Column */}
           <div ref={statsRef} className="space-y-10 group">
-            <div className="border-l-3 border-wff-gold pl-6 py-1 hover:border-white transition-colors duration-300">
-              <h3 className="font-bebas text-6xl md:text-7xl text-wff-gold mb-1 tracking-tight leading-none">
+            <div className="border-l-3 border-wff-gold pl-6 py-1 hover:border-fg transition-colors duration-300">
+              <h3 className="font-bebas text-6xl md:text-7xl text-gold-ink mb-1 tracking-tight leading-none">
                 {stats.founded}
               </h3>
-              <h4 className="font-bebas text-lg text-white mb-1 uppercase tracking-wide">FOUNDED GLOBALLY</h4>
-              <p className="font-sans text-xs text-white/50 max-w-sm leading-relaxed">
+              <h4 className="font-bebas text-lg text-fg mb-1 uppercase tracking-wide">FOUNDED GLOBALLY</h4>
+              <p className="font-sans text-xs text-fg/50 max-w-sm leading-relaxed">
                 Formed in Germany by legendary sport leadership. WFF represents the longest running worldwide registry for clean fitness model classes.
               </p>
             </div>
 
-            <div className="border-l-3 border-wff-red pl-6 py-1 hover:border-white transition-colors duration-300">
+            <div className="border-l-3 border-wff-red pl-6 py-1 hover:border-fg transition-colors duration-300">
               <h3 className="font-bebas text-6xl md:text-7xl text-wff-red mb-1 tracking-tight leading-none">
                 {stats.countries}+
               </h3>
-              <h4 className="font-bebas text-lg text-white mb-1 uppercase tracking-wide">AFFILIATED COUNTRIES</h4>
-              <p className="font-sans text-xs text-white/50 max-w-sm leading-relaxed">
+              <h4 className="font-bebas text-lg text-fg mb-1 uppercase tracking-wide">AFFILIATED COUNTRIES</h4>
+              <p className="font-sans text-xs text-fg/50 max-w-sm leading-relaxed">
                 Connecting professional athletes from all 5 continents. WFF holds structured state programs to issue pro cards and host global cups.
               </p>
             </div>
 
-            <div className="border-l-3 border-wff-green pl-6 py-1 hover:border-white transition-colors duration-300">
-              <h3 className="font-bebas text-6xl md:text-7xl text-white mb-1 tracking-tight leading-none">
+            <div className="border-l-3 border-wff-green pl-6 py-1 hover:border-fg transition-colors duration-300">
+              <h3 className="font-bebas text-6xl md:text-7xl text-fg mb-1 tracking-tight leading-none">
                 {stats.athletes.toLocaleString()}+
               </h3>
-              <h4 className="font-bebas text-lg text-white mb-1 uppercase tracking-wide">REGISTERED STATE ATHLETES</h4>
-              <p className="font-sans text-xs text-white/50 max-w-sm leading-relaxed">
+              <h4 className="font-bebas text-lg text-fg mb-1 uppercase tracking-wide">REGISTERED STATE ATHLETES</h4>
+              <p className="font-sans text-xs text-fg/50 max-w-sm leading-relaxed">
                 Our active national list of competitor cards across Ghana. We guarantee a level, scientifically evaluated, and clean stage environment.
               </p>
             </div>
@@ -388,11 +396,11 @@ export default function FederationClient() {
         </div>
 
         {/* Executive Board segment with CORRECT values */}
-        <div id="board" className="mt-32 pt-16 border-t border-white/10">
+        <div id="board" className="mt-32 pt-16 border-t border-fg/10">
           <div className="text-center mb-16 max-w-3xl mx-auto">
             <p className="font-sans text-wff-red font-bold uppercase tracking-[0.3em] mb-3 text-xs">National Leadership</p>
-            <h2 className="font-bebas text-5xl md:text-7xl mb-4 text-white">EXECUTIVE <span className="text-wff-gold">COMMITTEE</span></h2>
-            <p className="font-sans text-white/60 text-base md:text-lg leading-relaxed">
+            <h2 className="font-bebas text-5xl md:text-7xl mb-4 text-fg">EXECUTIVE <span className="text-gold-ink">COMMITTEE</span></h2>
+            <p className="font-sans text-fg/60 text-base md:text-lg leading-relaxed">
               Meet the licensed directors and sports commissioners of WFF Ghana. Setting international standards and building the next national generation.
             </p>
           </div>
@@ -402,7 +410,7 @@ export default function FederationClient() {
             {EXECUTIVE_BOARD.map((boardMember, idx) => (
               <div 
                 key={idx} 
-                className="reveal-block bg-[#0A0A0A]/85 border border-white/10 overflow-hidden relative group rounded-2xl flex flex-col justify-between hover:shadow-[0_15px_30px_rgba(0,0,0,0.7)] hover:border-wff-red/50 transition-all duration-300"
+                className="reveal-block bg-surface/85 border border-fg/10 overflow-hidden relative group rounded-2xl flex flex-col justify-between hover:shadow-[0_15px_30px_rgba(0,0,0,0.7)] hover:border-wff-red/50 transition-all duration-300"
               >
                 <div>
                   {/* Photo Container */}
@@ -421,26 +429,26 @@ export default function FederationClient() {
                       }}
                       referrerPolicy="no-referrer"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
                   </div>
 
                   {/* Title Info */}
                   <div className="p-6">
-                    <span className="font-sans text-[10px] uppercase tracking-widest text-wff-gold font-bold block mb-1">
+                    <span className="font-sans text-[10px] uppercase tracking-widest text-gold-ink font-bold block mb-1">
                       {boardMember.role}
                     </span>
-                    <h3 className="font-bebas text-2xl text-white tracking-wide group-hover:text-wff-red transition-colors mb-4">
+                    <h3 className="font-bebas text-2xl text-fg tracking-wide group-hover:text-wff-red transition-colors mb-4">
                       {boardMember.name}
                     </h3>
-                    <p className="font-sans text-xs text-white/50 leading-relaxed mb-4">
+                    <p className="font-sans text-xs text-fg/50 leading-relaxed mb-4">
                       {boardMember.bio}
                     </p>
                   </div>
                 </div>
 
                 {/* Interactive board quote callout */}
-                <div className="px-6 pb-6 mt-auto pt-2 border-t border-white/5">
-                  <p className="font-sans text-xs text-white/70 italic leading-relaxed">
+                <div className="px-6 pb-6 mt-auto pt-2 border-t border-fg/5">
+                  <p className="font-sans text-xs text-fg/70 italic leading-relaxed">
                     &ldquo;{boardMember.quote}&rdquo;
                   </p>
                 </div>
@@ -452,19 +460,19 @@ export default function FederationClient() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch mt-12">
             
             {/* The National Manifesto */}
-            <div className="lg:col-span-5 bg-[#0b0b0b] border border-white/10 p-8 md:p-10 rounded-2xl flex flex-col justify-between">
+            <div className="lg:col-span-5 bg-surface border border-fg/10 p-8 md:p-10 rounded-2xl flex flex-col justify-between">
               <div>
                 <Award size={36} className="text-wff-red mb-6" />
-                <h3 className="font-bebas text-3xl md:text-4xl text-white mb-4">WFF GHANA CONTEXT & INTEGRITY</h3>
-                <p className="font-sans text-sm text-white/70 leading-relaxed mb-6">
+                <h3 className="font-bebas text-3xl md:text-4xl text-fg mb-4">WFF GHANA CONTEXT & INTEGRITY</h3>
+                <p className="font-sans text-sm text-fg/70 leading-relaxed mb-6">
                   Under President Victor Ahenkorah Baiden, the organization advocates strongly for physical aesthetics underpinned by strict metabolic integrity and athlete welfare. We secure certified international stages, eliminating structural biases and ensuring fair judging panels.
                 </p>
-                <p className="font-sans text-sm text-white/50 leading-relaxed">
+                <p className="font-sans text-sm text-fg/50 leading-relaxed">
                   Our development focus spans from raw grassroot physical fitness campaigns in educational centers up to international level pro qualifiers.
                 </p>
               </div>
 
-              <div className="pt-8 border-t border-white/5 mt-8">
+              <div className="pt-8 border-t border-fg/5 mt-8">
                 <a 
                   href="/WFF_World_Rules_2026.pdf" 
                   download
@@ -476,18 +484,18 @@ export default function FederationClient() {
             </div>
 
             {/* Official Division Classifier & Rules Interactive Tab */}
-            <div className="lg:col-span-7 bg-[#0b0b0b] border border-white/5 p-8 md:p-10 rounded-2xl flex flex-col justify-between">
+            <div className="lg:col-span-7 bg-surface border border-fg/5 p-8 md:p-10 rounded-2xl flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-4 mb-6">
-                  <Scale size={28} className="text-wff-gold" />
-                  <h3 className="font-bebas text-3xl text-white">COMPETITION CLASSES & RULES</h3>
+                  <Scale size={28} className="text-gold-ink" />
+                  <h3 className="font-bebas text-3xl text-fg">COMPETITION CLASSES & RULES</h3>
                 </div>
-                <p className="font-sans text-xs text-white/50 mb-6 leading-relaxed">
+                <p className="font-sans text-xs text-fg/50 mb-6 leading-relaxed">
                   WFF competitive categories are highly defined to avoid overlap and protect specialized aesthetic values. Click on each division tab to view essential evaluation criteria and class limitations.
                 </p>
 
                 {/* Slider Tabs */}
-                <div className="flex flex-wrap gap-2 mb-6 border-b border-white/5 pb-4">
+                <div className="flex flex-wrap gap-2 mb-6 border-b border-fg/5 pb-4">
                   {COMPETITION_DIVISIONS.map((div) => (
                     <button
                       key={div.id}
@@ -495,7 +503,7 @@ export default function FederationClient() {
                       className={`px-4 py-2 text-xs uppercase tracking-wider font-extrabold transition-all rounded-lg ${
                         activeDivisionTab === div.id
                           ? 'bg-wff-gold text-black'
-                          : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                          : 'bg-fg/5 text-fg/60 hover:bg-fg/10 hover:text-fg'
                       }`}
                     >
                       {div.name}
@@ -510,15 +518,15 @@ export default function FederationClient() {
                     return (
                       <div key={div.id} className="space-y-4 animate-fade-in">
                         <div>
-                          <span className="text-[10px] uppercase font-mono tracking-widest text-[#00A86B] font-bold block mb-1">
+                          <span className="text-[10px] uppercase font-mono tracking-widest text-green-ink font-bold block mb-1">
                             {div.tagline}
                           </span>
-                          <p className="text-white text-sm font-semibold mb-3">{div.details}</p>
+                          <p className="text-fg text-sm font-semibold mb-3">{div.details}</p>
                         </div>
-                        <ul className="space-y-2.5 font-sans text-xs text-white/70 leading-relaxed">
+                        <ul className="space-y-2.5 font-sans text-xs text-fg/70 leading-relaxed">
                           {div.rules.map((rule, ruleIdx) => (
                             <li key={ruleIdx} className="flex items-start gap-2.5">
-                              <span className="text-wff-gold font-bold text-sm leading-none">✓</span>
+                              <span className="text-gold-ink font-bold text-sm leading-none">✓</span>
                               <span>{rule}</span>
                             </li>
                           ))}
@@ -529,8 +537,8 @@ export default function FederationClient() {
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-white/5 mt-8 text-right">
-                <span className="font-sans text-[10px] text-white/40 uppercase tracking-widest block font-bold">
+              <div className="pt-6 border-t border-fg/5 mt-8 text-right">
+                <span className="font-sans text-[10px] text-fg/40 uppercase tracking-widest block font-bold">
                   ★ Certified WFF Judging Guidelines Apply to All Classes
                 </span>
               </div>
@@ -540,11 +548,11 @@ export default function FederationClient() {
         </div>
 
         {/* Holistic Wellness Division Section */}
-        {/* <div id="wellness" className="mt-32 pt-16 border-t border-white/10"> */}
+        {/* <div id="wellness" className="mt-32 pt-16 border-t border-fg/10"> */}
           {/* <div className="text-center mb-16 max-w-3xl mx-auto">
-            <p className="font-sans text-[#00a86b] font-bold uppercase tracking-[0.3em] mb-4 text-xs">Holistic Health & Recovery</p>
-            <h2 className="font-bebas text-5xl md:text-7xl mb-6">WELLNESS <span className="text-[#00A86B]">DIVISION</span></h2>
-            <p className="font-sans text-white/75 text-base md:text-lg leading-relaxed">
+            <p className="font-sans text-green-ink font-bold uppercase tracking-[0.3em] mb-4 text-xs">Holistic Health & Recovery</p>
+            <h2 className="font-bebas text-5xl md:text-7xl mb-6">WELLNESS <span className="text-green-ink">DIVISION</span></h2>
+            <p className="font-sans text-fg/75 text-base md:text-lg leading-relaxed">
               True athletic strength requires ultimate internal balance. WFF Ghana is committed to elevating the overall health of the nation through active recovery, physiological wellness, and athletic poise.
             </p>
           </div> */}
@@ -560,13 +568,13 @@ export default function FederationClient() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#001010] via-transparent to-transparent"></div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 rounded-full border border-[#00A86B]/50 flex items-center justify-center text-[#00A86B] group-hover:bg-[#00A86B] group-hover:text-[#001414] transition-colors duration-700">
+              <div className="w-16 h-16 rounded-full border border-[#00A86B]/50 flex items-center justify-center text-green-ink group-hover:bg-[#00A86B] group-hover:text-[#001414] transition-colors duration-700">
                 <Play size={24} className="ml-1" />
               </div>
             </div>
             <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 right-6">
-              <h3 className="font-bebas text-2xl md:text-4xl text-white">MASTERCLASS: ACTIVE RECOVERY & PREPARATION</h3>
-              <p className="font-sans text-xs md:text-sm text-[#00A86B] font-bold">Featuring WFF Head Coach Kwame Mensah</p>
+              <h3 className="font-bebas text-2xl md:text-4xl text-fg">MASTERCLASS: ACTIVE RECOVERY & PREPARATION</h3>
+              <p className="font-sans text-xs md:text-sm text-green-ink font-bold">Featuring WFF Head Coach Kwame Mensah</p>
             </div>
           </div> */}
 
@@ -598,11 +606,11 @@ export default function FederationClient() {
                 key={index} 
                 className="bg-[#001414]/30 backdrop-blur-sm border border-[#00A86B]/10 p-8 hover:border-[#00a86b]/40 transition-colors duration-500 group rounded-2xl"
               >
-                <div className="w-14 h-14 rounded-full bg-[#00A86B]/10 flex items-center justify-center text-[#00A86B] mb-6 group-hover:scale-110 transition-transform duration-500">
+                <div className="w-14 h-14 rounded-full bg-[#00A86B]/10 flex items-center justify-center text-green-ink mb-6 group-hover:scale-110 transition-transform duration-500">
                   {pillar.icon}
                 </div>
-                <h3 className="font-bebas text-2xl mb-3 text-white group-hover:text-[#00A86B] transition-colors duration-300">{pillar.title}</h3>
-                <p className="font-sans text-sm text-white/50 leading-relaxed">
+                <h3 className="font-bebas text-2xl mb-3 text-fg group-hover:text-green-ink transition-colors duration-300">{pillar.title}</h3>
+                <p className="font-sans text-sm text-fg/50 leading-relaxed">
                   {pillar.desc}
                 </p>
               </div>

@@ -81,13 +81,13 @@ export default function Events() {
   }, [filter]);
 
   return (
-    <section id="events" ref={sectionRef} className="py-24 bg-[#050505] relative border-t border-white/5">
+    <section id="events" ref={sectionRef} className="py-24 bg-page relative border-t border-fg/5">
       <div className="container mx-auto px-6">
         
         <div className="flex flex-col md:flex-row justify-between items-end mb-16">
           <div>
             <h2 className="font-bebas text-5xl md:text-6xl mb-4">COMPETITION <span className="text-wff-red">CALENDAR</span></h2>
-            <p className="font-sans text-white/60 max-w-xl">Find upcoming qualifiers, open events, and international championships.</p>
+            <p className="font-sans text-fg/60 max-w-xl">Find upcoming qualifiers, open events, and international championships.</p>
           </div>
           
           {/* Filters */}
@@ -99,7 +99,7 @@ export default function Events() {
                 className={`font-bebas text-xl px-6 py-2 border transition-all duration-300 ${
                   filter === type 
                     ? 'border-wff-red bg-wff-red text-white' 
-                    : 'border-white/20 text-white/60 hover:border-white/50 hover:text-white'
+                    : 'border-fg/20 text-fg/60 hover:border-fg/50 hover:text-fg'
                 }`}
               >
                 {type}
@@ -113,16 +113,16 @@ export default function Events() {
           {filteredEvents.map((event) => (
             <div 
               key={event.id} 
-              className="event-card bg-[#111] border border-white/10 p-8 hover:border-wff-red/50 transition-colors duration-300 group flex flex-col justify-between"
+              className="event-card bg-raised border border-fg/10 p-8 hover:border-wff-red/50 transition-colors duration-300 group flex flex-col justify-between"
             >
               <div>
                 <div className="flex justify-between items-start mb-6">
                   <span className={`text-xs font-bold uppercase tracking-widest px-3 py-1 ${
-                    event.status === 'Upcoming' ? 'bg-wff-red/20 text-wff-red' : 'bg-white/10 text-white/50'
+                    event.status === 'Upcoming' ? 'bg-wff-red/20 text-wff-red' : 'bg-fg/10 text-fg/50'
                   }`}>
                     {event.status}
                   </span>
-                  <span className="text-xs font-bold uppercase tracking-widest text-wff-gold border border-wff-gold/30 px-3 py-1">
+                  <span className="text-xs font-bold uppercase tracking-widest text-gold-ink border border-wff-gold/30 px-3 py-1">
                     {event.type}
                   </span>
                 </div>
@@ -130,11 +130,11 @@ export default function Events() {
                 <h3 className="font-bebas text-3xl md:text-4xl mb-4 group-hover:text-wff-red transition-colors">{event.title}</h3>
                 
                 <div className="space-y-3 mb-8">
-                  <div className="flex items-center text-white/70 font-sans text-sm">
+                  <div className="flex items-center text-fg/70 font-sans text-sm">
                     <Calendar size={16} className="mr-3 text-wff-red" />
                     {event.date}
                   </div>
-                  <div className="flex items-center text-white/70 font-sans text-sm">
+                  <div className="flex items-center text-fg/70 font-sans text-sm">
                     <MapPin size={16} className="mr-3 text-wff-red" />
                     {event.location}
                   </div>
@@ -143,7 +143,7 @@ export default function Events() {
 
               <div className="flex flex-wrap gap-2">
                 {event.categories.map((cat, i) => (
-                  <span key={i} className="text-xs font-sans bg-white/5 text-white/80 px-3 py-1 rounded-full">
+                  <span key={i} className="text-xs font-sans bg-fg/5 text-fg/80 px-3 py-1 rounded-full">
                     {cat}
                   </span>
                 ))}

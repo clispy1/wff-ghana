@@ -13,17 +13,17 @@ export function PartnershipsSection({
   if (!partnerships) return <SectionSkeleton />;
 
   return (
-    <section className="py-24 bg-black border-b border-white/5">
+    <section className="py-24 bg-page border-b border-fg/5">
       <div className="container mx-auto px-6 text-center max-w-4xl reveal-target">
-        <h2 className="font-bebas text-5xl md:text-7xl text-white mb-6 select-none">
+        <h2 className="font-bebas text-5xl md:text-7xl text-fg mb-6 select-none">
           {partnerships.title}
         </h2>
-        <p className="font-sans text-sm text-white/60 max-w-xl mx-auto mb-10 leading-relaxed">
+        <p className="font-sans text-sm text-fg/60 max-w-xl mx-auto mb-10 leading-relaxed">
           {partnerships.body}
         </p>
         <Link
           href="/championship/partnerships"
-          className="inline-block border border-white/10 hover:border-white text-white font-sans text-xs font-black uppercase tracking-widest px-8 py-4 rounded-xl transition-all duration-300"
+          className="inline-block border border-fg/10 hover:border-fg text-fg font-sans text-xs font-black uppercase tracking-widest px-8 py-4 rounded-xl transition-all duration-300"
         >
           {partnerships.cta.text}
         </Link>

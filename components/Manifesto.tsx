@@ -36,16 +36,16 @@ export default function Manifesto() {
   }, []);
 
   return (
-    <section ref={containerRef} className="py-32 bg-wff-dark relative overflow-hidden">
+    <section ref={containerRef} className="py-32 bg-page relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-wff-red to-transparent opacity-50"></div>
       
       <div className="container mx-auto px-6 max-w-5xl text-center">
         <h2 className="font-sans text-wff-red font-bold uppercase tracking-[0.5em] text-sm mb-8">The Mission</h2>
         
-        <p ref={textRef} className="font-bebas text-5xl md:text-7xl lg:text-8xl leading-[0.9] text-white mix-blend-difference">
+        <p ref={textRef} className="font-bebas text-5xl md:text-7xl lg:text-8xl leading-[0.9] text-fg mix-blend-difference">
           WE ARE NOT JUST HOSTING A CHAMPIONSHIP. <br/>
-          <span className="text-white/40">WE ARE REDEFINING AFRICAN FITNESS.</span> <br/>
-          THE WORLD IS COMING TO <span className="text-wff-gold">ACCRA</span>.
+          <span className="text-fg/40">WE ARE REDEFINING AFRICAN FITNESS.</span> <br/>
+          THE WORLD IS COMING TO <span className="text-gold-ink">ACCRA</span>.
         </p>
       </div>
     </section>

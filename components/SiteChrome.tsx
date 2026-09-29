@@ -21,7 +21,9 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
   const isAdmin = pathname?.startsWith("/admin");
   const hideFooter = NO_FOOTER.includes(pathname ?? "");
 
-  if (isAdmin) return <>{children}</>;
+  // The dashboard is always dark: pin it to the dark theme tokens so the
+  // public site's light/dark toggle never reaches it.
+  if (isAdmin) return <div className="site-dark text-fg bg-page min-h-screen">{children}</div>;
 
   return (
     <>

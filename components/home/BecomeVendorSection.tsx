@@ -15,14 +15,14 @@ export function BecomeVendorSection({
   if (!becomeVendor) return <SectionSkeleton />;
 
   return (
-    <section className="py-24 bg-[#0a0a0a] border-b border-white/5 relative overflow-hidden">
+    <section className="py-24 bg-surface border-b border-fg/5 relative overflow-hidden">
       <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(252,209,22,0.05)_0%,transparent_70%)]"></div>
       <div className="container mx-auto px-6 relative z-10 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
           {/* Vendor Image */}
           <div className="lg:col-span-5 reveal-target relative">
-            <div className="relative aspect-[4/5] bg-[#111] border border-white/10 overflow-hidden group rounded-2xl shadow-2xl">
+            <div className="relative aspect-[4/5] bg-raised border border-fg/10 overflow-hidden group rounded-2xl shadow-2xl">
               {becomeVendor.image ? (
                 <Image
                   src={becomeVendor.image}
@@ -31,11 +31,11 @@ export function BecomeVendorSection({
                   className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-103"
                 />
               ) : (
-                <div className="absolute inset-0 bg-[#161616]" />
+                <div className="absolute inset-0 bg-raised-2" />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent"></div>
-              <div className="absolute bottom-8 left-8 pr-6">
-                <p className="font-sans text-wff-gold font-bold uppercase tracking-[0.4em] text-xs">
+              <div className="site-dark absolute bottom-8 left-8 pr-6">
+                <p className="font-sans text-gold-ink font-bold uppercase tracking-[0.4em] text-xs">
                   {becomeVendor.supertitle}
                 </p>
               </div>
@@ -45,13 +45,13 @@ export function BecomeVendorSection({
 
           {/* Copy */}
           <div className="lg:col-span-7 reveal-target lg:pl-8">
-            <p className="font-sans text-wff-gold font-bold uppercase tracking-[0.4em] text-xs mb-4 md:hidden">
+            <p className="font-sans text-gold-ink font-bold uppercase tracking-[0.4em] text-xs mb-4 md:hidden">
               {becomeVendor.supertitle}
             </p>
-            <h2 className="font-bebas text-5xl md:text-7xl text-white mb-6 leading-none tracking-wide select-none">
+            <h2 className="font-bebas text-5xl md:text-7xl text-fg mb-6 leading-none tracking-wide select-none">
               {becomeVendor.title}
             </h2>
-            <p className="font-sans text-base text-white/65 max-w-xl leading-relaxed mb-8">
+            <p className="font-sans text-base text-fg/65 max-w-xl leading-relaxed mb-8">
               {becomeVendor.body}
             </p>
 
@@ -59,12 +59,12 @@ export function BecomeVendorSection({
               {becomeVendor.benefits.map((benefit, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 border border-white/10 bg-[#111] rounded-xl px-5 py-4"
+                  className="flex items-center gap-3 border border-fg/10 bg-raised rounded-xl px-5 py-4"
                 >
                   <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-wff-red/15 text-wff-red">
                     <Check className="h-3.5 w-3.5" />
                   </span>
-                  <p className="font-sans text-sm text-white/80 leading-snug">{benefit}</p>
+                  <p className="font-sans text-sm text-fg/80 leading-snug">{benefit}</p>
                 </div>
               ))}
             </div>

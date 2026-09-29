@@ -44,13 +44,13 @@ export default function FeaturedAthletes() {
   }, []);
 
   return (
-    <section ref={containerRef} className="bg-[#0A0A0A] py-24 overflow-hidden relative min-h-screen flex flex-col justify-center">
+    <section ref={containerRef} className="bg-surface py-24 overflow-hidden relative min-h-screen flex flex-col justify-center">
       <div className="container mx-auto px-6 mb-12 flex justify-between items-end">
         <div>
-          <h2 className="font-bebas text-6xl md:text-8xl text-white leading-none">THE <span className="text-wff-red">ELITE</span></h2>
-          <p className="font-sans text-white/50 uppercase tracking-widest text-sm mt-4">Team Ghana Prospects</p>
+          <h2 className="font-bebas text-6xl md:text-8xl text-fg leading-none">THE <span className="text-wff-red">ELITE</span></h2>
+          <p className="font-sans text-fg/50 uppercase tracking-widest text-sm mt-4">Team Ghana Prospects</p>
         </div>
-        <Link href="/championship/athletes" className="hidden md:inline-block border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-6 py-3 hover:bg-white hover:text-black transition-colors">
+        <Link href="/championship/athletes" className="hidden md:inline-block border border-fg/20 text-fg font-sans text-xs font-bold uppercase tracking-widest px-6 py-3 hover:bg-white hover:text-black transition-colors">
           View Full Roster
         </Link>
       </div>
@@ -58,7 +58,7 @@ export default function FeaturedAthletes() {
       <div className="w-full overflow-hidden">
         <div ref={scrollRef} className="flex space-x-8 px-6 w-max">
           {featuredAthletes.map((athlete, idx) => (
-            <div key={idx} className="w-[300px] md:w-[400px] aspect-[3/4] relative group cursor-pointer bg-[#111] border border-white/10 overflow-hidden flex-shrink-0">
+            <div key={idx} className="w-[300px] md:w-[400px] aspect-[3/4] relative group cursor-pointer bg-raised border border-fg/10 overflow-hidden flex-shrink-0">
               <Image 
                 src={athlete.image} 
                 alt={athlete.name}
@@ -68,9 +68,9 @@ export default function FeaturedAthletes() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500"></div>
               
-              <div className="absolute bottom-0 left-0 w-full p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                <p className="font-sans text-wff-gold font-bold uppercase tracking-widest text-xs mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">{athlete.category}</p>
-                <h3 className="font-bebas text-4xl text-white">{athlete.name}</h3>
+              <div className="site-dark absolute bottom-0 left-0 w-full p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                <p className="font-sans text-gold-ink font-bold uppercase tracking-widest text-xs mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">{athlete.category}</p>
+                <h3 className="font-bebas text-4xl text-fg">{athlete.name}</h3>
               </div>
             </div>
           ))}
@@ -78,7 +78,7 @@ export default function FeaturedAthletes() {
       </div>
       
       <div className="container mx-auto px-6 mt-12 md:hidden">
-        <Link href="/championship/athletes" className="block text-center border border-white/20 text-white font-sans text-xs font-bold uppercase tracking-widest px-6 py-4 hover:bg-white hover:text-black transition-colors">
+        <Link href="/championship/athletes" className="block text-center border border-fg/20 text-fg font-sans text-xs font-bold uppercase tracking-widest px-6 py-4 hover:bg-white hover:text-black transition-colors">
           View Full Roster
         </Link>
       </div>

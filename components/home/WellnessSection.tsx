@@ -14,10 +14,10 @@ export function WellnessSection({ wellness }: { wellness?: HomeContent['wellness
         <p className="font-sans text-teal-400 font-bold uppercase tracking-[0.4em] text-xs mb-4">
           {wellness.supertitle}
         </p>
-        <h2 className="font-bebas text-5xl md:text-7xl text-white mb-6 tracking-wide select-none">
+        <h2 className="font-bebas text-5xl md:text-7xl text-fg mb-6 tracking-wide select-none">
           {wellness.title}
         </h2>
-        <p className="font-sans text-sm text-white/60 max-w-xl mx-auto mb-10 leading-relaxed">
+        <p className="font-sans text-sm text-fg/60 max-w-xl mx-auto mb-10 leading-relaxed">
           {wellness.body}
         </p>
       </div>

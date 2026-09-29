@@ -81,12 +81,12 @@ export default function News() {
   }, [selectedArticle]);
 
   return (
-    <section id="news" ref={sectionRef} className="py-24 bg-[#050505] relative border-t border-white/5">
+    <section id="news" ref={sectionRef} className="py-24 bg-page relative border-t border-fg/5">
       <div className="container mx-auto px-6">
         <div className="flex justify-between items-end mb-16">
           <div>
             <h2 className="font-bebas text-5xl md:text-6xl mb-4">LATEST <span className="text-wff-red">DISPATCHES</span></h2>
-            <p className="font-sans text-white/60 max-w-xl">News, results, and stories from the Ghanaian fitness community.</p>
+            <p className="font-sans text-fg/60 max-w-xl">News, results, and stories from the Ghanaian fitness community.</p>
           </div>
         </div>
 
@@ -111,9 +111,9 @@ export default function News() {
               </div>
               
               <div className="flex-grow flex flex-col">
-                <div className="font-sans text-xs text-white/50 uppercase tracking-widest mb-3">{article.date}</div>
+                <div className="font-sans text-xs text-fg/50 uppercase tracking-widest mb-3">{article.date}</div>
                 <h3 className="font-bebas text-3xl mb-3 group-hover:text-wff-red transition-colors">{article.title}</h3>
-                <p className="font-sans text-sm text-white/60 mb-6 line-clamp-3 flex-grow">{article.excerpt}</p>
+                <p className="font-sans text-sm text-fg/60 mb-6 line-clamp-3 flex-grow">{article.excerpt}</p>
                 
                 <div className="flex items-center text-wff-red font-sans text-sm font-bold uppercase tracking-widest mt-auto">
                   Read Full Story <ArrowRight size={16} className="ml-2 group-hover:translate-x-2 transition-transform" />
@@ -126,10 +126,10 @@ export default function News() {
 
       {/* Article Modal */}
       {selectedArticle && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-wff-dark/95 backdrop-blur-md">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-page/95 backdrop-blur-md">
           <div 
             ref={modalRef}
-            className="bg-[#111] border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar relative"
+            className="bg-raised border border-fg/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar relative"
           >
             <button 
               onClick={() => setSelectedArticle(null)}
@@ -146,7 +146,7 @@ export default function News() {
                 className="object-cover"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#111] to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-raised to-transparent"></div>
             </div>
 
             <div className="p-8 md:p-16 -mt-20 relative z-10">
@@ -154,14 +154,14 @@ export default function News() {
                 <span className="bg-wff-red text-white font-sans text-xs font-bold uppercase tracking-widest px-3 py-1">
                   {selectedArticle.category}
                 </span>
-                <span className="font-sans text-sm text-white/50 uppercase tracking-widest">
+                <span className="font-sans text-sm text-fg/50 uppercase tracking-widest">
                   {selectedArticle.date}
                 </span>
               </div>
               
               <h2 className="font-bebas text-5xl md:text-7xl mb-8 leading-none">{selectedArticle.title}</h2>
               
-              <div className="font-sans text-lg text-white/80 leading-relaxed space-y-6 whitespace-pre-line">
+              <div className="font-sans text-lg text-fg/80 leading-relaxed space-y-6 whitespace-pre-line">
                 {selectedArticle.content}
               </div>
             </div>

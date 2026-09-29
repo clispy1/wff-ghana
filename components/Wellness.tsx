@@ -59,11 +59,11 @@ export default function Wellness() {
   }, []);
 
   return (
-    <section id="wellness" ref={sectionRef} className="py-24 bg-wff-dark relative border-t border-white/5">
+    <section id="wellness" ref={sectionRef} className="py-24 bg-page relative border-t border-fg/5">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <h2 className="font-bebas text-5xl md:text-6xl mb-4">MORE THAN <span className="text-wff-red">MUSCLE</span></h2>
-          <p className="font-sans text-white/70 text-lg">
+          <p className="font-sans text-fg/70 text-lg">
             WFF Ghana is committed to elevating the overall health and wellness of the nation. We believe fitness is a holistic journey that transforms the mind, body, and community.
           </p>
         </div>
@@ -72,13 +72,13 @@ export default function Wellness() {
           {pillars.map((pillar, index) => (
             <div 
               key={index} 
-              className="wellness-card bg-[#111] border border-white/10 p-8 hover:border-wff-red/50 transition-colors duration-300 group text-center flex flex-col items-center"
+              className="wellness-card bg-raised border border-fg/10 p-8 hover:border-wff-red/50 transition-colors duration-300 group text-center flex flex-col items-center"
             >
               <div className="w-16 h-16 rounded-full bg-wff-red/10 flex items-center justify-center text-wff-red mb-6 group-hover:scale-110 transition-transform duration-300">
                 {pillar.icon}
               </div>
-              <h3 className="font-bebas text-2xl mb-4 text-white group-hover:text-wff-red transition-colors">{pillar.title}</h3>
-              <p className="font-sans text-sm text-white/60 leading-relaxed">
+              <h3 className="font-bebas text-2xl mb-4 text-fg group-hover:text-wff-red transition-colors">{pillar.title}</h3>
+              <p className="font-sans text-sm text-fg/60 leading-relaxed">
                 {pillar.desc}
               </p>
             </div>

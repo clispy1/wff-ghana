@@ -78,7 +78,7 @@ export default function Navbar() {
       >
         <Link href="/" className="z-50 relative group">
           <div className="font-bebas text-3xl tracking-wider">
-            WFF <span className="text-wff-red transition-colors group-hover:text-white">GHANA</span>
+            WFF <span className="text-wff-red transition-colors group-hover:text-fg">GHANA</span>
           </div>
         </Link>
 
@@ -91,7 +91,7 @@ export default function Navbar() {
                 key={link.name} 
                 href={link.href}
                 className={`font-sans text-xs lg:text-sm uppercase tracking-widest transition-all duration-300 relative group ${
-                  isActive ? 'text-wff-red drop-shadow-[0_0_8px_rgba(206,17,38,0.8)]' : 'text-white/80 hover:text-wff-red'
+                  isActive ? 'text-wff-red drop-shadow-[0_0_8px_rgba(206,17,38,0.8)]' : 'text-fg/80 hover:text-wff-red'
                 }`}
               >
                 {link.name}
@@ -101,10 +101,10 @@ export default function Navbar() {
           })}
           
           {/* Language Toggle */}
-          <div className="flex items-center space-x-2 font-sans text-xs font-bold tracking-widest text-white/50 border-l border-white/20 pl-6">
-            <button className="text-white hover:text-wff-gold transition-colors">EN</button>
+          <div className="flex items-center space-x-2 font-sans text-xs font-bold tracking-widest text-fg/50 border-l border-fg/20 pl-6">
+            <button className="text-fg hover:text-gold-ink transition-colors">EN</button>
             <span>/</span>
-            <button className="hover:text-wff-gold transition-colors">FR</button>
+            <button className="hover:text-gold-ink transition-colors">FR</button>
           </div>
 
           <Link 
@@ -117,7 +117,7 @@ export default function Navbar() {
 
         {/* Mobile Toggle */}
         <button 
-          className="md:hidden z-50 relative text-white"
+          className="md:hidden z-50 relative text-fg"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? <X size={32} /> : <Menu size={32} />}
@@ -127,7 +127,7 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <div 
         ref={menuRef}
-        className="fixed inset-0 bg-wff-dark z-40 flex flex-col justify-center items-center space-y-8 px-6"
+        className="fixed inset-0 bg-page z-40 flex flex-col justify-center items-center space-y-8 px-6"
         style={{ clipPath: 'circle(0% at 100% 0%)' }}
       >
         {/* Background Texture for Mobile Menu */}
@@ -141,7 +141,7 @@ export default function Navbar() {
               href={link.href}
               onClick={() => setIsOpen(false)}
               className={`font-bebas text-4xl tracking-wider transition-colors relative z-10 ${
-                isActive ? 'text-wff-red drop-shadow-[0_0_10px_rgba(206,17,38,0.8)]' : 'text-white hover:text-wff-red'
+                isActive ? 'text-wff-red drop-shadow-[0_0_10px_rgba(206,17,38,0.8)]' : 'text-fg hover:text-wff-red'
               }`}
             >
               {link.name}

@@ -55,27 +55,27 @@ export default function ShopClient({ products }: { products: ShopProduct[] }) {
   }, []);
 
   return (
-    <main className="pt-32 pb-24 min-h-screen bg-wff-dark">
+    <main className="pt-32 pb-24 min-h-screen bg-page">
       <div className="container mx-auto px-6">
         
         {/* Header */}
         <div ref={headerRef} className="flex flex-col md:flex-row justify-between items-end mb-16 opacity-0">
           <div>
             <h1 className="font-bebas text-6xl md:text-8xl mb-4">THE <span className="text-wff-red">ARMORY</span></h1>
-            <p className="font-sans text-white/60 max-w-xl text-lg">Support Team Ghana. Wear the pride. Get your official WFF gear and 2026 Championship apparel.</p>
+            <p className="font-sans text-fg/60 max-w-xl text-lg">Support Team Ghana. Wear the pride. Get your official WFF gear and 2026 Championship apparel.</p>
           </div>
         </div>
 
         {/* Product Grid */}
         <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
           {products.length === 0 ? (
-            <p className="text-white/40 text-sm col-span-full text-center py-16">
+            <p className="text-fg/40 text-sm col-span-full text-center py-16">
               Merchandise will be listed here soon.
             </p>
           ) : (
           products.map((product) => (
             <Link href={`/shop/${product.id}`} key={product.id} className="product-card group cursor-pointer block">
-              <div className="relative aspect-square bg-[#111] border border-white/10 mb-6 overflow-hidden rounded-xl">
+              <div className="relative aspect-square bg-raised border border-fg/10 mb-6 overflow-hidden rounded-xl">
                 {product.image ? (
                 <Image 
                   src={product.image} 
@@ -85,7 +85,7 @@ export default function ShopClient({ products }: { products: ShopProduct[] }) {
                   referrerPolicy="no-referrer"
                 />
                 ) : (
-                  <div className="absolute inset-0 bg-[#161616]" />
+                  <div className="absolute inset-0 bg-raised-2" />
                 )}
                 
                 {/* Tag */}
@@ -111,8 +111,8 @@ export default function ShopClient({ products }: { products: ShopProduct[] }) {
               </div>
               
               <div className="flex justify-between items-start">
-                <h3 className="font-bebas text-3xl text-white group-hover:text-wff-gold transition-colors max-w-[70%]">{product.name}</h3>
-                <span className="font-sans font-bold text-wff-gold text-lg">₵ {product.price.toFixed(2)}</span>
+                <h3 className="font-bebas text-3xl text-fg group-hover:text-gold-ink transition-colors max-w-[70%]">{product.name}</h3>
+                <span className="font-sans font-bold text-gold-ink text-lg">₵ {product.price.toFixed(2)}</span>
               </div>
             </Link>
           ))

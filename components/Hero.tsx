@@ -50,7 +50,7 @@ export const HERO_CONTENT = {
       label: "HOST CHAPTER",
       value: "Accra, Ghana",
       icon: MapPin,
-      iconColor: "text-wff-gold",
+      iconColor: "text-gold-ink",
     },
     {
       id: "date",
@@ -74,7 +74,7 @@ export const HERO_CONTENT = {
       subtitle: "PRO CARDS TO BE WON",
       detail:
         "Overall class champions in the upcoming championship secure a certified global WFF Pro Card, unlocking prestigious international stages.",
-      accentColor: "border-wff-gold text-wff-gold bg-wff-gold/5",
+      accentColor: "border-wff-gold text-gold-ink bg-wff-gold/5",
     },
     {
       id: "prizes",
@@ -90,7 +90,7 @@ export const HERO_CONTENT = {
       subtitle: "OFFICIAL WFF SCORING",
       detail:
         "Scored by an accredited panel using correct WFF International rules, focusing strictly on muscle symmetry, density, and stage carriage.",
-      accentColor: "border-white text-white bg-white/5",
+      accentColor: "border-fg text-fg bg-fg/5",
     },
   ] as FeatureHighlight[],
   stats: {
@@ -248,7 +248,7 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-[100svh] w-full overflow-hidden flex items-center justify-center bg-black pt-28 pb-16 lg:pb-8"
+      className="site-dark text-fg relative min-h-[100svh] w-full overflow-hidden flex items-center justify-center bg-page pt-28 pb-16 lg:pb-8"
       id="hero-section"
     >
       {/* 1. Dramatic Textured Backdrop */}
@@ -258,7 +258,7 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
       ></div>
 
       {/* 2. Layered Premium Gradient Vignettes (Ghana Colors glow subtly in the dark) */}
-      <div className="absolute inset-0 z-1 bg-gradient-to-b from-[#050505]/95 via-black/45 to-[#050505]"></div>
+      <div className="absolute inset-0 z-1 bg-gradient-to-b from-page/95 via-black/45 to-page"></div>
       <div className="absolute inset-0 z-1 bg-[radial-gradient(circle_at_65%_45%,rgba(206,17,38,0.12)_0%,rgba(252,209,22,0.06)_40%,rgba(0,107,63,0.04)_70%,transparent_100%)]"></div>
 
       {/* Fine technical background grid lines */}
@@ -275,22 +275,22 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
         {/* Top Mini-Banner Ticker (Technical Metadata) */}
         <div
           ref={bannerRef}
-          className="w-full flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4 mb-6 opacity-0"
+          className="w-full flex flex-wrap items-center justify-between gap-4 border-b border-fg/10 pb-4 mb-6 opacity-0"
         >
           <div className="flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-wff-green animate-pulse"></span>
-            <span className="font-sans font-extrabold text-[9px] md:text-xs uppercase tracking-[0.25em] text-white/50">
+            <span className="font-sans font-extrabold text-[9px] md:text-xs uppercase tracking-[0.25em] text-fg/50">
               {HERO_CONTENT.ticker.title}
             </span>
           </div>
-          <div className="flex items-center gap-6 font-sans text-[10px] md:text-xs text-white/40 uppercase tracking-widest font-mono">
+          <div className="flex items-center gap-6 font-sans text-[10px] md:text-xs text-fg/40 uppercase tracking-widest font-mono">
             <span>
               {event?.venue_name
                 ? [event.venue_name, event.venue_location].filter(Boolean).join(", ")
                 : "Venue To Be Announced"}
             </span>
             <span>•</span>
-            <span className="text-wff-gold font-bold">
+            <span className="text-gold-ink font-bold">
               {HERO_CONTENT.ticker.badge}
             </span>
           </div>
@@ -306,7 +306,7 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
             {/* Superhead Tagline */}
             <div className="animate-entrance inline-flex items-center gap-2 px-3 py-1 bg-wff-red/10 border border-wff-red/20 rounded-full w-max">
               <Trophy size={14} className="text-wff-red" />
-              <span className="font-sans text-[10px] font-black uppercase tracking-[0.3em] text-white">
+              <span className="font-sans text-[10px] font-black uppercase tracking-[0.3em] text-fg">
                 {HERO_CONTENT.tagline}
               </span>
             </div>
@@ -315,7 +315,7 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
             <h1 className="font-bebas flex flex-col leading-[0.80] uppercase select-none">
               <span
                 ref={titlePart1Ref}
-                className="animate-entrance block text-[13vw] md:text-[8vw] xl:text-[7.5rem] text-white tracking-tight"
+                className="animate-entrance block text-[13vw] md:text-[8vw] xl:text-[7.5rem] text-fg tracking-tight"
               >
                 {HERO_CONTENT.title.line1}
               </span>
@@ -333,28 +333,28 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
                 >
                   {HERO_CONTENT.title.line3}
                 </span>
-                <span className="block text-[11vw] md:text-[7.5vw] xl:text-[7rem] text-white/80 font-outline">
+                <span className="block text-[11vw] md:text-[7.5vw] xl:text-[7rem] text-fg/80 font-outline">
                   {HERO_CONTENT.title.year}
                 </span>
               </div>
             </h1>
 
             {/* Core Location/Date Information Pills */}
-            <div className="animate-entrance grid grid-cols-1 sm:grid-cols-3 gap-3 border-y border-white/5 py-4 w-full">
+            <div className="animate-entrance grid grid-cols-1 sm:grid-cols-3 gap-3 border-y border-fg/5 py-4 w-full">
               {heroDetails.map((detail) => {
                 const IconComponent = detail.icon;
                 return (
                   <div key={detail.id} className="flex items-center gap-3">
                     <div
-                      className={`p-2 rounded-xl bg-white/5 ${detail.iconColor}`}
+                      className={`p-2 rounded-xl bg-fg/5 ${detail.iconColor}`}
                     >
                       <IconComponent size={16} />
                     </div>
                     <div className="font-sans">
-                      <span className="block text-[9px] uppercase tracking-widest text-white/40 font-bold">
+                      <span className="block text-[9px] uppercase tracking-widest text-fg/40 font-bold">
                         {detail.label}
                       </span>
-                      <span className="text-white text-xs font-extrabold uppercase">
+                      <span className="text-fg text-xs font-extrabold uppercase">
                         {detail.value}
                       </span>
                     </div>
@@ -369,11 +369,11 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
             ref={rightColRef}
             className="lg:col-span-5 flex flex-col justify-center opacity-0"
           >
-            <div className="relative w-full bg-black/55 hover:bg-black/70 border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-xl shadow-[0_25px_60px_rgba(0,0,0,0.85)] transition-colors duration-500 overflow-hidden">
+            <div className="relative w-full bg-black/55 hover:bg-black/70 border border-fg/10 rounded-3xl p-6 md:p-8 backdrop-blur-xl shadow-[0_25px_60px_rgba(0,0,0,0.85)] transition-colors duration-500 overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-wff-red/10 rounded-full blur-[40px] pointer-events-none"></div>
 
               {/* Event Officiating Header */}
-              <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-fg/10">
                 <div className="flex items-center gap-2.5">
                   <div className="w-10 h-10 relative flex-shrink-0">
                     <Image
@@ -385,16 +385,16 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
                     />
                   </div>
                   <div>
-                    <h3 className="font-bebas text-lg text-white leading-none tracking-wide">
+                    <h3 className="font-bebas text-lg text-fg leading-none tracking-wide">
                       OFFICIAL COUNTDOWN
                     </h3>
-                    <span className="font-sans text-[9px] uppercase tracking-widest text-wff-gold font-bold">
+                    <span className="font-sans text-[9px] uppercase tracking-widest text-gold-ink font-bold">
                       STATE ATHLETE ENTRY
                     </span>
                   </div>
                 </div>
-                <div className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-lg">
-                  <span className="font-mono text-[9px] tracking-widest text-[#00A86B] font-bold uppercase animate-pulse">
+                <div className="px-2.5 py-1 bg-fg/5 border border-fg/10 rounded-lg">
+                  <span className="font-mono text-[9px] tracking-widest text-green-ink font-bold uppercase animate-pulse">
                     ● BOOKINGS ACTIVE
                   </span>
                 </div>
@@ -402,26 +402,26 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
 
               {/* Sports-Tech Countdown Ticker */}
               <div className="mb-8">
-                <span className="font-sans text-[9px] uppercase tracking-[0.25em] text-white/40 block mb-3 font-semibold">
+                <span className="font-sans text-[9px] uppercase tracking-[0.25em] text-fg/40 block mb-3 font-semibold">
                   CHAMPIONSHIP TIMER
                 </span>
 
-                <div className="grid grid-cols-4 gap-3 bg-black/60 p-4 rounded-2xl border border-white/5">
+                <div className="grid grid-cols-4 gap-3 bg-black/60 p-4 rounded-2xl border border-fg/5">
                   {[
                     {
                       label: "DAYS REMAINING",
                       value: timeLeft.days,
-                      color: "text-white",
+                      color: "text-fg",
                     },
                     {
                       label: "HOURS ACTIVE",
                       value: timeLeft.hours,
-                      color: "text-wff-gold",
+                      color: "text-gold-ink",
                     },
                     {
                       label: "MINUTES RUNNING",
                       value: timeLeft.minutes,
-                      color: "text-white",
+                      color: "text-fg",
                     },
                     {
                       label: "SECONDS TOTAL",
@@ -435,7 +435,7 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
                       >
                         {unit.value.toString().padStart(2, "0")}
                       </div>
-                      <div className="font-sans text-[8px] uppercase tracking-widest text-white/30 font-bold leading-normal">
+                      <div className="font-sans text-[8px] uppercase tracking-widest text-fg/30 font-bold leading-normal">
                         {unit.label.split(" ")[0]}
                       </div>
                     </div>
@@ -445,32 +445,32 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
 
               {/* Key Event Ticker Metrics - Authentic Launch Info */}
               <div className="space-y-3.5 mb-8">
-                <div className="flex items-center justify-between text-xs py-2 border-b border-white/5 font-sans">
-                  <span className="text-white/50 flex items-center gap-2 font-semibold">
+                <div className="flex items-center justify-between text-xs py-2 border-b border-fg/5 font-sans">
+                  <span className="text-fg/50 flex items-center gap-2 font-semibold">
                     <Users size={12} className="text-wff-red" />{" "}
                     {HERO_CONTENT.stats.athleteLabel}
                   </span>
-                  <span className="text-white font-extrabold font-mono text-xs uppercase">
+                  <span className="text-fg font-extrabold font-mono text-xs uppercase">
                     {HERO_CONTENT.stats.athleteValue}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between text-xs py-2 border-b border-white/5 font-sans">
-                  <span className="text-white/50 flex items-center gap-2 font-semibold">
-                    <ShieldCheck size={12} className="text-wff-gold" />{" "}
+                <div className="flex items-center justify-between text-xs py-2 border-b border-fg/5 font-sans">
+                  <span className="text-fg/50 flex items-center gap-2 font-semibold">
+                    <ShieldCheck size={12} className="text-gold-ink" />{" "}
                     {HERO_CONTENT.stats.classLabel}
                   </span>
-                  <span className="text-white font-extrabold font-mono text-xs uppercase">
+                  <span className="text-fg font-extrabold font-mono text-xs uppercase">
                     {HERO_CONTENT.stats.classValue}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between text-xs py-2 border-b border-white/5 font-sans">
-                  <span className="text-white/50 flex items-center gap-2 font-semibold">
+                <div className="flex items-center justify-between text-xs py-2 border-b border-fg/5 font-sans">
+                  <span className="text-fg/50 flex items-center gap-2 font-semibold">
                     <Clock size={12} className="text-wff-green" />{" "}
                     {HERO_CONTENT.stats.weighInLabel}
                   </span>
-                  <span className="text-white font-extrabold font-mono text-xs uppercase">
+                  <span className="text-fg font-extrabold font-mono text-xs uppercase">
                     {HERO_CONTENT.stats.weighInValue}
                   </span>
                 </div>
@@ -491,7 +491,7 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
 
                 <Link
                   href={HERO_CONTENT.ctas.portal.href}
-                  className="flex items-center justify-center gap-1.5 bg-white/5 border border-white/10 hover:border-wff-gold text-white hover:text-wff-gold py-3 px-4 rounded-xl font-bebas text-xl tracking-widest transition-all hover:bg-white/10 duration-300 font-bold uppercase"
+                  className="flex items-center justify-center gap-1.5 bg-fg/5 border border-fg/10 hover:border-wff-gold text-fg hover:text-gold-ink py-3 px-4 rounded-xl font-bebas text-xl tracking-widest transition-all hover:bg-fg/10 duration-300 font-bold uppercase"
                 >
                   {HERO_CONTENT.ctas.portal.text}
                 </Link>
@@ -499,7 +499,7 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
             </div>
 
             {/* Tiny disclaimer note */}
-            <div className="text-center mt-4 font-sans text-[10px] text-white/30 tracking-widest font-semibold">
+            <div className="text-center mt-4 font-sans text-[10px] text-fg/30 tracking-widest font-semibold">
               {HERO_CONTENT.disclaimer}
             </div>
           </div>
