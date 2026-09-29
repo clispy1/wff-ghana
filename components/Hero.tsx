@@ -78,7 +78,7 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
       </div>
 
       <div className="relative z-10 flex-1 flex items-center container mx-auto max-w-7xl px-6 pt-28 pb-10">
-        <div className="max-w-3xl animate-in fade-in slide-in-from-bottom-6 duration-700">
+        <div className="max-w-5xl animate-in fade-in slide-in-from-bottom-6 duration-700">
           <p className="flex flex-wrap items-center gap-x-5 gap-y-2 font-sans text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-fg/80 mb-6">
             <span className="flex items-center gap-2">
               <Calendar size={15} className="text-gold-ink" /> {dates}
@@ -88,7 +88,7 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
             </span>
           </p>
 
-          <h1 className="font-bebas uppercase leading-[0.88] tracking-tight text-[15vw] sm:text-7xl lg:text-[6.25rem] mb-6">
+          <h1 className="font-display uppercase leading-[0.98] lg:leading-[0.92] tracking-tight text-[15vw] sm:text-8xl lg:text-[8.5rem] mb-7">
             All Africa
             <br />
             Bodybuilding

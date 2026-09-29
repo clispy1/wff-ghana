@@ -25,6 +25,7 @@
   --color-green-ink: #007A4D;
 
   --font-bebas: var(--font-bebas), sans-serif;
+  --font-display: var(--font-anton), sans-serif;
   --font-sans: var(--font-dm-sans), sans-serif;
 
   --animate-marquee: marquee 20s linear infinite;

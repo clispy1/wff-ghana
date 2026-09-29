@@ -1,5 +1,5 @@
 import type {Metadata} from 'next';
-import { Teko, DM_Sans, Geist } from 'next/font/google';
+import { Teko, DM_Sans, Geist, Anton } from 'next/font/google';
 import SmoothScrolling from '@/components/SmoothScrolling';
 import { CartProvider } from '@/lib/CartContext';
 import SiteChrome from '@/components/SiteChrome';
@@ -16,6 +16,13 @@ const teko = Teko({
   weight: ['300', '400', '500', '600', '700'],
 });
 
+// Heavy poster face for the homepage hero title.
+const anton = Anton({
+  subsets: ['latin'],
+  variable: '--font-anton',
+  weight: '400',
+});
+
 const dmSans = DM_Sans({
   subsets: ['latin'],
   variable: '--font-dm-sans',
@@ -28,7 +35,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="en" className={cn(teko.variable, dmSans.variable, "font-sans", geist.variable)} suppressHydrationWarning>
+    <html lang="en" className={cn(teko.variable, anton.variable, dmSans.variable, "font-sans", geist.variable)} suppressHydrationWarning>
       <head>
         {/* Applies a saved dark-theme choice before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
