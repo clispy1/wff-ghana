@@ -16,7 +16,7 @@ const COPY = {
     },
     ticket: {
       title: 'TICKETS SECURED',
-      body: 'Payment received. Your tickets have been reserved and confirmation is on its way to your inbox.',
+      body: 'Payment received. Your tickets are reserved. We have texted your reference to your phone. Show it at the entrance.',
     },
     vendor: {
       title: 'APPLICATION & FEE RECEIVED',
@@ -44,7 +44,10 @@ export default async function PaymentStatusPage({
 }) {
   const params = await searchParams;
   const status = params.status === 'success' ? 'success' : params.status === 'failed' ? 'failed' : 'error';
-  const purpose = (params.purpose || 'default') as keyof typeof COPY.success;
+  // Error redirects can't always say what was being paid for; the
+  // reference prefix (WFF-TICKET-…) still does.
+  const fromRef = params.reference?.match(/^WFF-([A-Z]+)-/)?.[1]?.toLowerCase();
+  const purpose = (params.purpose || fromRef || 'default') as keyof typeof COPY.success;
 
   const copy =
     status === 'success'

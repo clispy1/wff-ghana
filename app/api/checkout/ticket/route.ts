@@ -20,11 +20,18 @@ export async function POST(request: Request) {
         quantity?: number;
       };
 
-    if (!ticket_tier_id || !buyer_name || !buyer_email) {
+    const name = buyer_name?.trim();
+    const email = buyer_email?.trim();
+    const phone = buyer_phone?.trim();
+
+    if (!ticket_tier_id || !name || !email || !phone) {
       return NextResponse.json(
-        { error: 'Ticket type, name and email are required.' },
+        { error: 'Ticket type, name, email and phone number are required.' },
         { status: 400 },
       );
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: 'Enter a valid email address.' }, { status: 400 });
     }
 
     const qty = Math.max(1, Math.min(20, Math.floor(Number(quantity) || 1)));
@@ -55,9 +62,9 @@ export async function POST(request: Request) {
       .insert({
         reference,
         ticket_tier_id: tier.id,
-        buyer_name,
-        buyer_email,
-        buyer_phone: buyer_phone || null,
+        buyer_name: name,
+        buyer_email: email,
+        buyer_phone: phone,
         quantity: qty,
         unit_price: unitPrice,
         total,
@@ -69,18 +76,21 @@ export async function POST(request: Request) {
 
     if (orderError) throw orderError;
 
-    await admin.from('payments').insert({
+    // Without this row settlePayment can't match the charge to the order,
+    // so a buyer would pay and never be marked paid. Stop before Paystack.
+    const { error: paymentError } = await admin.from('payments').insert({
       reference,
       purpose: 'ticket',
       related_id: order.id,
       amount: total,
       currency: 'GHS',
       status: 'pending',
-      customer_email: buyer_email,
+      customer_email: email,
     });
+    if (paymentError) throw paymentError;
 
     const paystack = await initializeTransaction({
-      email: buyer_email,
+      email,
       amount: total,
       reference,
       callbackUrl: `${siteUrl()}/api/paystack/callback`,
