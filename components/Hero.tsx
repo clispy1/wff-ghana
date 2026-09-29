@@ -79,28 +79,31 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
 
       <div className="relative z-10 flex-1 flex items-center container mx-auto max-w-7xl px-6 pt-28 pb-10">
         <div className="max-w-5xl animate-in fade-in slide-in-from-bottom-6 duration-700">
-          <p className="flex flex-wrap items-center gap-x-5 gap-y-2 font-sans text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-fg/80 mb-6">
-            <span className="flex items-center gap-2">
-              <Calendar size={15} className="text-gold-ink" /> {dates}
-            </span>
-            <span className="flex items-center gap-2">
-              <MapPin size={15} className="text-wff-red" /> {place}
-            </span>
+          <p className="font-sans text-[11px] md:text-xs font-bold uppercase tracking-[0.25em] text-fg/70 mb-5">
+            World Fitness Federation Ghana <span className="text-fg/40">·</span> with WFF International presents
           </p>
 
-          <h1 className="font-display uppercase leading-[0.98] lg:leading-[0.92] tracking-tight text-[15vw] sm:text-8xl lg:text-[8.5rem] mb-7">
+          {/* Gold, stacked-shadow lettering after the event flyer. */}
+          <h1 className="font-display uppercase text-gold-3d leading-[1.02] text-[9.4vw] sm:text-6xl lg:text-[5.75rem] mb-6">
             All Africa
             <br />
             Bodybuilding
             <br />
-            <span className="text-wff-red">Championship</span>{" "}
-            <span className="text-gold-ink">2026</span>
+            Championship
           </h1>
 
-          <p className="font-sans text-base md:text-lg text-fg/75 leading-relaxed max-w-xl mb-10">
-            Africa&apos;s top natural athletes on one stage
-            {event?.venue_name ? <> at the {event.venue_name}</> : null}. Get your seat or
-            enter the competition.
+          <p className="inline-block font-sans font-extrabold uppercase tracking-[0.2em] text-sm md:text-lg text-white bg-[#5a0d0d] border-2 border-wff-gold rounded-md px-5 py-2 mb-7">
+            Ghana Meets Africa
+          </p>
+
+          <p className="flex flex-wrap items-center gap-x-5 gap-y-2 font-sans text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-fg/85 mb-10">
+            <span className="flex items-center gap-2">
+              <Calendar size={15} className="text-gold-ink shrink-0" /> {dates}
+            </span>
+            <span className="flex items-center gap-2">
+              <MapPin size={15} className="text-wff-red shrink-0" />
+              {event?.venue_name ? `${event.venue_name}, ${place}` : place}
+            </span>
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">

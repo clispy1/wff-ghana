@@ -1,5 +1,5 @@
 import type {Metadata} from 'next';
-import { Teko, DM_Sans, Geist, Anton } from 'next/font/google';
+import { Teko, DM_Sans, Geist, Bungee } from 'next/font/google';
 import SmoothScrolling from '@/components/SmoothScrolling';
 import { CartProvider } from '@/lib/CartContext';
 import SiteChrome from '@/components/SiteChrome';
@@ -16,10 +16,10 @@ const teko = Teko({
   weight: ['300', '400', '500', '600', '700'],
 });
 
-// Heavy poster face for the homepage hero title.
-const anton = Anton({
+// Chunky poster face for the homepage hero title, matching the event flyer.
+const display = Bungee({
   subsets: ['latin'],
-  variable: '--font-anton',
+  variable: '--font-display-face',
   weight: '400',
 });
 
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="en" className={cn(teko.variable, anton.variable, dmSans.variable, "font-sans", geist.variable)} suppressHydrationWarning>
+    <html lang="en" className={cn(teko.variable, display.variable, dmSans.variable, "font-sans", geist.variable)} suppressHydrationWarning>
       <head>
         {/* Applies a saved dark-theme choice before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
