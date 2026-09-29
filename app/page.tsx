@@ -31,7 +31,7 @@ export default async function HomePage() {
   ] = await Promise.all([
     supabase
       .from('sponsors')
-      .select('name, tier, display_order')
+      .select('name, tier, logo_url, link_url, display_order')
       .order('display_order', { ascending: true }),
     supabase
       .from('news_articles')
@@ -56,7 +56,12 @@ export default async function HomePage() {
 
   const props: HomeClientProps = {
     sponsors:
-      sponsorsRes.data?.map((s) => ({ name: s.name, role: s.tier })) ?? [],
+      sponsorsRes.data?.map((s) => ({
+        name: s.name,
+        role: s.tier,
+        logoUrl: s.logo_url,
+        linkUrl: s.link_url,
+      })) ?? [],
     news:
       newsRes.data?.map((n) => ({
         id: n.id,

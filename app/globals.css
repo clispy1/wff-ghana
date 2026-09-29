@@ -25,6 +25,7 @@
   --color-green-ink: #007A4D;
 
   --font-bebas: var(--font-bebas), sans-serif;
+  --font-display: var(--font-display-face), sans-serif;
   --font-sans: var(--font-dm-sans), sans-serif;
 
   --animate-marquee: marquee 20s linear infinite;
@@ -183,4 +184,17 @@ body {
   html {
     @apply font-sans;
   }
+}
+/* Hero title: gold gradient lettering with a stacked "3D" edge, after
+   the event flyer. drop-shadow (not text-shadow) because the glyphs are
+   transparent-filled for the gradient. */
+.text-gold-3d {
+  background: linear-gradient(180deg, #FFF3A0 0%, #FCD116 38%, #F0A500 62%, #C26A00 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter:
+    drop-shadow(0 2px 0 #8A4B00)
+    drop-shadow(0 3px 0 #5C3000)
+    drop-shadow(0 10px 18px rgba(0, 0, 0, 0.7));
 }

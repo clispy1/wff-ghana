@@ -1,510 +1,167 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  formatEventDateShort,
-  type WffEvent,
-} from "@/lib/activeEvent";import {
-  Trophy,
-  MapPin,
-  Calendar,
-  ChevronRight,
-  Activity,
-  Users,
-  ShieldCheck,
-  Award,
-  Clock,
-} from "lucide-react";
+import { ArrowRight, Calendar, MapPin } from "lucide-react";
+import { formatEventRange, type WffEvent } from "@/lib/activeEvent";
 
-gsap.registerPlugin(ScrollTrigger);
+type Countdown = { days: number; hours: number; minutes: number; seconds: number };
+type EventClock =
+  | { phase: "unknown" | "live" | "over" }
+  | { phase: "upcoming"; left: Countdown };
 
-// Correct Competition Divisions & Benefits for WFF Official Rulebook
-export interface FeatureHighlight {
-  id: string;
-  title: string;
-  subtitle: string;
-  detail: string;
-  accentColor: string;
+/**
+ * Where the event stands relative to now. `upcoming` carries the time
+ * left; `live` covers the whole start–end range (end date inclusive).
+ */
+function useEventClock(event?: WffEvent | null): EventClock {
+  const [now, setNow] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!event?.start_date) return;
+    const tick = () => setNow(Date.now());
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [event?.start_date]);
+
+  if (!event?.start_date || now === null) return { phase: "unknown" };
+
+  const start = new Date(`${event.start_date}T00:00:00`).getTime();
+  const end = new Date(`${event.end_date || event.start_date}T23:59:59`).getTime();
+  if (Number.isNaN(start)) return { phase: "unknown" };
+
+  if (now < start) {
+    const d = start - now;
+    const left: Countdown = {
+      days: Math.floor(d / 86_400_000),
+      hours: Math.floor((d % 86_400_000) / 3_600_000),
+      minutes: Math.floor((d % 3_600_000) / 60_000),
+      seconds: Math.floor((d % 60_000) / 1000),
+    };
+    return { phase: "upcoming", left };
+  }
+  return { phase: now <= end ? "live" : "over" };
 }
 
-export const HERO_CONTENT = {
-  ticker: {
-    title: "WORLD FITNESS FEDERATION GHANA OFFICIAL LAUNCH",
-    venue: "COLLEGE OF PHYSICIANS & SURGEONS, ACCRA",
-    badge: "AFRICAN CHAMPIONSHIP",
-  },
-  tagline: "BUILDING THE FUTURE OF NATURAL AESTHETICS",
-  title: {
-    line1: "ALL AFRICA",
-    line2: "BODYBUILDING",
-    line3: "CHAMPIONSHIP",
-    year: "2026",
-  },
-  details: [
-    {
-      id: "host",
-      label: "HOST CHAPTER",
-      value: "Accra, Ghana",
-      icon: MapPin,
-      iconColor: "text-gold-ink",
-    },
-    {
-      id: "date",
-      label: "UPCOMING EVENT",
-      value: "Oct 2nd - 4th, 2026",
-      icon: Calendar,
-      iconColor: "text-wff-red",
-    },
-    {
-      id: "status",
-      label: "ACCREDITATION",
-      value: "WFF International Authorized",
-      icon: Award,
-      iconColor: "text-wff-green",
-    },
-  ],
-  highlights: [
-    {
-      id: "pro-status",
-      title: "Global Pro Status",
-      subtitle: "PRO CARDS TO BE WON",
-      detail:
-        "Overall class champions in the upcoming championship secure a certified global WFF Pro Card, unlocking prestigious international stages.",
-      accentColor: "border-wff-gold text-gold-ink bg-wff-gold/5",
-    },
-    {
-      id: "prizes",
-      title: "Aesthetic Platform",
-      subtitle: "CHAPTER SUPPORT & DEALS",
-      detail:
-        "Founding class winners secure national sponsorships, brand ambassadorships, and official support for continental representations.",
-      accentColor: "border-wff-red text-wff-red bg-wff-red/5",
-    },
-    {
-      id: "judging",
-      title: "Uncompromised Integrity",
-      subtitle: "OFFICIAL WFF SCORING",
-      detail:
-        "Scored by an accredited panel using correct WFF International rules, focusing strictly on muscle symmetry, density, and stage carriage.",
-      accentColor: "border-fg text-fg bg-fg/5",
-    },
-  ] as FeatureHighlight[],
-  stats: {
-    athleteLabel: "LAUNCH RESERVATIONS",
-    athleteValue: "Open for Entries",
-    classLabel: "COMPETITION CLASSES",
-    classValue: "4 Major Categories",
-    weighInLabel: "WEIGH-IN SELECTION",
-    weighInValue: "Oct 2nd, 2026",
-  },
-  ctas: {
-    passes: { text: "GET TICKETS", href: "/championship#tickets" },
-    portal: { text: "REGISTER ATHLETE", href: "/register" },
-  },
-  disclaimer:
-    "★ DECLARED UNDER THE WORLD FITNESS FEDERATION INTERNATIONAL CHARTER",
-};
-
 export default function Hero({ event }: { event?: WffEvent | null }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const leftColRef = useRef<HTMLDivElement>(null);
-  const rightColRef = useRef<HTMLDivElement>(null);
-  const bgRef = useRef<HTMLDivElement>(null);
-  const titlePart1Ref = useRef<HTMLSpanElement>(null);
-  const titlePart2Ref = useRef<HTMLSpanElement>(null);
-  const titlePart3Ref = useRef<HTMLSpanElement>(null);
-  const bannerRef = useRef<HTMLDivElement>(null);
+  const clock = useEventClock(event);
 
-  const [activeHighlight, setActiveHighlight] = useState<string>("pro-status");
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-
-  // Host chapter and date come from the active event (fetched server-side
-  // and passed in). No event means honest "to be announced" labels — the
-  // admin's active event in the dashboard is the only source of truth.
-  const heroDetails = HERO_CONTENT.details.map((detail) => {
-    if (detail.id === "host" && event?.venue_location) {
-      return { ...detail, value: event.venue_location };
-    }
-    if (detail.id === "host" && !event?.venue_location) {
-      return { ...detail, value: "To Be Announced" };
-    }
-    if (detail.id === "date" && event?.start_date) {
-      return {
-        ...detail,
-        value: formatEventDateShort(event.start_date) || detail.value,
-      };
-    }
-    if (detail.id === "date" && !event?.start_date) {
-      return { ...detail, value: "To Be Announced" };
-    }
-    return detail;
-  });
-
-  useEffect(() => {
-    // GSAP Timeline Entry Animation
-    const tl = gsap.timeline({ delay: 1.2 }); // Wait for standard loader if present
-
-    // Slowly scale background over infinity
-    if (bgRef.current) {
-      gsap.to(bgRef.current, {
-        scale: 1.15,
-        duration: 25,
-        ease: "none",
-        repeat: -1,
-        yoyo: true,
-      });
-    }
-
-    // Top banner entry
-    if (bannerRef.current) {
-      tl.fromTo(
-        bannerRef.current,
-        { y: -30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
-      );
-    }
-
-    // Left Column reveals (kinetic typography)
-    if (leftColRef.current) {
-      const items = leftColRef.current.querySelectorAll(".animate-entrance");
-      tl.fromTo(
-        items,
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1, stagger: 0.15, ease: "power3.out" },
-        "-=0.4",
-      );
-    }
-
-    // Right glassmorphic card entrance
-    if (rightColRef.current) {
-      tl.fromTo(
-        rightColRef.current,
-        { scale: 0.95, opacity: 0, y: 30 },
-        { scale: 1, opacity: 1, y: 0, duration: 1, ease: "power2.out" },
-        "-=0.8",
-      );
-    }
-
-    // Gentle parallax scrolling for left side elements
-    if (containerRef.current && leftColRef.current) {
-      gsap.to(leftColRef.current, {
-        y: "15vh",
-        opacity: 0.2,
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
-    }
-
-  }, []);
-
-  // Countdown runs against the active event's start date, so changing
-  // the date in the admin dashboard moves the clock. No active event
-  // means no target — the ticker reads zeroed rather than a hardcoded date.
-  useEffect(() => {
-    const targetDate = event?.start_date
-      ? new Date(`${event.start_date}T00:00:00`).getTime()
-      : NaN;
-
-    if (Number.isNaN(targetDate)) return;
-
-    const updateTimer = () => {
-      const distance = targetDate - Date.now();
-
-      if (distance < 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
-      }
-
-      setTimeLeft({
-        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor(
-          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-        ),
-        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((distance % (1000 * 60)) / 1000),
-      });
-    };
-
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-
-    return () => clearInterval(interval);
-  }, [event?.start_date]);
+  // Date and venue come from the active event set in the admin dashboard.
+  const dates = formatEventRange(event?.start_date, event?.end_date) ?? "Dates to be announced";
+  const place = event?.venue_location || "Venue to be announced";
 
   return (
     <section
-      ref={containerRef}
-      className="site-dark text-fg relative min-h-[100svh] w-full overflow-hidden flex items-center justify-center bg-page pt-28 pb-16 lg:pb-8"
       id="hero-section"
+      className="site-dark text-fg relative min-h-[100svh] w-full overflow-hidden flex flex-col bg-page"
     >
-      {/* 1. Dramatic Textured Backdrop */}
-      <div
-        ref={bgRef}
-        className="absolute inset-0 z-0 bg-[url('/hero-bg.jpeg')] bg-cover bg-center bg-no-repeat opacity-[0.45] mix-blend-luminosity"
-      ></div>
+      {/* Photo */}
+      <Image
+        src="/hero-bg.jpeg"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-[62%_center] z-0"
+      />
+      {/* Scrims: dark on the left for the text, and top/bottom for the navbar and countdown. */}
+      <div className="absolute inset-0 z-1 bg-gradient-to-r from-black/90 via-black/60 to-black/10" />
+      <div className="absolute inset-0 z-1 bg-gradient-to-b from-black/70 via-transparent to-black/85" />
 
-      {/* 2. Layered Premium Gradient Vignettes (Ghana Colors glow subtly in the dark) */}
-      <div className="absolute inset-0 z-1 bg-gradient-to-b from-page/95 via-black/45 to-page"></div>
-      <div className="absolute inset-0 z-1 bg-[radial-gradient(circle_at_65%_45%,rgba(206,17,38,0.12)_0%,rgba(252,209,22,0.06)_40%,rgba(0,107,63,0.04)_70%,transparent_100%)]"></div>
-
-      {/* Fine technical background grid lines */}
-      <div className="absolute inset-0 z-1 opacity-10 bg-[linear-gradient(to_right,#ffffff0c_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0c_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
-
-      {/* 3. Outer Frame Ghana-Colored Ribbons (Subtle elegant border) */}
-      <div className="absolute top-0 left-0 right-0 h-1.5 z-2 flex">
-        <div className="h-full flex-grow bg-wff-red"></div>
-        <div className="h-full flex-grow bg-wff-gold"></div>
-        <div className="h-full flex-grow bg-wff-green"></div>
+      {/* Ghana ribbon */}
+      <div className="absolute top-0 inset-x-0 h-1.5 z-2 flex">
+        <div className="flex-1 bg-wff-red" />
+        <div className="flex-1 bg-wff-gold" />
+        <div className="flex-1 bg-wff-green" />
       </div>
 
-      <div className="container mx-auto px-6 max-w-7xl relative z-10 w-full h-full flex flex-col justify-between">
-        {/* Top Mini-Banner Ticker (Technical Metadata) */}
-        <div
-          ref={bannerRef}
-          className="w-full flex flex-wrap items-center justify-between gap-4 border-b border-fg/10 pb-4 mb-6 opacity-0"
-        >
-          <div className="flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-wff-green animate-pulse"></span>
-            <span className="font-sans font-extrabold text-[9px] md:text-xs uppercase tracking-[0.25em] text-fg/50">
-              {HERO_CONTENT.ticker.title}
+      <div className="relative z-10 flex-1 flex items-center container mx-auto max-w-7xl px-6 pt-28 pb-10">
+        <div className="max-w-5xl animate-in fade-in slide-in-from-bottom-6 duration-700">
+          <p className="font-sans text-[11px] md:text-xs font-bold uppercase tracking-[0.25em] text-fg/70 mb-5">
+            World Fitness Federation Ghana <span className="text-fg/40">·</span> with WFF International presents
+          </p>
+
+          {/* Gold, stacked-shadow lettering after the event flyer. */}
+          <h1 className="font-display uppercase text-gold-3d leading-[1.02] text-[9.4vw] sm:text-6xl lg:text-[5.75rem] mb-6">
+            All Africa
+            <br />
+            Bodybuilding
+            <br />
+            Championship
+          </h1>
+
+          <p className="inline-block font-sans font-extrabold uppercase tracking-[0.2em] text-sm md:text-lg text-white bg-[#5a0d0d] border-2 border-wff-gold rounded-md px-5 py-2 mb-7">
+            Ghana Meets Africa
+          </p>
+
+          <p className="flex flex-wrap items-center gap-x-5 gap-y-2 font-sans text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-fg/85 mb-10">
+            <span className="flex items-center gap-2">
+              <Calendar size={15} className="text-gold-ink shrink-0" /> {dates}
             </span>
-          </div>
-          <div className="flex items-center gap-6 font-sans text-[10px] md:text-xs text-fg/40 uppercase tracking-widest font-mono">
-            <span>
-              {event?.venue_name
-                ? [event.venue_name, event.venue_location].filter(Boolean).join(", ")
-                : "Venue To Be Announced"}
+            <span className="flex items-center gap-2">
+              <MapPin size={15} className="text-wff-red shrink-0" />
+              {event?.venue_name ? `${event.venue_name}, ${place}` : place}
             </span>
-            <span>•</span>
-            <span className="text-gold-ink font-bold">
-              {HERO_CONTENT.ticker.badge}
-            </span>
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link
+              href="/championship#tickets"
+              className="group inline-flex items-center justify-center gap-2 bg-wff-red text-white font-bebas text-2xl tracking-wider px-9 py-3.5 rounded-xl hover:bg-white hover:text-wff-red transition-colors"
+            >
+              Get Tickets
+              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              href="/register"
+              className="inline-flex items-center justify-center border border-fg/30 text-fg font-bebas text-2xl tracking-wider px-9 py-3.5 rounded-xl hover:border-wff-gold hover:text-gold-ink transition-colors"
+            >
+              Register as an Athlete
+            </Link>
           </div>
         </div>
+      </div>
 
-        {/* Main Bento Layout Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full mt-4">
-          {/* LEFT COLUMN: Large Kinetic Typography and Interactive Highlight Switcher */}
-          <div
-            ref={leftColRef}
-            className="lg:col-span-7 flex flex-col justify-center space-y-6 md:space-y-8"
-          >
-            {/* Superhead Tagline */}
-            <div className="animate-entrance inline-flex items-center gap-2 px-3 py-1 bg-wff-red/10 border border-wff-red/20 rounded-full w-max">
-              <Trophy size={14} className="text-wff-red" />
-              <span className="font-sans text-[10px] font-black uppercase tracking-[0.3em] text-fg">
-                {HERO_CONTENT.tagline}
-              </span>
-            </div>
-
-            {/* Huge Display Title */}
-            <h1 className="font-bebas flex flex-col leading-[0.80] uppercase select-none">
-              <span
-                ref={titlePart1Ref}
-                className="animate-entrance block text-[13vw] md:text-[8vw] xl:text-[7.5rem] text-fg tracking-tight"
-              >
-                {HERO_CONTENT.title.line1}
-              </span>
-              <span
-                ref={titlePart2Ref}
-                className="animate-entrance block text-[15vw] md:text-[9.5vw] xl:text-[9rem] text-transparent tracking-tighter"
-                style={{ WebkitTextStroke: "1.5px rgba(255,255,255,0.7)" }}
-              >
-                {HERO_CONTENT.title.line2}
-              </span>
-              <div className="animate-entrance flex items-center flex-wrap gap-x-4 md:gap-x-6">
-                <span
-                  ref={titlePart3Ref}
-                  className="block text-[11vw] md:text-[7.5vw] xl:text-[7rem] text-wff-red tracking-wide drop-shadow-[0_0_25px_rgba(206,17,38,0.4)]"
-                >
-                  {HERO_CONTENT.title.line3}
-                </span>
-                <span className="block text-[11vw] md:text-[7.5vw] xl:text-[7rem] text-fg/80 font-outline">
-                  {HERO_CONTENT.title.year}
-                </span>
-              </div>
-            </h1>
-
-            {/* Core Location/Date Information Pills */}
-            <div className="animate-entrance grid grid-cols-1 sm:grid-cols-3 gap-3 border-y border-fg/5 py-4 w-full">
-              {heroDetails.map((detail) => {
-                const IconComponent = detail.icon;
-                return (
-                  <div key={detail.id} className="flex items-center gap-3">
-                    <div
-                      className={`p-2 rounded-xl bg-fg/5 ${detail.iconColor}`}
-                    >
-                      <IconComponent size={16} />
-                    </div>
-                    <div className="font-sans">
-                      <span className="block text-[9px] uppercase tracking-widest text-fg/40 font-bold">
-                        {detail.label}
-                      </span>
-                      <span className="text-fg text-xs font-extrabold uppercase">
-                        {detail.value}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* RIGHT COLUMN: Glassmorphic Core Desk & Digital Countdown */}
-          <div
-            ref={rightColRef}
-            className="lg:col-span-5 flex flex-col justify-center opacity-0"
-          >
-            <div className="relative w-full bg-black/55 hover:bg-black/70 border border-fg/10 rounded-3xl p-6 md:p-8 backdrop-blur-xl shadow-[0_25px_60px_rgba(0,0,0,0.85)] transition-colors duration-500 overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-wff-red/10 rounded-full blur-[40px] pointer-events-none"></div>
-
-              {/* Event Officiating Header */}
-              <div className="flex items-center justify-between mb-8 pb-4 border-b border-fg/10">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 relative flex-shrink-0">
-                    <Image
-                      src="/wff-ghana-logo.svg"
-                      alt="WFF"
-                      fill
-                      className="object-contain"
-                      priority
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-bebas text-lg text-fg leading-none tracking-wide">
-                      OFFICIAL COUNTDOWN
-                    </h3>
-                    <span className="font-sans text-[9px] uppercase tracking-widest text-gold-ink font-bold">
-                      STATE ATHLETE ENTRY
-                    </span>
-                  </div>
-                </div>
-                <div className="px-2.5 py-1 bg-fg/5 border border-fg/10 rounded-lg">
-                  <span className="font-mono text-[9px] tracking-widest text-green-ink font-bold uppercase animate-pulse">
-                    ● BOOKINGS ACTIVE
-                  </span>
-                </div>
-              </div>
-
-              {/* Sports-Tech Countdown Ticker */}
-              <div className="mb-8">
-                <span className="font-sans text-[9px] uppercase tracking-[0.25em] text-fg/40 block mb-3 font-semibold">
-                  CHAMPIONSHIP TIMER
-                </span>
-
-                <div className="grid grid-cols-4 gap-3 bg-black/60 p-4 rounded-2xl border border-fg/5">
-                  {[
-                    {
-                      label: "DAYS REMAINING",
-                      value: timeLeft.days,
-                      color: "text-fg",
-                    },
-                    {
-                      label: "HOURS ACTIVE",
-                      value: timeLeft.hours,
-                      color: "text-gold-ink",
-                    },
-                    {
-                      label: "MINUTES RUNNING",
-                      value: timeLeft.minutes,
-                      color: "text-fg",
-                    },
-                    {
-                      label: "SECONDS TOTAL",
-                      value: timeLeft.seconds,
-                      color: "text-wff-red",
-                    },
-                  ].map((unit, idx) => (
-                    <div key={unit.label} className="text-center">
-                      <div
-                        className={`font-bebas text-3xl md:text-5xl ${unit.color} leading-none tracking-tight mb-2 font-mono`}
-                      >
-                        {unit.value.toString().padStart(2, "0")}
+      {/* Countdown strip */}
+      {clock.phase !== "unknown" && clock.phase !== "over" && (
+        <div className="relative z-10 border-t border-fg/10 bg-black/40 backdrop-blur-md">
+          <div className="container mx-auto max-w-7xl px-6 py-5 flex flex-wrap items-center justify-between gap-4">
+            {clock.phase !== "upcoming" ? (
+              <p className="flex items-center gap-3 font-bebas text-2xl md:text-3xl tracking-wide">
+                <span className="w-2.5 h-2.5 rounded-full bg-wff-red animate-pulse" />
+                Happening now
+              </p>
+            ) : (
+              <>
+                <p className="font-sans text-[11px] font-bold uppercase tracking-[0.25em] text-fg/60">
+                  Starts in
+                </p>
+                <div className="flex gap-6 md:gap-10">
+                  {(
+                    [
+                      ["Days", clock.left.days],
+                      ["Hours", clock.left.hours],
+                      ["Mins", clock.left.minutes],
+                      ["Secs", clock.left.seconds],
+                    ] as const
+                  ).map(([label, value]) => (
+                    <div key={label} className="text-center">
+                      <div className="font-bebas text-3xl md:text-4xl leading-none tabular-nums">
+                        {String(value).padStart(2, "0")}
                       </div>
-                      <div className="font-sans text-[8px] uppercase tracking-widest text-fg/30 font-bold leading-normal">
-                        {unit.label.split(" ")[0]}
+                      <div className="font-sans text-[10px] uppercase tracking-widest text-fg/50 mt-1">
+                        {label}
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Key Event Ticker Metrics - Authentic Launch Info */}
-              <div className="space-y-3.5 mb-8">
-                <div className="flex items-center justify-between text-xs py-2 border-b border-fg/5 font-sans">
-                  <span className="text-fg/50 flex items-center gap-2 font-semibold">
-                    <Users size={12} className="text-wff-red" />{" "}
-                    {HERO_CONTENT.stats.athleteLabel}
-                  </span>
-                  <span className="text-fg font-extrabold font-mono text-xs uppercase">
-                    {HERO_CONTENT.stats.athleteValue}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between text-xs py-2 border-b border-fg/5 font-sans">
-                  <span className="text-fg/50 flex items-center gap-2 font-semibold">
-                    <ShieldCheck size={12} className="text-gold-ink" />{" "}
-                    {HERO_CONTENT.stats.classLabel}
-                  </span>
-                  <span className="text-fg font-extrabold font-mono text-xs uppercase">
-                    {HERO_CONTENT.stats.classValue}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between text-xs py-2 border-b border-fg/5 font-sans">
-                  <span className="text-fg/50 flex items-center gap-2 font-semibold">
-                    <Clock size={12} className="text-wff-green" />{" "}
-                    {HERO_CONTENT.stats.weighInLabel}
-                  </span>
-                  <span className="text-fg font-extrabold font-mono text-xs uppercase">
-                    {HERO_CONTENT.stats.weighInValue}
-                  </span>
-                </div>
-              </div>
-
-              {/* ACTION CALLOUT HUBS */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Link
-                  href={HERO_CONTENT.ctas.passes.href}
-                  className="group relative flex items-center justify-center gap-1.5 bg-wff-red text-white py-3 px-4 rounded-xl font-bebas text-xl tracking-widest hover:bg-white hover:text-black transition-all shadow-[0_10px_20px_rgba(206,17,38,0.25)] hover:scale-103 duration-300 font-bold uppercase"
-                >
-                  {HERO_CONTENT.ctas.passes.text}
-                  <ChevronRight
-                    size={16}
-                    className="group-hover:translate-x-1 transition-transform"
-                  />
-                </Link>
-
-                <Link
-                  href={HERO_CONTENT.ctas.portal.href}
-                  className="flex items-center justify-center gap-1.5 bg-fg/5 border border-fg/10 hover:border-wff-gold text-fg hover:text-gold-ink py-3 px-4 rounded-xl font-bebas text-xl tracking-widest transition-all hover:bg-fg/10 duration-300 font-bold uppercase"
-                >
-                  {HERO_CONTENT.ctas.portal.text}
-                </Link>
-              </div>
-            </div>
-
-            {/* Tiny disclaimer note */}
-            <div className="text-center mt-4 font-sans text-[10px] text-fg/30 tracking-widest font-semibold">
-              {HERO_CONTENT.disclaimer}
-            </div>
+              </>
+            )}
           </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }
