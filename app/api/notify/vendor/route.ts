@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase-admin';
 import { sendSms, notifyAdmin } from '@/lib/sms';
+import { sendEmail } from '@/lib/email';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /**
  * Fired by the vendor application form right after a successful submit
- * — texts the vendor a confirmation and texts the admin numbers that a
+ * — texts and emails the vendor a confirmation and texts the admin numbers that a
  * new application came in. Best-effort: SMS failures here never surface
  * to the applicant, the application itself already succeeded.
  */
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
     const admin = createSupabaseAdminClient();
     const { data: vendor } = await admin
       .from('vendors')
-      .select('name, phone, category, package_name')
+      .select('name, email, phone, category, package_name')
       .eq('id', vendor_id)
       .maybeSingle();
 
@@ -39,6 +40,17 @@ export async function POST(request: Request) {
       notifyAdmin(
         `New vendor application: ${vendor.name} (${vendor.category}${vendor.package_name ? `, ${vendor.package_name}` : ''}). Review in /admin.`,
       ),
+      sendEmail({
+        to: vendor.email,
+        toName: vendor.name,
+        subject: 'Your WFF Ghana vendor application is received',
+        heading: 'Application received',
+        paragraphs: [
+          `Hi ${vendor.name}, thank you for applying to be a vendor at the 2026 All Africa Bodybuilding Championship.`,
+          'We will review your application and get back to you by email.',
+        ],
+        details: [['Package', vendor.package_name || vendor.category]],
+      }),
     ]);
 
     return NextResponse.json({ ok: true });
