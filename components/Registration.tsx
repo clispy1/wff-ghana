@@ -1140,7 +1140,7 @@ export default function Registration() {
       <div className="container mx-auto px-6 relative z-10">
         {isSuccess ? (
           // ── SUCCESS STATE: personalized, ego-boosting ──
-          <div className="max-w-2xl mx-auto border border-wff-gold/30 rounded-2xl p-12 text-center bg-gradient-to-b from-[#120d02] to-surface animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
+          <div className="max-w-2xl mx-auto border border-wff-gold/30 rounded-2xl p-12 text-center bg-gradient-to-b from-wff-gold/10 to-surface animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-wff-red via-wff-gold to-wff-green" />
             <div className="w-20 h-20 rounded-full bg-wff-gold/10 border border-wff-gold/40 flex items-center justify-center mx-auto mb-8">
               <Medal size={40} className="text-gold-ink" />
