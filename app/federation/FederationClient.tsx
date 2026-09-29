@@ -604,7 +604,7 @@ export default function FederationClient() {
             ].map((pillar, index) => (
               <div 
                 key={index} 
-                className="bg-[#001414]/30 backdrop-blur-sm border border-[#00A86B]/10 p-8 hover:border-[#00a86b]/40 transition-colors duration-500 group rounded-2xl"
+                className="bg-[#00A86B]/5 backdrop-blur-sm border border-[#00A86B]/10 p-8 hover:border-[#00a86b]/40 transition-colors duration-500 group rounded-2xl"
               >
                 <div className="w-14 h-14 rounded-full bg-[#00A86B]/10 flex items-center justify-center text-green-ink mb-6 group-hover:scale-110 transition-transform duration-500">
                   {pillar.icon}

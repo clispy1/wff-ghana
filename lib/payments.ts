@@ -70,12 +70,29 @@ export async function settlePayment(
         .eq('id', payment.related_id);
       break;
 
-    case 'ticket':
-      await admin
+    case 'ticket': {
+      const { data: order } = await admin
         .from('ticket_orders')
         .update({ payment_status: 'paid', paystack_ref: reference, paid_at: paidAt })
-        .eq('id', payment.related_id);
+        .eq('id', payment.related_id)
+        .select('buyer_name, buyer_phone, quantity, ticket_tiers(name)')
+        .single();
+
+      if (order) {
+        const tier = (order.ticket_tiers as { name?: string } | null)?.name || 'Championship';
+        const passes = `${order.quantity} x ${tier} ticket${order.quantity === 1 ? '' : 's'}`;
+        Promise.all([
+          order.buyer_phone
+            ? sendSms(
+                order.buyer_phone,
+                `Payment received! ${passes} for the WFF Ghana All Africa Championship. Show this reference at the entrance: ${reference} - WFF Ghana`,
+              )
+            : Promise.resolve(),
+          notifyAdmin(`Ticket sale: ${order.buyer_name} bought ${passes}. Ref: ${reference}.`),
+        ]).catch(() => {});
+      }
       break;
+    }
 
     case 'registration': {
       const { data: reg } = await admin

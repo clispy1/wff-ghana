@@ -90,12 +90,15 @@ export default function TicketPurchaseModal({
             <label className={labelClass}>Email Address</label>
             <input required type="email" value={form.email} onChange={set('email')} className={inputClass} />
             <p className="font-sans text-[10px] text-fg/30 mt-1.5">
-              Your tickets are sent to this address.
+              Your receipt from Paystack is sent here.
             </p>
           </div>
           <div>
             <label className={labelClass}>Phone Number</label>
-            <input type="tel" value={form.phone} onChange={set('phone')} className={inputClass} />
+            <input required type="tel" value={form.phone} onChange={set('phone')} className={inputClass} />
+            <p className="font-sans text-[10px] text-fg/30 mt-1.5">
+              Your ticket reference is texted to this number. Show it at the entrance.
+            </p>
           </div>
 
           <div>
