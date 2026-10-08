@@ -45,7 +45,12 @@ function useEventClock(event?: WffEvent | null): EventClock {
   return { phase: now <= end ? "live" : "over" };
 }
 
-export default function Hero({ event }: { event?: WffEvent | null }) {
+/**
+ * `over` (computed on the server, see lib/eventPhase) switches the hero to
+ * its post-event form: a thank-you line and the gallery instead of
+ * tickets and registration.
+ */
+export default function Hero({ event, over = false }: { event?: WffEvent | null; over?: boolean }) {
   const clock = useEventClock(event);
 
   // Date and venue come from the active event set in the admin dashboard.
@@ -80,7 +85,11 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
       <div className="relative z-10 flex-1 flex items-center container mx-auto max-w-7xl px-6 pt-28 pb-10">
         <div className="max-w-5xl animate-in fade-in slide-in-from-bottom-6 duration-700">
           <p className="font-sans text-[11px] md:text-xs font-bold uppercase tracking-[0.25em] text-fg/70 mb-5">
-            World Fitness Federation Ghana <span className="text-fg/40">·</span> with WFF International presents
+            {over ? (
+              <>That&apos;s a wrap <span className="text-fg/40">·</span> Thank you, Accra</>
+            ) : (
+              <>World Fitness Federation Ghana <span className="text-fg/40">·</span> with WFF International presents</>
+            )}
           </p>
 
           {/* Gold, stacked-shadow lettering after the event flyer. */}
@@ -96,7 +105,7 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
             Ghana Meets Africa
           </p>
 
-          <p className="flex flex-wrap items-center gap-x-5 gap-y-2 font-sans text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-fg/85 mb-10">
+          <p className={`flex flex-wrap items-center gap-x-5 gap-y-2 font-sans text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-fg/85 ${over ? "mb-5" : "mb-10"}`}>
             <span className="flex items-center gap-2">
               <Calendar size={15} className="text-gold-ink shrink-0" /> {dates}
             </span>
@@ -106,19 +115,26 @@ export default function Hero({ event }: { event?: WffEvent | null }) {
             </span>
           </p>
 
+          {over && (
+            <p className="font-sans text-base md:text-lg text-fg/80 leading-relaxed max-w-xl mb-10">
+              Thank you to every athlete, fan, official and sponsor who made history with us.
+              Relive the moments from the stage.
+            </p>
+          )}
+
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
-              href="/championship#tickets"
+              href={over ? "/media" : "/championship#tickets"}
               className="group inline-flex items-center justify-center gap-2 bg-wff-red text-white font-bebas text-2xl tracking-wider px-9 py-3.5 rounded-xl hover:bg-white hover:text-wff-red transition-colors"
             >
-              Get Tickets
+              {over ? "View the Gallery" : "Get Tickets"}
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
-              href="/register"
+              href={over ? "/partnerships" : "/register"}
               className="inline-flex items-center justify-center border border-fg/30 text-fg font-bebas text-2xl tracking-wider px-9 py-3.5 rounded-xl hover:border-wff-gold hover:text-gold-ink transition-colors"
             >
-              Register as an Athlete
+              {over ? "Partner With Us" : "Register as an Athlete"}
             </Link>
           </div>
         </div>

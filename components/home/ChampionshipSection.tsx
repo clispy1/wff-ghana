@@ -10,9 +10,12 @@ import { SectionSkeleton } from './SectionSkeleton';
 export function ChampionshipSection({
   eventData,
   championship,
+  over = false,
 }: {
   eventData: WffEvent | null;
   championship?: HomeContent['championship'];
+  /** Event has finished: point at the gallery instead of tickets and registration. */
+  over?: boolean;
 }) {
   if (!championship) return <SectionSkeleton />;
 
@@ -104,16 +107,16 @@ export function ChampionshipSection({
 
         <div className="text-center reveal-target flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            href="/championship"
+            href={over ? "/media" : "/championship"}
             className="inline-block bg-wff-red text-white py-4 px-10 rounded-xl font-bebas text-xl tracking-widest hover:bg-white hover:text-black transition-colors w-full sm:w-auto font-bold uppercase"
           >
-            {championship.ctas.tickets.text}
+            {over ? "View the Gallery" : championship.ctas.tickets.text}
           </Link>
           <Link
-            href="/register"
+            href={over ? "/championship" : "/register"}
             className="inline-block border border-wff-gold text-gold-ink py-4 px-10 rounded-xl font-bebas text-xl tracking-widest hover:bg-wff-gold hover:text-black transition-colors w-full sm:w-auto font-bold uppercase"
           >
-            {championship.ctas.register.text}
+            {over ? "Championship Recap" : championship.ctas.register.text}
           </Link>
         </div>
       </div>

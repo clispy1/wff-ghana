@@ -21,6 +21,27 @@ interface NavItem {
   items?: SubLink[];
 }
 
+// Links that only make sense before the event: hidden once it's over.
+const PRE_EVENT_ONLY = ['/championship#tickets', '/championship#logistics', '/register'];
+
+/** Post-event menu: no tickets, travel or registration links. */
+function postEventNav(items: NavItem[]): NavItem[] {
+  return items.map((item) =>
+    item.items
+      ? {
+          ...item,
+          items: item.items
+            .filter((sub) => !PRE_EVENT_ONLY.includes(sub.href))
+            .map((sub) =>
+              sub.href === '/championship'
+                ? { ...sub, name: 'Championship Recap', desc: 'Look back on the 2026 All Africa Championship.' }
+                : sub,
+            ),
+        }
+      : item,
+  );
+}
+
 const navItems: NavItem[] = [
   {
     title: 'Federation',
@@ -43,6 +64,11 @@ const navItems: NavItem[] = [
     ]
   },
   {
+    title: 'Gallery',
+    isDropdown: false,
+    href: '/media'
+  },
+  {
     title: 'Official Shop',
     isDropdown: false,
     href: '/shop'
@@ -54,7 +80,13 @@ const navItems: NavItem[] = [
   }
 ];
 
-export default function ScrubberNavbar() {
+export default function ScrubberNavbar({ eventOver = false }: { eventOver?: boolean }) {
+  const menu = eventOver ? postEventNav(navItems) : navItems;
+  // Main call to action: registration before the event, the gallery after.
+  const cta = eventOver
+    ? { href: '/media', label: 'View Gallery', mobileLabel: 'VIEW THE GALLERY' }
+    : { href: '/register', label: 'Register Athlete', mobileLabel: 'REGISTER ATHLETE NOW' };
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
@@ -118,7 +150,7 @@ export default function ScrubberNavbar() {
 
             {/* Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center space-x-2">
-              {navItems.map((item, itemIdx) => {
+              {menu.map((item, itemIdx) => {
                 if (!item.isDropdown) {
                   const isActive = pathname === item.href;
                   return (
@@ -208,10 +240,10 @@ export default function ScrubberNavbar() {
             <div className="flex items-center gap-2 md:gap-4">
               {/* Registration CTA button on desktop */}
               <Link 
-                href="/register"
+                href={cta.href}
                 className="hidden sm:inline-flex items-center justify-center bg-wff-red text-white text-[10px] font-bold uppercase tracking-widest px-6 py-2.5 rounded-full hover:bg-white hover:text-black transition-all shadow-md hover:scale-105 active:scale-95 duration-200"
               >
-                Register Athlete
+                {cta.label}
               </Link>
 
               <ThemeToggle className="p-2.5 text-fg/80 hover:text-fg transition-colors bg-fg/5 hover:bg-fg/10 border border-fg/5 rounded-full" />
@@ -252,7 +284,7 @@ export default function ScrubberNavbar() {
         <div className="h-full flex flex-col pt-28 pb-10 px-6 overflow-y-auto">
           {/* Menu Sections (Accordions) */}
           <div className="flex-grow space-y-4">
-            {navItems.map((item, itemIdx) => {
+            {menu.map((item, itemIdx) => {
               if (!item.isDropdown) {
                 const isActive = pathname === item.href;
                 return (
@@ -325,10 +357,10 @@ export default function ScrubberNavbar() {
           {/* Quick Contact & Register Options */}
           <div className="mt-8 space-y-4">
             <Link 
-              href="/register"
+              href={cta.href}
               className="flex items-center justify-center w-full bg-wff-red hover:bg-white text-white hover:text-black py-4 rounded-xl font-bebas text-2xl tracking-widest transition-colors shadow-lg"
             >
-              REGISTER ATHLETE NOW
+              {cta.mobileLabel}
             </Link>
             <div className="text-center font-sans text-xs text-fg/40">
               World Fitness Federation Ghana © 2026

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import HomeClient, { type HomeClientProps } from './HomeClient';
 import { createServerSupabase } from '@/lib/supabase/server';
+import { isEventOver } from '@/lib/eventPhase';
 import { fetchActiveEvent } from '@/lib/activeEvent';
 import { fetchPublicHomeContent } from '@/lib/homeContent';
 import { fetchGalleryMedia } from '@/lib/galleryMedia';
@@ -79,6 +80,7 @@ export default async function HomePage() {
         description: p.description,
       })) ?? [],
     eventData,
+    eventOver: isEventOver(eventData),
     content,
     galleryPhotos,
     vendors:

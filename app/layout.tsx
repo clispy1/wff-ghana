@@ -3,6 +3,9 @@ import { Teko, DM_Sans, Geist, Bungee } from 'next/font/google';
 import SmoothScrolling from '@/components/SmoothScrolling';
 import { CartProvider } from '@/lib/CartContext';
 import SiteChrome from '@/components/SiteChrome';
+import { createServerSupabase } from '@/lib/supabase/server';
+import { fetchActiveEvent } from '@/lib/activeEvent';
+import { isEventOver } from '@/lib/eventPhase';
 import { THEME_INIT_SCRIPT } from '@/components/ThemeToggle';
 import './globals.css'; // Global styles
 import { cn } from "@/lib/utils";
@@ -33,7 +36,10 @@ export const metadata: Metadata = {
   description: 'Official digital home for the World Fitness Federation (WFF) Ghana. Host of the 2026 All Africa Championship.',
 };
 
-export default function RootLayout({children}: {children: React.ReactNode}) {
+export default async function RootLayout({children}: {children: React.ReactNode}) {
+  // The navbar swaps its event calls to action once the event is over.
+  const eventOver = isEventOver(await fetchActiveEvent(await createServerSupabase()));
+
   return (
     <html lang="en" className={cn(teko.variable, display.variable, dmSans.variable, "font-sans", geist.variable)} suppressHydrationWarning>
       <head>
@@ -43,7 +49,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
       <body className="text-fg font-sans antialiased overflow-x-hidden selection:bg-wff-red selection:text-white" suppressHydrationWarning>
         <CartProvider>
           <SmoothScrolling>
-            <SiteChrome>{children}</SiteChrome>
+            <SiteChrome eventOver={eventOver}>{children}</SiteChrome>
           </SmoothScrolling>
         </CartProvider>
         <Analytics/>

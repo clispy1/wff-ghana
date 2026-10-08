@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase-admin';
 import { buildReference, initializeTransaction, siteUrl } from '@/lib/paystack';
+import { fetchActiveEvent } from '@/lib/activeEvent';
+import { isEventOver } from '@/lib/eventPhase';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -36,6 +38,11 @@ export async function POST(request: Request) {
 
     const qty = Math.max(1, Math.min(20, Math.floor(Number(quantity) || 1)));
     const admin = createSupabaseAdminClient();
+
+    // Nobody should be able to pay for an event that has already happened.
+    if (isEventOver(await fetchActiveEvent(admin))) {
+      return NextResponse.json({ error: 'Ticket sales have closed: the event has ended.' }, { status: 400 });
+    }
 
     const { data: tier, error: tierError } = await admin
       .from('ticket_tiers')
