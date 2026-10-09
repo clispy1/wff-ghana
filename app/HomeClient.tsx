@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Hero from '@/components/Hero';
 import WorldChampionships from '@/components/WorldChampionships';
+import { EventFilmSection } from '@/components/home/EventFilmSection';
 import { SponsorsMarquee, type Sponsor } from '@/components/home/SponsorsMarquee';
 import { FederationSection } from '@/components/home/FederationSection';
 import { JourneySection } from '@/components/home/JourneySection';
@@ -108,6 +109,9 @@ export default function HomeClient({
 
       {/* 1. Hero Module — always shown */}
       <Hero event={eventData} over={eventOver} />
+
+      {/* 1.5 Event film (placeholder until a video is set in the admin) */}
+      {enabledSections.eventFilm && <EventFilmSection film={content.eventFilm} />}
 
       {/* 2. Authentic Partners / Sponsors Strip (Moving Marquee) */}
       {enabledSections.sponsorsMarquee && <SponsorsMarquee sponsors={sponsors} />}

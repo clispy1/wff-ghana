@@ -14,6 +14,7 @@ import { supabase } from './supabase';
  */
 
 export interface HomeSectionVisibility {
+  eventFilm: boolean;
   sponsorsMarquee: boolean;
   federation: boolean;
   journey: boolean;
@@ -33,6 +34,7 @@ export interface HomeSectionVisibility {
 export const HOME_SECTION_KEY = 'home_sections_visibility';
 
 export const HOME_SECTION_DEFAULTS: HomeSectionVisibility = {
+  eventFilm: true,
   sponsorsMarquee: true,
   federation: true,
   journey: true,
@@ -53,6 +55,10 @@ export const HOME_SECTION_META: Record<
   keyof HomeSectionVisibility,
   { label: string; hint: string }
 > = {
+  eventFilm: {
+    label: 'Event Film',
+    hint: 'The event video directly below the hero (placeholder until a video is set).',
+  },
   sponsorsMarquee: {
     label: 'Sponsors Marquee',
     hint: 'Animated partner strip directly below the hero.',

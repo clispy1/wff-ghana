@@ -36,7 +36,7 @@ import {
 // Every collapsible card on this page, in the order they're rendered —
 // used to drive "expand all / collapse all" and each card's own toggle.
 const SECTION_IDS = [
-  "sectionVisibility", "president", "journey", "championship", "ambassadors",
+  "sectionVisibility", "eventFilm", "president", "journey", "championship", "ambassadors",
   "wellness", "armory", "gallery", "news", "partnerships", "becomeVendor", "contactCta",
 ] as const;
 type SectionId = (typeof SECTION_IDS)[number];
@@ -225,6 +225,46 @@ export default function AdminHomepagePage() {
             </div>
           ))}
         </div>
+      </SectionCard>
+
+      {/* Event film under the hero */}
+      <GroupHeading>Event Film</GroupHeading>
+      <SectionCard
+        title="EVENT FILM"
+        hint="The video directly under the hero. Leave the video empty to show a &quot;coming soon&quot; placeholder."
+        saving={savingKey === "eventFilm"}
+        saved={savedKey === "eventFilm"}
+        onSave={() => save("eventFilm")}
+        collapsible
+        open={isOpen("eventFilm")}
+        onOpenChange={(v) => setSectionOpen("eventFilm", v)}
+      >
+        <Field
+          label="Supertitle"
+          value={content.eventFilm.supertitle}
+          onChange={(e) => update("eventFilm", { ...content.eventFilm, supertitle: e.target.value })}
+        />
+        <Field
+          label="Title"
+          value={content.eventFilm.title}
+          onChange={(e) => update("eventFilm", { ...content.eventFilm, title: e.target.value })}
+        />
+        <TextAreaField
+          label="Description"
+          value={content.eventFilm.description}
+          onChange={(v) => update("eventFilm", { ...content.eventFilm, description: v })}
+          rows={2}
+        />
+        <VideoPicker
+          value={content.eventFilm.videoUrl}
+          onChange={(url) => update("eventFilm", { ...content.eventFilm, videoUrl: url })}
+        />
+        <ImagePicker
+          label="Cover Image (optional — shown before the video plays)"
+          folder="homepage/event-film"
+          value={content.eventFilm.posterUrl}
+          onChange={(url) => update("eventFilm", { ...content.eventFilm, posterUrl: url })}
+        />
       </SectionCard>
 
       {/* Federation / President */}
@@ -919,6 +959,64 @@ function ImagePicker({
           {error && <p className="text-wff-red text-[11px]">{error}</p>}
         </div>
       </div>
+    </div>
+  );
+}
+
+// Supabase's free plan rejects uploads over 50MB; most event films are
+// bigger, which is why a YouTube link is the recommended route.
+const VIDEO_UPLOAD_LIMIT_MB = 50;
+
+function VideoPicker({ value, onChange }: { value: string; onChange: (url: string) => void }) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFile = async (file: File) => {
+    setError(null);
+    if (file.size > VIDEO_UPLOAD_LIMIT_MB * 1024 * 1024) {
+      setError(
+        `That file is ${Math.round(file.size / 1024 / 1024)}MB; uploads are limited to ${VIDEO_UPLOAD_LIMIT_MB}MB. Upload it to YouTube and paste the link instead.`,
+      );
+      return;
+    }
+    setUploading(true);
+    try {
+      onChange(await uploadPublicMedia("homepage/event-film", file));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-white/50 text-xs">Video</Label>
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Paste a YouTube link (recommended), e.g. https://youtu.be/…"
+        className={inputClass}
+      />
+      <input
+        type="file"
+        accept="video/mp4,video/webm,video/quicktime"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFile(file);
+        }}
+        className="block w-full text-xs text-white/60 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-white/10 file:text-white file:font-sans file:text-xs hover:file:bg-wff-red cursor-pointer"
+      />
+      <p className="text-white/30 text-[11px]">
+        …or upload a video file (MP4, up to {VIDEO_UPLOAD_LIMIT_MB}MB). YouTube plays faster on phones and has no size limit.
+      </p>
+      {value && (
+        <button type="button" onClick={() => onChange("")} className="text-[11px] text-wff-red hover:underline">
+          Remove video (show the placeholder)
+        </button>
+      )}
+      {uploading && <p className="text-white/30 text-[11px]">Uploading video… keep this tab open.</p>}
+      {error && <p className="text-wff-red text-[11px]">{error}</p>}
     </div>
   );
 }

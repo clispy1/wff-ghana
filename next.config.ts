@@ -24,6 +24,13 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
+        // YouTube thumbnails for the homepage event film.
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
+        port: '',
+        pathname: '/vi/**',
+      },
+      {
         protocol: 'https',
         hostname: '*.supabase.co',
         port: '',

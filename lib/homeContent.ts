@@ -71,6 +71,8 @@ export interface HomeContent {
     cta: { text: string };
   };
   contactCta: { title: string; passesBtn: { text: string }; contactBtn: { text: string } };
+  /** Event film under the hero: a YouTube link or an uploaded video file. Empty videoUrl shows a "coming soon" placeholder. */
+  eventFilm: { supertitle: string; title: string; description: string; videoUrl: string; posterUrl: string };
 }
 
 /**
@@ -223,6 +225,13 @@ export const HOME_CONTENT_DEFAULTS: HomeContent = {
     passesBtn: { text: 'REGISTER TO COMPETE' },
     contactBtn: { text: 'CONTACT OFFICIALS' },
   },
+  eventFilm: {
+    supertitle: 'Official Event Film',
+    title: 'Relive the Championship',
+    description: 'Three days of Africa\'s best physiques on one stage in Accra.',
+    videoUrl: '',
+    posterUrl: '',
+  },
 };
 
 /** site_content.key -> HomeContent section, both directions. */
@@ -238,6 +247,7 @@ export const HOME_CONTENT_KEYS: Record<keyof HomeContent, string> = {
   partnerships: 'home_partnerships',
   becomeVendor: 'home_become_vendor',
   contactCta: 'home_contact_cta',
+  eventFilm: 'home_event_film',
 };
 
 /**
