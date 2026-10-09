@@ -335,7 +335,8 @@ export default function ChampionshipClient({
 
         )}
 
-        {/* Detailed Running Order & Timetable */}
+        {/* Detailed Running Order & Timetable (pre-event only) */}
+        {!eventOver && (
         <div
           id="schedule"
           className="bg-raised/80 backdrop-blur-md border border-fg/10 rounded-2xl p-8 md:p-12 mb-16"
@@ -402,6 +403,7 @@ export default function ChampionshipClient({
           </div>
           )}
         </div>
+        )}
 
         {/* Airport Transfers, Visa Guidance, Accommodations (pre-event only) */}
         {eventOver ? null : !logistics ? (

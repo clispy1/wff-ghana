@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="bg-page pt-20 pb-10 border-t border-fg/10">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
           
           <div className="md:col-span-2">
             <Link href="/" className="inline-block mb-6">
@@ -20,21 +20,11 @@ export default function Footer() {
           <div>
             <h4 className="font-bebas text-2xl mb-6">Quick Links</h4>
             <ul className="space-y-3 font-sans text-sm text-fg/60">
-              <li><Link href="#about" className="hover:text-wff-red transition-colors">About Us</Link></li>
-              <li><Link href="#cameroon-2026" className="hover:text-wff-red transition-colors">Cameroon 2026</Link></li>
-              <li><Link href="#events" className="hover:text-wff-red transition-colors">Events Calendar</Link></li>
-              <li><Link href="#athletes" className="hover:text-wff-red transition-colors">Team Roster</Link></li>
-              <li><Link href="#news" className="hover:text-wff-red transition-colors">Latest News</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-bebas text-2xl mb-6">Legal</h4>
-            <ul className="space-y-3 font-sans text-sm text-fg/60">
-              <li><a href="#" className="hover:text-wff-red transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-wff-red transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-wff-red transition-colors">Competition Rules</a></li>
-              <li><a href="#" className="hover:text-wff-red transition-colors">Anti-Doping Policy</a></li>
+              <li><Link href="/federation" className="hover:text-wff-red transition-colors">The Federation</Link></li>
+              <li><Link href="/championship" className="hover:text-wff-red transition-colors">All Africa Championship</Link></li>
+              <li><Link href="/media" className="hover:text-wff-red transition-colors">Gallery</Link></li>
+              <li><Link href="/shop" className="hover:text-wff-red transition-colors">Official Shop</Link></li>
+              <li><Link href="/contact" className="hover:text-wff-red transition-colors">Contact</Link></li>
             </ul>
           </div>
 

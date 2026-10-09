@@ -85,7 +85,7 @@ function VendorCard({ vendor }: { vendor: Vendor }) {
   );
 }
 
-export default function VendorsClient({ vendors }: { vendors: Vendor[] }) {
+export default function VendorsClient({ vendors, eventOver = false }: { vendors: Vendor[]; eventOver?: boolean }) {
   const vendorsByCategory = (key: string) =>
     vendors.filter((v) => v.category === key);
   const hasVendors = vendors.length > 0;
@@ -100,21 +100,24 @@ export default function VendorsClient({ vendors }: { vendors: Vendor[] }) {
           EVENT <span className="text-gold-ink">VENDORS</span>
         </h1>
         <p className="font-sans text-sm text-fg/50 max-w-xl mx-auto mt-6">
-          The food, merch and services fuelling the championship weekend in
-          Accra. More vendors will be added as we get closer to October 2–4, 2026.
+          {eventOver
+            ? 'The food, merch and services that fuelled the championship weekend in Accra. Thank you to every vendor who was part of it.'
+            : 'The food, merch and services fuelling the championship weekend in Accra. More vendors will be added as we get closer to the event.'}
         </p>
 
+        {!eventOver && (
         <Link
           href="/championship/vendors/apply"
           className="inline-flex items-center gap-2 bg-wff-red text-white font-bebas text-xl px-8 py-3 mt-8 hover:bg-white hover:text-wff-red transition-colors"
         >
           BECOME A VENDOR <ArrowRight className="h-5 w-5" />
         </Link>
+        )}
       </div>
 
       {!hasVendors ? (
         <p className="text-center text-fg/40 font-sans text-sm py-24 max-w-md mx-auto">
-          The vendor lineup is coming soon. Check back closer to the event.
+          {eventOver ? 'No vendors were listed for this event.' : 'The vendor lineup is coming soon. Check back closer to the event.'}
         </p>
       ) : (
         <div className="space-y-14">

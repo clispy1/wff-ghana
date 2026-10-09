@@ -22,7 +22,7 @@ interface NavItem {
 }
 
 // Links that only make sense before the event: hidden once it's over.
-const PRE_EVENT_ONLY = ['/championship#tickets', '/championship#logistics', '/register'];
+const PRE_EVENT_ONLY = ['/championship#tickets', '/championship#schedule', '/championship#logistics', '/register'];
 
 /** Post-event menu: no tickets, travel or registration links. */
 function postEventNav(items: NavItem[]): NavItem[] {
