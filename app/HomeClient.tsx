@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Hero from '@/components/Hero';
 import WorldChampionships from '@/components/WorldChampionships';
+import { EventFilmSection } from '@/components/home/EventFilmSection';
 import { SponsorsMarquee, type Sponsor } from '@/components/home/SponsorsMarquee';
 import { FederationSection } from '@/components/home/FederationSection';
 import { JourneySection } from '@/components/home/JourneySection';
@@ -37,6 +38,8 @@ export interface HomeClientProps {
     description: string;
   }[];
   eventData: WffEvent | null;
+  /** Active event has finished: post-event calls to action. */
+  eventOver: boolean;
   content: Partial<HomeContent>;
   galleryPhotos: GalleryPhoto[];
   vendors: { id: string; name: string; category: string }[];
@@ -48,6 +51,7 @@ export default function HomeClient({
   news,
   products,
   eventData,
+  eventOver,
   content,
   galleryPhotos,
   vendors,
@@ -104,7 +108,10 @@ export default function HomeClient({
     <main ref={containerRef} className="relative bg-page min-h-screen overflow-hidden">
 
       {/* 1. Hero Module — always shown */}
-      <Hero event={eventData} />
+      <Hero event={eventData} over={eventOver} />
+
+      {/* 1.5 Event film (placeholder until a video is set in the admin) */}
+      {enabledSections.eventFilm && <EventFilmSection film={content.eventFilm} />}
 
       {/* 2. Authentic Partners / Sponsors Strip (Moving Marquee) */}
       {enabledSections.sponsorsMarquee && <SponsorsMarquee sponsors={sponsors} />}
@@ -117,7 +124,7 @@ export default function HomeClient({
 
       {/* 5. Natural Championship Details Panel */}
       {enabledSections.championship && (
-        <ChampionshipSection eventData={eventData} championship={championship} />
+        <ChampionshipSection eventData={eventData} championship={championship} over={eventOver} />
       )}
 
       {/* 5.5 Continental Rulebook (World Championships Component) */}

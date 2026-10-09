@@ -16,7 +16,13 @@ const NO_FOOTER = ["/register"];
  * app/admin/(dashboard)/layout.tsx) and shouldn't show the public site
  * frame around it, or on the login screen either.
  */
-export default function SiteChrome({ children }: { children: React.ReactNode }) {
+export default function SiteChrome({
+  children,
+  eventOver = false,
+}: {
+  children: React.ReactNode;
+  eventOver?: boolean;
+}) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
   const hideFooter = NO_FOOTER.includes(pathname ?? "");
@@ -27,7 +33,7 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
 
   return (
     <>
-      <ScrubberNavbar />
+      <ScrubberNavbar eventOver={eventOver} />
       <CartDrawer />
       {children}
       {!hideFooter && <Footer />}

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import ChampionshipClient, { type ChampionshipClientProps } from './ChampionshipClient';
 import { createServerSupabase } from '@/lib/supabase/server';
 import { fetchActiveEvent } from '@/lib/activeEvent';
+import { isEventOver } from '@/lib/eventPhase';
 import { fetchPublicEventPageContent } from '@/lib/eventContent';
 
 export const metadata: Metadata = {
@@ -40,6 +41,7 @@ export default async function ChampionshipPage() {
         labelColor: h.label_color,
       })) ?? [],
     championshipEvent,
+    eventOver: isEventOver(championshipEvent),
     pageContent,
   };
 

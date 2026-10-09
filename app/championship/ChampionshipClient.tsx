@@ -47,6 +47,8 @@ export interface ChampionshipClientProps {
     labelColor: string;
   }[];
   championshipEvent: WffEvent | null;
+  /** Event has finished: no ticket sales or travel info, gallery instead. */
+  eventOver?: boolean;
   pageContent: Partial<EventPageContent>;
 }
 
@@ -74,6 +76,7 @@ export default function ChampionshipClient({
   tickets: TICKETS,
   hotels: HOTELS,
   championshipEvent,
+  eventOver = false,
   pageContent,
 }: ChampionshipClientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -143,7 +146,7 @@ export default function ChampionshipClient({
         <div ref={headerRef} className="max-w-4xl mx-auto text-center mb-16">
           <p className="font-sans text-gold-ink font-bold uppercase tracking-[0.3em] mb-4">
             {championshipEvent?.start_date
-              ? `${new Date(championshipEvent.start_date).getFullYear()} Continental Summit`
+              ? `${new Date(championshipEvent.start_date).getFullYear()} Continental Summit${eventOver ? " · Concluded" : ""}`
               : "Continental Summit"}
           </p>
           <h1 className="font-bebas text-6xl md:text-8xl mb-6">
@@ -172,8 +175,8 @@ export default function ChampionshipClient({
             },
             {
               icon: <Ticket className="text-fg" size={24} />,
-              title: TICKETS.length > 0 ? "Pre-Sale Live" : "Tickets Coming Soon",
-              subtitle: TICKETS.length > 0 ? "Exquisite Seating Plans" : "Check back soon",
+              title: eventOver ? "Event Concluded" : TICKETS.length > 0 ? "Pre-Sale Live" : "Tickets Coming Soon",
+              subtitle: eventOver ? "Thank you for attending" : TICKETS.length > 0 ? "Exquisite Seating Plans" : "Check back soon",
             },
             {
               icon: <Award className="text-gold-ink" size={24} />,
@@ -187,10 +190,12 @@ export default function ChampionshipClient({
             },
             {
               icon: <ClipboardCheck className="text-gold-ink" size={24} />,
-              title: registrationOpen ? "Registration Open" : "Registration Closed",
-              subtitle: championshipEvent?.registration_deadline
-                ? `Closes ${formatEventDate(championshipEvent.registration_deadline)}`
-                : "Details to follow",
+              title: registrationOpen && !eventOver ? "Registration Open" : "Registration Closed",
+              subtitle: eventOver
+                ? "See you at the next championship"
+                : championshipEvent?.registration_deadline
+                  ? `Closes ${formatEventDate(championshipEvent.registration_deadline)}`
+                  : "Details to follow",
             },
           ].map((item, idx) => (
             <div
@@ -221,7 +226,26 @@ export default function ChampionshipClient({
           </div>
         )}
 
+        {eventOver && (
+          <div className="bg-raised/80 border border-wff-gold/30 rounded-2xl p-8 md:p-12 mb-16 text-center">
+            <h2 className="font-bebas text-4xl md:text-6xl mb-4 text-fg">
+              THAT&apos;S A <span className="text-wff-red">WRAP</span>
+            </h2>
+            <p className="font-sans text-sm md:text-base text-fg/60 max-w-xl mx-auto mb-8 leading-relaxed">
+              Thank you to every athlete, fan, official and sponsor who made the championship
+              unforgettable. Relive the moments from the stage.
+            </p>
+            <Link
+              href="/media"
+              className="inline-block bg-wff-red text-white font-bebas text-xl tracking-wider px-9 py-3 rounded-xl hover:bg-white hover:text-wff-red transition-colors"
+            >
+              View the Gallery
+            </Link>
+          </div>
+        )}
+
         {/* Tickets Section */}
+        {!eventOver && (
         <div
           id="tickets"
           className="bg-raised/80 backdrop-blur-md border border-fg/10 rounded-2xl p-8 md:p-12 mb-16 relative overflow-hidden"
@@ -309,7 +333,10 @@ export default function ChampionshipClient({
           </div>
         </div>
 
-        {/* Detailed Running Order & Timetable */}
+        )}
+
+        {/* Detailed Running Order & Timetable (pre-event only) */}
+        {!eventOver && (
         <div
           id="schedule"
           className="bg-raised/80 backdrop-blur-md border border-fg/10 rounded-2xl p-8 md:p-12 mb-16"
@@ -376,9 +403,10 @@ export default function ChampionshipClient({
           </div>
           )}
         </div>
+        )}
 
-        {/* Airport Transfers, Visa Guidance, Accommodations */}
-        {!logistics ? (
+        {/* Airport Transfers, Visa Guidance, Accommodations (pre-event only) */}
+        {eventOver ? null : !logistics ? (
           <div id="logistics" className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
             <div className="bg-raised/80 border border-fg/10 p-8 rounded-2xl space-y-4">
               <Skeleton className="h-5 w-40 bg-fg/10" />

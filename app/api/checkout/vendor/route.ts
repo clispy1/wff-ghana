@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase-admin';
 import { buildReference, initializeTransaction, siteUrl } from '@/lib/paystack';
+import { fetchActiveEvent } from '@/lib/activeEvent';
+import { isEventOver } from '@/lib/eventPhase';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,6 +24,10 @@ export async function POST(request: Request) {
     }
 
     const admin = createSupabaseAdminClient();
+
+    if (isEventOver(await fetchActiveEvent(admin))) {
+      return NextResponse.json({ error: 'Vendor applications have closed: the event has ended.' }, { status: 400 });
+    }
 
     const { data: vendor, error } = await admin
       .from('vendors')
